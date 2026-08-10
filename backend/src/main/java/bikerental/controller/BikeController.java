@@ -66,6 +66,9 @@ public class BikeController {
         if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only image uploads are allowed");
         }
+        if (file.getSize() > 5L * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image must be 5 MB or smaller");
+        }
 
         String originalName = file.getOriginalFilename() == null ? "image" : file.getOriginalFilename();
         String safeName = originalName.replaceAll("[^a-zA-Z0-9._-]", "_");

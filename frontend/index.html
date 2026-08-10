@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
     <title>Bike Rental Admin</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,37 +14,103 @@
     }
 </script>
 
-<div class="container">
-    <div class="header">
+<div class="admin-shell">
+    <header class="admin-header">
         <div>
-            <h1>🚀 Bike Rental Admin</h1>
-            <p class="subtext">Manage vehicles, availability and customer bookings.</p>
+            <a class="brand" href="index.html">Bike<span>Rental</span> <small>Admin</small></a>
+            <p>Manage vehicles, availability and customer bookings.</p>
         </div>
-        <button onclick="toggleBookingPanel()" class="booking-btn">📦 Bookings</button>
-    </div>
+        <div class="header-actions">
+            <a class="ghost-link" href="user.html" target="_blank" rel="noopener">View Customer Site ↗</a>
+            <button type="button" onclick="toggleBookingPanel()" class="booking-btn">Bookings <span id="pendingBookingBadge" class="count-badge" hidden>0</span></button>
+            <button type="button" onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+    </header>
 
-    <div class="card">
-        <h2 id="formTitle">Add Bike</h2>
-        <div class="form-row">
-            <input type="text" id="name" placeholder="Bike Name">
-            <input type="text" id="type" placeholder="Type (Bike / Scooty)">
-            <input type="number" id="price" min="1" step="0.01" placeholder="Price per day">
-            <input type="file" id="image" accept="image/*">
-        </div>
-        <div class="form-actions">
-            <button onclick="addBike()" class="add-btn" id="saveBikeButton">Save Bike</button>
-            <button onclick="cancelEdit()" class="secondary-btn" id="cancelEditButton" hidden>Cancel Edit</button>
-        </div>
-    </div>
+    <section class="stats-grid" aria-label="Overview">
+        <article class="stat-card"><span>Total Vehicles</span><strong id="totalBikeCount">—</strong></article>
+        <article class="stat-card"><span>Available</span><strong id="availableBikeCount" class="green-text">—</strong></article>
+        <article class="stat-card"><span>Unavailable</span><strong id="unavailableBikeCount" class="red-text">—</strong></article>
+        <article class="stat-card"><span>Pending Bookings</span><strong id="pendingBookingCount" class="amber-text">—</strong></article>
+    </section>
 
-    <div class="card">
-        <h2>Bike List</h2>
+    <section class="panel-card form-panel">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">VEHICLE MANAGEMENT</p>
+                <h2 id="formTitle">Add Bike</h2>
+            </div>
+            <button type="button" onclick="cancelEdit()" class="secondary-btn compact-btn" id="cancelEditButton" hidden>Cancel Edit</button>
+        </div>
+
+        <form id="bikeForm" novalidate>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">Vehicle Name</label>
+                    <input type="text" id="name" minlength="2" maxlength="80" placeholder="e.g. Yamaha R15 V4" aria-describedby="nameError" required>
+                    <small id="nameError" class="field-error" aria-live="polite"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="type">Vehicle Type</label>
+                    <input type="text" id="type" maxlength="30" list="vehicleTypes" placeholder="Bike / Scooty / Bullet" aria-describedby="typeError" required>
+                    <datalist id="vehicleTypes">
+                        <option value="Bike"></option>
+                        <option value="Scooty"></option>
+                        <option value="Bullet"></option>
+                    </datalist>
+                    <small id="typeError" class="field-error" aria-live="polite"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Price Per Day (₹)</label>
+                    <input type="number" id="price" min="1" max="1000000" step="0.01" placeholder="e.g. 1500" aria-describedby="priceError" required>
+                    <small id="priceError" class="field-error" aria-live="polite"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Vehicle Image <span class="optional-text">optional while editing</span></label>
+                    <input type="file" id="image" accept="image/png,image/jpeg,image/webp,image/gif" aria-describedby="imageHelp imageError">
+                    <small id="imageHelp" class="field-help">JPG, PNG, WEBP or GIF • max 5 MB</small>
+                    <small id="imageError" class="field-error" aria-live="polite"></small>
+                </div>
+            </div>
+
+            <div id="imagePreviewWrap" class="image-preview-wrap" hidden>
+                <img id="imagePreview" alt="Selected vehicle preview">
+                <span id="imagePreviewText"></span>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="primary-btn" id="saveBikeButton">Save Bike</button>
+                <button type="button" onclick="resetBikeForm()" class="secondary-btn">Clear Form</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="panel-card">
+        <div class="section-head table-heading">
+            <div>
+                <p class="eyebrow">FLEET</p>
+                <h2>Bike List</h2>
+            </div>
+            <div class="table-tools">
+                <input id="bikeSearch" type="search" placeholder="Search vehicle…" aria-label="Search vehicles">
+                <select id="availabilityFilter" aria-label="Filter by availability">
+                    <option value="ALL">All Status</option>
+                    <option value="AVAILABLE">Available</option>
+                    <option value="UNAVAILABLE">Unavailable</option>
+                </select>
+                <button id="refreshAdminButton" type="button" class="secondary-btn compact-btn" onclick="refreshAdminData()">↻ Refresh</button>
+            </div>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
+                        <th>Vehicle</th>
                         <th>Type</th>
                         <th>Price/Day</th>
                         <th>Status</th>
@@ -54,36 +121,52 @@
                 <tbody id="bikeTable"></tbody>
             </table>
         </div>
-    </div>
+    </section>
+</div>
 
-    <div id="bookingPanel" class="booking-panel">
-        <button onclick="toggleBookingPanel()" class="close-btn">×</button>
-        <h2>📦 Bookings</h2>
-        <button onclick="clearBookings()" class="clear-btn">🧹 Clear All Bookings</button>
-        <div class="booking-table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Phone</th>
-                        <th>Bike</th>
-                        <th>Pickup</th>
-                        <th>Days</th>
-                        <th>Total</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="bookingTable"></tbody>
-            </table>
+<div id="panelBackdrop" class="panel-backdrop" onclick="toggleBookingPanel(false)"></div>
+<aside id="bookingPanel" class="booking-panel" aria-hidden="true" aria-labelledby="bookingPanelTitle">
+    <div class="booking-panel-head">
+        <div>
+            <p class="eyebrow">CUSTOMER REQUESTS</p>
+            <h2 id="bookingPanelTitle">Bookings</h2>
         </div>
+        <button type="button" onclick="toggleBookingPanel(false)" class="close-btn" aria-label="Close bookings panel">×</button>
     </div>
-</div>
 
-<div class="logout-container">
-    <button onclick="logout()" class="logout-btn">Logout</button>
-</div>
+    <div class="booking-toolbar">
+        <input id="bookingSearch" type="search" placeholder="Search ID, customer, phone or bike…" aria-label="Search bookings">
+        <select id="bookingStatusFilter" aria-label="Filter booking status">
+            <option value="ALL">All Status</option>
+            <option value="PENDING">Pending</option>
+            <option value="APPROVED">Approved</option>
+            <option value="COMPLETED">Completed</option>
+            <option value="REJECTED">Rejected</option>
+        </select>
+        <button type="button" onclick="clearBookings()" class="danger-outline-btn">Clear All</button>
+    </div>
+
+    <div class="booking-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Bike</th>
+                    <th>Pickup</th>
+                    <th>Days</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="bookingTable"></tbody>
+        </table>
+    </div>
+</aside>
+
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
 <script src="config.js"></script>
 <script src="script.js"></script>

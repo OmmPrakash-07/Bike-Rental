@@ -3,19 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
     <title>Bike Rental Admin Login</title>
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
-<div class="login-container">
-    <div class="login-card">
-        <h2>🔐 Admin Login</h2>
-        <input type="text" id="username" placeholder="Username" autocomplete="username">
-        <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-        <button onclick="login()">Login</button>
-        <p class="hint">Local demo default: admin / 1234</p>
-    </div>
-</div>
+<main class="login-page">
+    <section class="login-card" aria-labelledby="loginTitle">
+        <a class="brand" href="user.html">Bike<span>Rental</span></a>
+        <p class="eyebrow">ADMIN ACCESS</p>
+        <h1 id="loginTitle">Welcome back</h1>
+        <p class="login-copy">Sign in to manage vehicles and booking requests.</p>
+
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" maxlength="80" placeholder="Enter username" autocomplete="username" aria-describedby="usernameError" required>
+                <small id="usernameError" class="field-error" aria-live="polite"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrap">
+                    <input type="password" id="password" maxlength="120" placeholder="Enter password" autocomplete="current-password" aria-describedby="passwordError" required>
+                    <button id="togglePasswordButton" class="show-password-btn" type="button" aria-label="Show password">Show</button>
+                </div>
+                <small id="passwordError" class="field-error" aria-live="polite"></small>
+            </div>
+
+            <div id="loginError" class="login-error" hidden aria-live="polite"></div>
+            <button id="loginButton" class="login-btn" type="submit">Sign In</button>
+        </form>
+
+        <a class="back-link" href="user.html">← Back to customer site</a>
+    </section>
+</main>
+
 <script src="config.js"></script>
 <script src="login.js"></script>
 </body>

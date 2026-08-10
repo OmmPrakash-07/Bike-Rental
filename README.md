@@ -40,6 +40,11 @@ The frontend and backend stay in one GitHub repository. When deploying the backe
 - Added customer Booking ID status lookup.
 - Removed the old UI claim about ₹50 online payment because payment is not implemented yet.
 - Frontend API URL now lives in one file: `frontend/config.js`.
+- Polished the customer, admin, and login UI with a consistent responsive dark theme.
+- Added customer-side inline validation for name, 10-digit phone, pickup date, duration, and Booking ID lookup.
+- Added admin-side inline validation for vehicle name/type/price and 5 MB image upload limits.
+- Added image preview, vehicle/booking search and filters, dashboard counters, loading states, toast feedback, and safer confirmation prompts.
+- Added matching backend validation for vehicle field lengths/price range, customer name length, positive bike IDs, and upload size.
 
 ## Run locally
 

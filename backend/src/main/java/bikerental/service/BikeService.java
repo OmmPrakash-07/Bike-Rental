@@ -38,6 +38,8 @@ public class BikeService {
     public Bike addBike(Bike bike) {
         validateBike(bike);
         bike.setId(null);
+        bike.setName(bike.getName().trim());
+        bike.setType(bike.getType().trim());
         bike.setAvailable(true);
         return bikeRepository.save(bike);
     }
@@ -111,11 +113,27 @@ public class BikeService {
         if (bike == null || bike.getName() == null || bike.getName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bike name is required");
         }
+        String name = bike.getName().trim();
+        if (name.length() < 2 || name.length() > 80) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Bike name must be between 2 and 80 characters");
+        }
+
         if (bike.getType() == null || bike.getType().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bike type is required");
         }
-        if (bike.getPricePerDay() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price per day must be greater than 0");
+        if (bike.getType().trim().length() > 30) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Bike type must be 30 characters or fewer");
+        }
+
+        if (!Double.isFinite(bike.getPricePerDay()) || bike.getPricePerDay() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Price per day must be greater than 0");
+        }
+        if (bike.getPricePerDay() > 1_000_000) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Price per day must not exceed 1000000");
         }
     }
 }

@@ -169,6 +169,11 @@ public class BookingService {
         if (request.getCustomerName() == null || request.getCustomerName().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer name is required");
         }
+        String customerName = request.getCustomerName().trim();
+        if (customerName.length() < 2 || customerName.length() > 80) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Customer name must be between 2 and 80 characters");
+        }
         if (request.getPhone() == null || !request.getPhone().trim().matches("^[0-9]{10}$")) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter a valid 10-digit phone number");
         }
@@ -186,6 +191,9 @@ public class BookingService {
         if (request.getDurationDays() == null || request.getDurationDays() < 1 || request.getDurationDays() > 30) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Duration must be between 1 and 30 days");
+        }
+        if (request.getBikeId() != null && request.getBikeId() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bikeId must be a positive number");
         }
     }
 }
