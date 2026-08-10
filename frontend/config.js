@@ -1,5 +1,7 @@
-// Change only this value when your backend is deployed.
-// Example: https://your-backend.up.railway.app
+// Backend API configuration
+
 window.BIKE_RENTAL_CONFIG = {
-    API_BASE_URL: localStorage.getItem("bikeRentalApiBaseUrl") || "http://localhost:8080"
+  API_BASE_URL:
+    localStorage.getItem("bikeRentalApiBaseUrl") ||
+    "https://bike-rental-production-6e17.up.railway.app"
 };
