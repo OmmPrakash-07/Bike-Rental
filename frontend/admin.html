@@ -9,7 +9,7 @@
 </head>
 <body>
 <script>
-    if (localStorage.getItem("isLoggedIn") !== "true") {
+    if (!localStorage.getItem("bikeRentalAdminToken")) {
         window.location.href = "login.html";
     }
 </script>
@@ -17,11 +17,11 @@
 <div class="admin-shell">
     <header class="admin-header">
         <div>
-            <a class="brand" href="index.html">Bike<span>Rental</span> <small>Admin</small></a>
+            <a class="brand" href="admin.html">Bike<span>Rental</span> <small>Admin</small></a>
             <p>Manage vehicles, availability and customer bookings.</p>
         </div>
         <div class="header-actions">
-            <a class="ghost-link" href="./" target="_blank" rel="noopener">View Customer Site ↗</a>
+            <a class="ghost-link" href="/" target="_blank" rel="noopener">View Customer Site ↗</a>
             <button type="button" onclick="toggleBookingPanel()" class="booking-btn">Bookings <span id="pendingBookingBadge" class="count-badge" hidden>0</span></button>
             <button type="button" onclick="logout()" class="logout-btn">Logout</button>
         </div>

@@ -9,15 +9,18 @@
 </head>
 <body>
 <nav class="navbar">
-    <a class="logo logo-link" href="user.html" aria-label="Bike Rental home">Bike<span>Rental</span></a>
+    <a class="logo logo-link" href="/" aria-label="Bike Rental home">Bike<span>Rental</span></a>
     <div class="nav-actions">
-        <a class="nav-link" href="#booking-status">Check booking</a>
+        <span id="userWelcome" class="user-welcome" hidden></span>
+        <button id="myBookingsLink" class="nav-link nav-button" type="button" onclick="scrollToMyBookings()" hidden>My Bookings</button>
+        <a id="accountLink" class="nav-link" href="account.html">Login / Sign Up</a>
+        <button id="userLogoutButton" class="nav-link nav-button danger-link" type="button" onclick="logoutUser()" hidden>Logout</button>
         <a class="nav-phone" href="#help">📞 Need help?</a>
     </div>
 </nav>
 
 <main>
-    <section class="section hero-section">
+    <section id="vehicles" class="section hero-section">
         <div class="hero-heading-row">
             <div>
                 <span class="section-label">LIVE VEHICLE AVAILABILITY</span>
@@ -33,11 +36,33 @@
         <div id="bikeContainer" class="grid" aria-live="polite"></div>
     </section>
 
+
+    <section id="my-bookings" class="section my-bookings-section">
+        <div class="form-card bookings-account-card">
+            <div class="section-head-inline">
+                <div>
+                    <span class="section-label">YOUR ACCOUNT</span>
+                    <h2>My Bookings</h2>
+                    <p>Only bookings linked to your signed-in account are shown here.</p>
+                </div>
+                <button class="refresh-btn" type="button" onclick="loadMyBookings()">↻ Refresh</button>
+            </div>
+            <div id="myBookingsAuthNotice" class="auth-required-box">
+                <strong>Sign in to see your bookings.</strong>
+                <span>Your booking history is private and protected by your account.</span>
+                <a class="btn-primary inline-cta" href="account.html?mode=login">Login / Sign Up</a>
+            </div>
+            <div id="myBookingsContent" hidden>
+                <div id="myBookingsList" class="my-bookings-list" aria-live="polite"></div>
+            </div>
+        </div>
+    </section>
+
     <section id="booking-status" class="section status-section">
         <div class="form-card status-card">
             <span class="section-label">CHECK BOOKING</span>
             <h2>Already booked?</h2>
-            <p>Enter your Booking ID to see the latest status.</p>
+            <p>Enter one of <strong>your</strong> Booking IDs. Other users' bookings are blocked by the backend.</p>
             <form id="bookingLookupForm" class="status-search-row" novalidate>
                 <div class="field-wrap compact-field">
                     <label class="sr-only" for="bookingLookupId">Booking ID</label>
@@ -65,7 +90,7 @@
                 <div class="step">
                     <div class="circle">2</div>
                     <h3>Send Booking Request</h3>
-                    <p>Enter your details, pickup date and rental duration.</p>
+                    <p>Sign in, choose your pickup date and rental duration.</p>
                 </div>
                 <div class="step">
                     <div class="circle">3</div>
@@ -103,19 +128,10 @@
         <form id="bookingForm" novalidate>
             <input id="selectedBikeId" type="hidden">
 
-            <div class="form-group">
-                <label for="customerName">Your Name</label>
-                <input id="customerName" type="text" minlength="2" maxlength="80" autocomplete="name" placeholder="Enter your full name" aria-describedby="customerNameError" required>
-                <small id="customerNameError" class="field-error" aria-live="polite"></small>
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <div class="phone-input-wrap">
-                    <span class="phone-prefix">+91</span>
-                    <input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile number" aria-describedby="phoneError" required>
-                </div>
-                <small id="phoneError" class="field-error" aria-live="polite"></small>
+            <div class="booking-account-box">
+                <span>Booking as</span>
+                <div id="bookingAccountSummary"></div>
+                <small>Name and phone are taken securely from your signed-in account.</small>
             </div>
 
             <div class="form-grid-two">
@@ -135,7 +151,7 @@
             </div>
 
             <div id="bookingEstimate" class="estimate-box" aria-live="polite"></div>
-            <p class="form-note">No payment is collected online yet. This sends a booking request to the rental shop.</p>
+            <p class="form-note">Your account identity is verified before this booking request is created. ₹50 confirmation payment will be added in the next phase.</p>
             <button id="submitBookingButton" class="btn-primary" type="submit">Send Booking Request</button>
         </form>
     </div>

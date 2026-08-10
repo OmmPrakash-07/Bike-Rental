@@ -13,4 +13,5 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean existsByBikeNameIgnoreCaseAndStatusIn(String bikeName, Collection<String> statuses);
     List<Booking> findByBikeIdAndStatusIn(Long bikeId, Collection<String> statuses);
     Optional<Booking> findFirstByBikeIdAndStatusOrderByIdDesc(Long bikeId, String status);
+    List<Booking> findByUserIdOrderByIdDesc(Long userId);
 }

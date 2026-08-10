@@ -999,3 +999,43 @@ button:focus-visible, a:focus-visible, input:focus-visible {
         min-height: 190px;
     }
 }
+
+/* Account + ownership security UI */
+.nav-button { border: 0; background: transparent; font: inherit; cursor: pointer; }
+.danger-link { color: #fca5a5; }
+.user-welcome { color: #cbd5e1; font-size: .82rem; font-weight: 700; }
+.my-bookings-section { padding-top: 16px; }
+.bookings-account-card { max-width: 1020px; margin: 0 auto; }
+.section-head-inline { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
+.section-head-inline h2 { margin: 7px 0 4px; }
+.section-head-inline p { margin: 0; color: #94a3b8; }
+.auth-required-box { margin-top: 20px; display: grid; gap: 7px; padding: 20px; border-radius: 14px; border: 1px solid rgba(255,107,0,.18); background: rgba(255,107,0,.05); color: #cbd5e1; }
+.auth-required-box strong { color: #f8fafc; }
+.auth-required-box span { font-size: .84rem; color: #94a3b8; }
+.inline-cta { width: fit-content; min-width: 150px; margin-top: 7px; text-decoration: none; }
+.my-bookings-list { margin-top: 20px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.my-booking-card { padding: 18px; border-radius: 14px; background: #0d1627; border: 1px solid rgba(255,255,255,.07); }
+.my-booking-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.booking-number { color: #94a3b8; font-weight: 800; }
+.my-booking-card h3 { margin: 14px 0 10px; font-size: 1rem; }
+.my-booking-meta { display: flex; flex-wrap: wrap; gap: 10px 16px; color: #94a3b8; font-size: .78rem; }
+.my-booking-meta strong { color: #e2e8f0; }
+.booking-detail-btn { margin-top: 14px; border: 1px solid rgba(255,255,255,.09); background: #1e293b; color: #f8fafc; padding: 9px 12px; border-radius: 9px; font-weight: 700; cursor: pointer; }
+.booking-account-box { margin: 12px 0 18px; padding: 14px 16px; border-radius: 12px; background: #0d1627; border: 1px solid rgba(255,255,255,.07); }
+.booking-account-box > span, .booking-account-box small { display: block; color: #94a3b8; font-size: .75rem; }
+#bookingAccountSummary { margin: 5px 0; display: grid; gap: 2px; }
+#bookingAccountSummary strong { color: #f8fafc; }
+#bookingAccountSummary span { color: #cbd5e1; font-size: .82rem; }
+.compact-empty { min-height: 100px; }
+@media (max-width: 760px) {
+    .nav-actions { gap: 9px; flex-wrap: wrap; justify-content: flex-end; }
+    .user-welcome { display: none !important; }
+    .my-bookings-list { grid-template-columns: 1fr; }
+    .section-head-inline { flex-direction: column; }
+    .section-head-inline .refresh-btn { width: 100%; }
+}
+
+
+[hidden] {
+    display: none !important;
+}

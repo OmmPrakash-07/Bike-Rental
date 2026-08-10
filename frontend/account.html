@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
+    <title>Bike Rental Account</title>
+    <link rel="stylesheet" href="account.css">
+</head>
+<body>
+<main class="account-page">
+    <section class="account-card" aria-labelledby="accountTitle">
+        <a class="brand" href="/">Bike<span>Rental</span></a>
+        <p class="eyebrow">CUSTOMER ACCOUNT</p>
+        <h1 id="accountTitle">Book securely</h1>
+        <p class="account-copy">Sign in or create an account. Your bookings stay linked to your user ID, so another customer cannot view them by changing a Booking ID.</p>
+
+        <div id="signedInPanel" class="signed-in-panel" hidden>
+            <span>Signed in as</span>
+            <strong id="signedInName"></strong>
+            <small id="signedInEmail"></small>
+            <div class="signed-actions">
+                <a class="primary-link" href="/">Continue to vehicles</a>
+                <button id="accountLogoutButton" class="secondary-button" type="button">Logout</button>
+            </div>
+        </div>
+
+        <div id="authForms">
+            <div class="auth-tabs" role="tablist" aria-label="Account mode">
+                <button id="loginTab" class="auth-tab active" type="button" role="tab" aria-selected="true">Login</button>
+                <button id="signupTab" class="auth-tab" type="button" role="tab" aria-selected="false">Sign Up</button>
+            </div>
+
+            <div id="authError" class="auth-error" hidden aria-live="polite"></div>
+
+            <form id="userLoginForm" novalidate>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input id="loginEmail" type="email" maxlength="160" autocomplete="email" placeholder="you@example.com" required>
+                    <small id="loginEmailError" class="field-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="password-wrap">
+                        <input id="loginPassword" type="password" maxlength="72" autocomplete="current-password" placeholder="Enter password" required>
+                        <button class="show-password-btn" type="button" data-password-target="loginPassword">Show</button>
+                    </div>
+                    <small id="loginPasswordError" class="field-error"></small>
+                </div>
+                <button id="userLoginButton" class="submit-button" type="submit">Login</button>
+            </form>
+
+            <form id="userSignupForm" hidden novalidate>
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input id="signupName" type="text" minlength="2" maxlength="80" autocomplete="name" placeholder="Your full name" required>
+                    <small id="signupNameError" class="field-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input id="signupEmail" type="email" maxlength="160" autocomplete="email" placeholder="you@example.com" required>
+                    <small id="signupEmailError" class="field-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <div class="phone-wrap"><span>+91</span><input id="signupPhone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel-national" placeholder="10-digit number" required></div>
+                    <small id="signupPhoneError" class="field-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="password-wrap">
+                        <input id="signupPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="At least 8 characters" required>
+                        <button class="show-password-btn" type="button" data-password-target="signupPassword">Show</button>
+                    </div>
+                    <small class="field-help">Use 8–72 characters with at least one letter and one number.</small>
+                    <small id="signupPasswordError" class="field-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input id="signupConfirmPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" placeholder="Repeat password" required>
+                    <small id="signupConfirmPasswordError" class="field-error"></small>
+                </div>
+                <button id="userSignupButton" class="submit-button" type="submit">Create Account</button>
+            </form>
+        </div>
+
+        <a class="back-link" href="/">← Back to vehicles</a>
+        <div class="security-note"><strong>Privacy:</strong> booking ownership is checked on the backend, not only hidden in the UI.</div>
+    </section>
+</main>
+<script src="config.js"></script>
+<script src="account.js"></script>
+</body>
+</html>

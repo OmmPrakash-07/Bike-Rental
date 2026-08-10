@@ -2,6 +2,8 @@ package bikerental.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +27,13 @@ public class BookingController {
     }
 
     @PostMapping
-    public Booking addBooking(@RequestBody Booking booking) {
-        return service.createBooking(booking);
+    public Booking addBooking(@RequestBody Booking booking, @AuthenticationPrincipal Jwt jwt) {
+        return service.createBooking(booking, userId(jwt));
+    }
+
+    @GetMapping("/my")
+    public List<Booking> getMyBookings(@AuthenticationPrincipal Jwt jwt) {
+        return service.getBookingsForUser(userId(jwt));
     }
 
     @GetMapping
@@ -35,8 +42,11 @@ public class BookingController {
     }
 
     @GetMapping("/{id}")
-    public Booking getBooking(@PathVariable Long id) {
-        return service.getBooking(id);
+    public Booking getBooking(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        if (hasScope(jwt, "admin")) {
+            return service.getBooking(id);
+        }
+        return service.getBookingForUser(id, userId(jwt));
     }
 
     @PutMapping("/{id}/approve")
@@ -52,5 +62,14 @@ public class BookingController {
     @DeleteMapping("/clear")
     public void clearAllBookings() {
         service.clearAllBookings();
+    }
+
+    private Long userId(Jwt jwt) {
+        return Long.valueOf(jwt.getSubject());
+    }
+
+    private boolean hasScope(Jwt jwt, String scope) {
+        String scopes = jwt.getClaimAsString("scope");
+        return scopes != null && List.of(scopes.split(" ")).contains(scope);
     }
 }

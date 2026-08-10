@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import bikerental.model.Bike;
 import bikerental.model.Booking;
+import bikerental.model.UserAccount;
 import bikerental.repository.BikeRepository;
 import bikerental.repository.BookingRepository;
 
@@ -22,42 +23,43 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final BikeRepository bikeRepository;
+    private final UserAccountService userService;
 
-    public BookingService(BookingRepository bookingRepository, BikeRepository bikeRepository) {
+    public BookingService(BookingRepository bookingRepository,
+            BikeRepository bikeRepository,
+            UserAccountService userService) {
         this.bookingRepository = bookingRepository;
         this.bikeRepository = bikeRepository;
+        this.userService = userService;
     }
 
     @Transactional
-    public Booking createBooking(Booking request) {
+    public Booking createBooking(Booking request, Long authenticatedUserId) {
         validateBookingRequest(request);
-
+        UserAccount user = userService.getRequiredUser(authenticatedUserId);
         Bike bike = resolveBike(request);
 
         if (!bike.isAvailable()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "This bike is currently unavailable");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This bike is currently unavailable");
         }
 
         if (bookingRepository.existsByBikeIdAndStatusIn(bike.getId(), ACTIVE_STATUSES)
                 || bookingRepository.existsByBikeNameIgnoreCaseAndStatusIn(bike.getName(), ACTIVE_STATUSES)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "This bike already has an active booking request");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "This bike already has an active booking request");
         }
 
         request.setId(null);
-        request.setCustomerName(request.getCustomerName().trim());
-        request.setPhone(request.getPhone().trim());
+        request.setUserId(user.getId());
+        request.setCustomerName(user.getFullName());
+        request.setPhone(user.getPhone());
         request.setBikeId(bike.getId());
         request.setBikeName(bike.getName());
         request.setPricePerDay(bike.getPricePerDay());
         request.setTotalAmount(bike.getPricePerDay() * request.getDurationDays());
         request.setStatus("PENDING");
 
-        // Reserve the bike immediately so another customer cannot submit a conflicting request.
         bike.setAvailable(false);
         bikeRepository.save(bike);
-
         return bookingRepository.save(request);
     }
 
@@ -65,18 +67,30 @@ public class BookingService {
         return bookingRepository.findAll();
     }
 
+    public List<Booking> getBookingsForUser(Long userId) {
+        userService.getRequiredUser(userId);
+        return bookingRepository.findByUserIdOrderByIdDesc(userId);
+    }
+
     public Booking getBooking(Long id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
     }
 
+    public Booking getBookingForUser(Long id, Long userId) {
+        Booking booking = getBooking(id);
+        if (booking.getUserId() == null || !booking.getUserId().equals(userId)) {
+            // 404 avoids confirming that another user's booking ID exists.
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
+        }
+        return booking;
+    }
+
     @Transactional
     public Booking approveBooking(Long id) {
         Booking booking = getBooking(id);
-
         if (!"PENDING".equals(booking.getStatus())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Only a pending booking can be approved");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only a pending booking can be approved");
         }
 
         Bike bike = resolveBike(booking);
@@ -84,20 +98,17 @@ public class BookingService {
             booking.setBikeId(bike.getId());
         }
 
-        List<Booking> activeBookings = bookingRepository.findByBikeIdAndStatusIn(
-                bike.getId(), Set.of("APPROVED"));
-
-        boolean anotherApprovedBookingExists = activeBookings.stream()
+        boolean anotherApprovedBookingExists = bookingRepository
+                .findByBikeIdAndStatusIn(bike.getId(), Set.of("APPROVED"))
+                .stream()
                 .anyMatch(existing -> !existing.getId().equals(booking.getId()));
 
         if (anotherApprovedBookingExists) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Bike is already assigned to another approved booking");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bike is already assigned to another approved booking");
         }
 
         bike.setAvailable(false);
         bikeRepository.save(bike);
-
         booking.setStatus("APPROVED");
         return bookingRepository.save(booking);
     }
@@ -105,10 +116,8 @@ public class BookingService {
     @Transactional
     public Booking rejectBooking(Long id) {
         Booking booking = getBooking(id);
-
         if (!"PENDING".equals(booking.getStatus())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "Only a pending booking can be rejected");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only a pending booking can be rejected");
         }
 
         booking.setStatus("REJECTED");
@@ -123,16 +132,14 @@ public class BookingService {
             bike.setAvailable(true);
             bikeRepository.save(bike);
         } catch (ResponseStatusException ignored) {
-            // Old booking may reference a bike that was deleted before this cleanup.
+            // Legacy booking may reference a deleted bike.
         }
-
         return saved;
     }
 
     @Transactional
     public void clearAllBookings() {
         List<Booking> bookings = bookingRepository.findAll();
-
         bookings.stream()
                 .filter(booking -> ACTIVE_STATUSES.contains(booking.getStatus()))
                 .forEach(booking -> {
@@ -141,10 +148,9 @@ public class BookingService {
                         bike.setAvailable(true);
                         bikeRepository.save(bike);
                     } catch (ResponseStatusException ignored) {
-                        // Safe cleanup if an old booking points to a deleted bike.
+                        // Safe cleanup if a legacy booking points to a deleted bike.
                     }
                 });
-
         bookingRepository.deleteAll();
     }
 
@@ -153,29 +159,16 @@ public class BookingService {
             return bikeRepository.findById(request.getBikeId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bike not found"));
         }
-
         if (request.getBikeName() != null && !request.getBikeName().isBlank()) {
             return bikeRepository.findFirstByNameIgnoreCase(request.getBikeName().trim())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bike not found"));
         }
-
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bikeId is required");
     }
 
     private void validateBookingRequest(Booking request) {
         if (request == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking data is required");
-        }
-        if (request.getCustomerName() == null || request.getCustomerName().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer name is required");
-        }
-        String customerName = request.getCustomerName().trim();
-        if (customerName.length() < 2 || customerName.length() > 80) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Customer name must be between 2 and 80 characters");
-        }
-        if (request.getPhone() == null || !request.getPhone().trim().matches("^[0-9]{10}$")) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter a valid 10-digit phone number");
         }
         if (request.getDate() == null || request.getDate().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup date is required");
@@ -189,10 +182,9 @@ public class BookingService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pickup date must use YYYY-MM-DD format");
         }
         if (request.getDurationDays() == null || request.getDurationDays() < 1 || request.getDurationDays() > 30) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Duration must be between 1 and 30 days");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Duration must be between 1 and 30 days");
         }
-        if (request.getBikeId() != null && request.getBikeId() <= 0) {
+        if (request.getBikeId() == null || request.getBikeId() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "bikeId must be a positive number");
         }
     }

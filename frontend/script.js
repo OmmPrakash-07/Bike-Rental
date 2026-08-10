@@ -4,6 +4,24 @@ const BOOKING_API = `${API_BASE}/api/bookings`;
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
+const ADMIN_TOKEN_KEY = "bikeRentalAdminToken";
+
+function adminToken() {
+    return localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+}
+
+async function adminFetch(url, options = {}) {
+    const token = adminToken();
+    const headers = new Headers(options.headers || {});
+    if (token) headers.set("Authorization", `Bearer ${token}`);
+    const response = await fetch(url, { ...options, headers });
+    if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        window.location.href = "login.html";
+    }
+    return response;
+}
+
 let editId = null;
 let editImageUrl = "";
 let bikesCache = [];
@@ -190,7 +208,7 @@ async function loadBikes() {
     const table = document.getElementById("bikeTable");
     table.innerHTML = `<tr><td class="empty-row" colspan="7">Loading vehicles…</td></tr>`;
     try {
-        const res = await fetch(BIKE_API, { cache: "no-store" });
+        const res = await adminFetch(BIKE_API, { cache: "no-store" });
         if (!res.ok) throw new Error(await errorMessage(res));
         bikesCache = await res.json();
         renderBikes();
@@ -216,7 +234,7 @@ async function saveBike(event) {
         if (values.file) {
             const formData = new FormData();
             formData.append("file", values.file);
-            const uploadRes = await fetch(`${BIKE_API}/upload`, { method: "POST", body: formData });
+            const uploadRes = await adminFetch(`${BIKE_API}/upload`, { method: "POST", body: formData });
             if (!uploadRes.ok) throw new Error(await errorMessage(uploadRes));
             imageUrl = `uploads/${await uploadRes.text()}`;
         }
@@ -230,7 +248,7 @@ async function saveBike(event) {
         const url = editId ? `${BIKE_API}/${editId}` : BIKE_API;
         const method = editId ? "PUT" : "POST";
 
-        const res = await fetch(url, {
+        const res = await adminFetch(url, {
             method,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(bikeData)
@@ -338,7 +356,7 @@ async function deleteBike(id) {
     const bike = bikesCache.find(item => item.id === id);
     if (!confirm(`Delete ${bike?.name || `bike #${id}`}? This cannot be undone.`)) return;
     try {
-        const res = await fetch(`${BIKE_API}/${id}`, { method: "DELETE" });
+        const res = await adminFetch(`${BIKE_API}/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast("Vehicle deleted.");
         if (editId === id) resetBikeForm();
@@ -351,7 +369,7 @@ async function deleteBike(id) {
 async function makeAvailable(id) {
     if (!confirm("Make this bike available? An approved booking will be completed; a pending booking will be rejected.")) return;
     try {
-        const res = await fetch(`${BIKE_API}/${id}/available`, { method: "PUT" });
+        const res = await adminFetch(`${BIKE_API}/${id}/available`, { method: "PUT" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast("Vehicle is available again.");
         await Promise.all([loadBikes(), loadBookings()]);
@@ -363,7 +381,7 @@ async function makeAvailable(id) {
 async function makeUnavailable(id) {
     if (!confirm("Mark this vehicle unavailable for an offline rental?")) return;
     try {
-        const res = await fetch(`${BIKE_API}/${id}/unavailable`, { method: "PUT" });
+        const res = await adminFetch(`${BIKE_API}/${id}/unavailable`, { method: "PUT" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast("Vehicle marked unavailable.");
         await loadBikes();
@@ -419,7 +437,7 @@ async function loadBookings() {
     const table = document.getElementById("bookingTable");
     table.innerHTML = `<tr><td class="empty-row" colspan="9">Loading bookings…</td></tr>`;
     try {
-        const res = await fetch(BOOKING_API, { cache: "no-store" });
+        const res = await adminFetch(BOOKING_API, { cache: "no-store" });
         if (!res.ok) throw new Error(await errorMessage(res));
         bookingsCache = await res.json();
         renderBookings();
@@ -445,7 +463,7 @@ function toggleBookingPanel(forceOpen) {
 async function approveBooking(id) {
     if (!confirm(`Approve booking #${id}?`)) return;
     try {
-        const res = await fetch(`${BOOKING_API}/${id}/approve`, { method: "PUT" });
+        const res = await adminFetch(`${BOOKING_API}/${id}/approve`, { method: "PUT" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast(`Booking #${id} approved.`);
         await Promise.all([loadBookings(), loadBikes()]);
@@ -457,7 +475,7 @@ async function approveBooking(id) {
 async function rejectBooking(id) {
     if (!confirm(`Reject booking #${id}? The vehicle will become available again.`)) return;
     try {
-        const res = await fetch(`${BOOKING_API}/${id}/reject`, { method: "PUT" });
+        const res = await adminFetch(`${BOOKING_API}/${id}/reject`, { method: "PUT" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast(`Booking #${id} rejected.`, "info");
         await Promise.all([loadBookings(), loadBikes()]);
@@ -469,7 +487,7 @@ async function rejectBooking(id) {
 async function clearBookings() {
     if (!confirm("Delete ALL booking history? Active vehicles held by bookings will be released. This cannot be undone.")) return;
     try {
-        const res = await fetch(`${BOOKING_API}/clear`, { method: "DELETE" });
+        const res = await adminFetch(`${BOOKING_API}/clear`, { method: "DELETE" });
         if (!res.ok) throw new Error(await errorMessage(res));
         showToast("All bookings cleared.", "info");
         await Promise.all([loadBookings(), loadBikes()]);
@@ -486,7 +504,7 @@ async function refreshAdminData() {
 }
 
 function logout() {
-    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem(ADMIN_TOKEN_KEY);
     window.location.href = "login.html";
 }
 
