@@ -1,124 +1,329 @@
-# Bike Rental — Clean Continuation
+# 🏍️ Bike Rental Management System
 
-This is the repaired version of the existing Bike Rental project. It keeps the same project idea and UI direction, but separates frontend and backend cleanly inside one repository.
+A full-stack **Bike Rental Management System** built with **Spring Boot, MySQL, HTML, CSS, and JavaScript**. The project provides a customer-facing rental interface and an admin dashboard for managing vehicles, bookings, availability, and uploaded vehicle images.
 
-## Project structure
+The frontend is deployed on **Vercel**, while the backend, database, and persistent image storage are hosted on **Railway**.
+
+## 🌐 Live Project
+
+- **Customer Website:** https://bike-rental-phi.vercel.app/
+- **Admin Login:** https://bike-rental-phi.vercel.app/login.html
+- **Backend API:** https://bike-rental-production-6e17.up.railway.app
+- **Health Check:** https://bike-rental-production-6e17.up.railway.app/api/health
+
+> Admin credentials are intended for project/demo use only. Do not expose production credentials in this README.
+
+---
+
+## 📸 Screenshots
+
+### Customer Side
+
+![Bike Rental Customer Dashboard](docs/screenshots/user-dashboard.png)
+
+### Admin Dashboard
+
+![Bike Rental Admin Dashboard](docs/screenshots/admin-dashboard.png)
+
+### Booking Management
+
+![Bike Rental Booking Management](docs/screenshots/admin-bookings.png)
+
+---
+
+## ✨ Features
+
+### Customer
+
+- View all rental vehicles with live availability.
+- View vehicle type, image, and rental price per day.
+- Book an available vehicle through a proper booking form.
+- Enter pickup date and rental duration.
+- Automatic total rental amount calculation.
+- Receive a unique **Booking ID** after a successful booking request.
+- Check booking status using the Booking ID.
+- Clear availability states for available and reserved vehicles.
+- Responsive interface for desktop and mobile.
+- Client-side validation for customer name, phone number, pickup date, duration, and Booking ID.
+
+### Admin
+
+- Admin login interface.
+- Dashboard counters for total, available, unavailable, and pending bookings.
+- Add new vehicles with image upload.
+- Edit vehicle information.
+- Delete vehicles.
+- Mark a vehicle unavailable for offline rental.
+- Mark returned vehicles available again.
+- Search and filter vehicles.
+- View booking requests.
+- Search and filter bookings.
+- Approve or reject pending booking requests.
+- Booking lifecycle management.
+- Uploaded image preview and validation.
+
+### Backend
+
+- REST API built with Spring Boot.
+- MySQL persistence using Spring Data JPA.
+- Automatic booking ID generation.
+- Server-side validation.
+- Duplicate/conflicting booking protection.
+- Vehicle reservation when a booking request is created.
+- Approved bookings keep vehicles unavailable.
+- Returning a vehicle completes its active booking.
+- CORS configuration for the deployed frontend.
+- Persistent vehicle image storage using a Railway Volume.
+- Environment-variable based database configuration.
+
+---
+
+## 🔄 Booking Flow
 
 ```text
-bikerental-clean/
-├── backend/      # Spring Boot + JPA + MySQL
+AVAILABLE VEHICLE
+      ↓
+Customer submits booking request
+      ↓
+PENDING
+      ↓
+Vehicle becomes reserved/unavailable
+      ↓
+Admin reviews request
+   ↙          ↘
+REJECTED     APPROVED
+   ↓             ↓
+Available     Rental active
+                 ↓
+          Vehicle returned
+                 ↓
+             COMPLETED
+                 ↓
+             AVAILABLE
+```
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript |
+| Backend | Java, Spring Boot |
+| API | REST |
+| ORM | Spring Data JPA / Hibernate |
+| Database | MySQL |
+| Backend Hosting | Railway |
+| Database Hosting | Railway MySQL |
+| Image Storage | Railway Volume |
+| Frontend Hosting | Vercel |
+| Version Control | Git & GitHub |
+
+---
+
+## 🏗️ Architecture
+
+```text
+                 ┌────────────────────────────┐
+                 │       Vercel Frontend      │
+                 │ HTML + CSS + JavaScript    │
+                 └─────────────┬──────────────┘
+                               │ HTTPS / REST
+                               ▼
+                 ┌────────────────────────────┐
+                 │    Railway Spring Boot     │
+                 │        REST Backend        │
+                 └──────────┬─────────┬───────┘
+                            │         │
+                            │         │ image files
+                            ▼         ▼
+                  ┌──────────────┐  ┌───────────────┐
+                  │ Railway MySQL│  │ Railway Volume│
+                  │ bikes/bookings│ │ /data/uploads │
+                  └──────────────┘  └───────────────┘
+```
+
+---
+
+## 📁 Project Structure
+
+```text
+Bike-Rental/
+│
+├── backend/
 │   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── bikerental/
+│   │   │   └── resources/
+│   │   │       └── application.properties
+│   │   └── test/
 │   ├── pom.xml
 │   ├── mvnw
-│   ├── mvnw.cmd
-│   └── uploads/
-├── frontend/     # HTML + CSS + JavaScript
-│   ├── user.html
-│   ├── index.html
-│   ├── login.html
-│   └── config.js
+│   └── mvnw.cmd
+│
+├── frontend/
+│   ├── index.html          # Customer homepage
+│   ├── admin.html          # Admin dashboard
+│   ├── login.html          # Admin login
+│   ├── user.js
+│   ├── script.js
+│   ├── config.js
+│   ├── user.css
+│   └── ...
+│
+├── docs/
+│   └── screenshots/
+│       ├── user-dashboard.png
+│       ├── admin-dashboard.png
+│       └── admin-bookings.png
+│
+├── .gitignore
 └── README.md
 ```
 
-The frontend and backend stay in one GitHub repository. When deploying the backend to Railway, set the service Root Directory to `backend`. Railway can use the same repository while only building the backend folder.
+---
 
-## What was repaired
+## 🔌 Main API Endpoints
 
-- Removed the database password that was hard-coded in source code.
-- Added environment-variable database configuration for local use and Railway.
-- Added `/api/health`.
-- Centralized CORS and upload-directory configuration.
-- Bike editing no longer changes an unavailable bike back to available.
-- A booking now reserves the bike immediately, preventing multiple conflicting pending bookings.
-- Rejecting a pending booking makes the bike available again.
-- Approving a booking is protected against another approved booking for the same bike.
-- Making a bike available completes an approved booking or rejects an old pending booking.
-- Added `bikeId`, `durationDays`, `pricePerDay`, and `totalAmount` to bookings.
-- Added booking input validation and upload validation.
-- Replaced customer-side `prompt()` booking with a proper booking form/modal.
-- Customer now receives a real Booking ID.
-- Added customer Booking ID status lookup.
-- Removed the old UI claim about ₹50 online payment because payment is not implemented yet.
-- Frontend API URL now lives in one file: `frontend/config.js`.
-- Polished the customer, admin, and login UI with a consistent responsive dark theme.
-- Added customer-side inline validation for name, 10-digit phone, pickup date, duration, and Booking ID lookup.
-- Added admin-side inline validation for vehicle name/type/price and 5 MB image upload limits.
-- Added image preview, vehicle/booking search and filters, dashboard counters, loading states, toast feedback, and safer confirmation prompts.
-- Added matching backend validation for vehicle field lengths/price range, customer name length, positive bike IDs, and upload size.
+### Health
 
-## Run locally
-
-### 1. Start MySQL
-
-Make sure MySQL is running. The backend uses database `bike_rental` by default and can create it automatically.
-
-### 2. Set your MySQL password in PowerShell
-
-```powershell
-$env:MYSQLUSER="root"
-$env:MYSQLPASSWORD="YOUR_MYSQL_PASSWORD"
-$env:MYSQLDATABASE="bike_rental"
+```http
+GET /api/health
 ```
 
-If your local MySQL root account has no password, you can omit `MYSQLPASSWORD`.
+### Vehicles
 
-### 3. Start backend
+```http
+GET    /api/bikes
+POST   /api/bikes
+PUT    /api/bikes/{id}
+DELETE /api/bikes/{id}
+PUT    /api/bikes/{id}/available
+PUT    /api/bikes/{id}/unavailable
+```
+
+### Bookings
+
+```http
+GET  /api/bookings
+GET  /api/bookings/{id}
+POST /api/bookings
+PUT  /api/bookings/{id}/approve
+PUT  /api/bookings/{id}/reject
+```
+
+> Exact endpoints may evolve as the project continues. Keep this section synchronized with the backend controllers.
+
+---
+
+## 💻 Run Locally
+
+### Prerequisites
+
+- Java 21+ / compatible JDK
+- MySQL 8+
+- Python 3 (optional, only for serving the static frontend locally)
+- Git
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/OmmPrakash-07/Bike-Rental.git
+cd Bike-Rental
+```
+
+### 2. Create the database
+
+```sql
+CREATE DATABASE bike_rental;
+```
+
+### 3. Configure backend environment variables
+
+PowerShell example:
+
+```powershell
+$env:MYSQLHOST="localhost"
+$env:MYSQLPORT="3306"
+$env:MYSQLDATABASE="bike_rental"
+$env:MYSQLUSER="root"
+$env:MYSQLPASSWORD="YOUR_MYSQL_PASSWORD"
+```
+
+### 4. Start the backend
 
 ```powershell
 cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-Health check:
+Backend runs at:
 
 ```text
-http://localhost:8080/api/health
+http://localhost:8080
 ```
 
-### 4. Start frontend
+### 5. Start the frontend
 
-Open the `frontend` folder with VS Code Live Server (or another static server).
+Open another terminal:
 
-Customer page:
+```powershell
+cd frontend
+python -m http.server 5500
+```
+
+Customer site:
 
 ```text
-user.html
+http://localhost:5500/
 ```
 
 Admin login:
 
 ```text
-login.html
+http://localhost:5500/login.html
 ```
 
-Default local demo admin credentials:
+---
+
+## ⚙️ Frontend API Configuration
+
+The deployed Railway backend URL is configured in:
 
 ```text
-username: admin
-password: 1234
+frontend/config.js
 ```
 
-Override these in deployment with `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
-
-## Frontend backend URL
-
-Local default in `frontend/config.js`:
+Example:
 
 ```javascript
-API_BASE_URL: "http://localhost:8080"
+window.BIKE_RENTAL_CONFIG = {
+  API_BASE_URL:
+    localStorage.getItem("bikeRentalApiBaseUrl") ||
+    "https://bike-rental-production-6e17.up.railway.app"
+};
 ```
 
-After Railway deployment, change this one value to the Railway backend domain.
-
-## Railway layout
-
-Keep the whole repository exactly as it is. In Railway, create the backend service from this repository and select:
+For local development, the browser API override can be changed to:
 
 ```text
-Root Directory: backend
+http://localhost:8080
 ```
 
-For the backend database, configure these environment variables (or map the equivalent Railway MySQL variables):
+---
+
+## 🚀 Deployment
+
+### Backend — Railway
+
+The repository contains both frontend and backend. The Railway backend service uses:
+
+```text
+Root Directory: /backend
+```
+
+Required database variables:
 
 ```text
 MYSQLHOST
@@ -128,34 +333,92 @@ MYSQLUSER
 MYSQLPASSWORD
 ```
 
-Spring Boot automatically reads `PORT` when Railway provides it.
-
-For uploaded bike images in production, set `UPLOAD_DIR` to a persistent volume mount path. Without persistent storage, uploaded images can be lost on redeploy.
-
-## Current API
+Persistent image storage:
 
 ```text
-GET    /api/health
-POST   /api/auth/login
-
-GET    /api/bikes
-POST   /api/bikes
-PUT    /api/bikes/{id}
-DELETE /api/bikes/{id}
-POST   /api/bikes/upload
-PUT    /api/bikes/{id}/available
-PUT    /api/bikes/{id}/unavailable
-
-POST   /api/bookings
-GET    /api/bookings
-GET    /api/bookings/{id}
-PUT    /api/bookings/{id}/approve
-PUT    /api/bookings/{id}/reject
-DELETE /api/bookings/clear
+UPLOAD_DIR=/data/uploads
 ```
 
-## Next development step
+Railway Volume mount:
 
-Do not restart the project from zero. Continue from this checkpoint.
+```text
+/data/uploads
+```
 
-Recommended next feature: add real payment only after the current booking flow is tested end-to-end. For a production system, admin authentication and public booking-status privacy also need stronger security; the current login remains suitable for a student/demo project, not a public production admin panel.
+### Frontend — Vercel
+
+Vercel uses:
+
+```text
+Root Directory: frontend
+```
+
+Production customer homepage:
+
+```text
+/
+```
+
+Admin login:
+
+```text
+/login.html
+```
+
+Admin dashboard:
+
+```text
+/admin.html
+```
+
+---
+
+## ✅ Current Project Status
+
+- [x] Spring Boot backend
+- [x] MySQL integration
+- [x] Vehicle CRUD
+- [x] Vehicle image upload
+- [x] Persistent Railway image volume
+- [x] Customer vehicle listing
+- [x] Booking form
+- [x] Rental duration
+- [x] Automatic price calculation
+- [x] Booking ID generation
+- [x] Booking status lookup
+- [x] Admin booking management
+- [x] Approve/reject workflow
+- [x] Duplicate booking protection
+- [x] Vehicle availability lifecycle
+- [x] Frontend validation
+- [x] Backend validation
+- [x] Responsive UI polish
+- [x] Railway backend deployment
+- [x] Railway MySQL deployment
+- [x] Vercel frontend deployment
+
+---
+
+## 🔮 Possible Future Improvements
+
+- Secure admin authentication with Spring Security and hashed credentials.
+- User accounts and rental history.
+- Online payment integration.
+- Booking cancellation workflow.
+- Date-range availability instead of one active reservation per vehicle.
+- Email/SMS booking notifications.
+- Admin analytics and revenue reports.
+- Cloud object storage/CDN for larger-scale image hosting.
+- Automated backend tests and CI/CD checks.
+
+---
+
+## 👨‍💻 Project Purpose
+
+This project was developed as a **major/academic project** to demonstrate practical full-stack development using Java, Spring Boot, MySQL, REST APIs, frontend JavaScript, deployment, persistent storage, validation, and real booking workflow management.
+
+---
+
+## 📄 License
+
+This project is currently intended for educational and demonstration purposes.
