@@ -1,0 +1,17 @@
+# Backend build output
+backend/target/
+
+# Runtime uploads (use persistent storage/volume in deployment)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE / OS
+.vscode/
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+*.local

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Rental</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="logo">Bike<span>Rental</span></div>
+    <a class="nav-phone" href="#help">📞 Need help?</a>
+</nav>
+
+<main>
+    <section class="section hero-section">
+        <span class="section-label">AVAILABLE VEHICLES</span>
+        <h1>Choose Your <span class="accent">Ride</span></h1>
+        <p class="hero-copy">Live availability, simple booking request, and clear booking ID.</p>
+        <div id="bikeContainer" class="grid"></div>
+    </section>
+
+    <section class="section status-section">
+        <div class="form-card status-card">
+            <span class="section-label">CHECK BOOKING</span>
+            <h2>Already booked?</h2>
+            <p>Enter your Booking ID to check the latest status.</p>
+            <div class="status-search-row">
+                <input id="bookingLookupId" type="number" min="1" placeholder="Booking ID, e.g. 12">
+                <button class="btn-primary" onclick="checkBookingStatus()">Check Status</button>
+            </div>
+            <div id="bookingLookupResult" class="lookup-result" hidden></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="process-card reveal">
+            <div class="header-group">
+                <p class="subtitle">SIMPLE PROCESS</p>
+                <h2 class="main-title">How It <span class="accent">Works</span></h2>
+            </div>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="circle">1</div>
+                    <h3>Browse Vehicles</h3>
+                    <p>See bikes and scooties with live availability.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">2</div>
+                    <h3>Send Booking Request</h3>
+                    <p>Enter your details, pickup date and rental duration.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">3</div>
+                    <h3>Wait for Approval</h3>
+                    <p>Your vehicle is reserved while the shop reviews your request.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">4</div>
+                    <h3>Pick Up & Ride</h3>
+                    <p>Show your Booking ID at the shop after approval.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="help" class="help-card reveal delay-2">
+            <h2 class="main-title compact">Need Help? Call Us 📞</h2>
+            <p class="help-text">Contact details below are placeholders—replace them with the rental shop's real information.</p>
+            <div class="contact-info">
+                <div class="info-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
+                <div class="info-item"><span class="icon">📍</span><span>Bhubaneswar, Odisha</span></div>
+                <div class="info-item gray-text"><span class="icon">🕒</span><span>Open 7 AM — 9 PM Daily</span></div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="bookingModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeBookingModal()"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+        <button class="modal-close" onclick="closeBookingModal()" aria-label="Close">×</button>
+        <span class="section-label">BOOK YOUR RIDE</span>
+        <h2 id="bookingModalTitle">Booking Request</h2>
+        <p id="selectedBikeSummary" class="selected-bike-summary"></p>
+
+        <form id="bookingForm" onsubmit="submitBooking(event)">
+            <input id="selectedBikeId" type="hidden">
+            <div class="form-group">
+                <label for="customerName">Your Name</label>
+                <input id="customerName" type="text" maxlength="80" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input id="phone" type="tel" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10-digit mobile number" required>
+            </div>
+            <div class="form-group">
+                <label for="pickupDate">Pickup Date</label>
+                <input id="pickupDate" type="date" required>
+            </div>
+            <div class="form-group">
+                <label for="durationDays">Rental Duration</label>
+                <input id="durationDays" type="number" min="1" max="30" value="1" required oninput="updateBookingEstimate()">
+            </div>
+            <div id="bookingEstimate" class="estimate-box"></div>
+            <button id="submitBookingButton" class="btn-primary" type="submit">Send Booking Request</button>
+        </form>
+    </div>
+</div>
+
+<div id="successModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeSuccessModal()"></div>
+    <div class="modal-card success-card" role="dialog" aria-modal="true">
+        <button class="modal-close" onclick="closeSuccessModal()" aria-label="Close">×</button>
+        <div class="success-icon">✓</div>
+        <h2>Booking Request Sent</h2>
+        <div id="successDetails"></div>
+        <button class="btn-primary" onclick="closeSuccessModal()">Done</button>
+    </div>
+</div>
+
+<footer>
+    <div class="logo">Bike<span>Rental</span></div>
+    <div>Simple bike rental management project.</div>
+</footer>
+
+<script src="config.js"></script>
+<script src="user.js"></script>
+</body>
+</html>

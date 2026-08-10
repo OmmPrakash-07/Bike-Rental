@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bike Rental Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<script>
+    if (localStorage.getItem("isLoggedIn") !== "true") {
+        window.location.href = "login.html";
+    }
+</script>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>🚀 Bike Rental Admin</h1>
+            <p class="subtext">Manage vehicles, availability and customer bookings.</p>
+        </div>
+        <button onclick="toggleBookingPanel()" class="booking-btn">📦 Bookings</button>
+    </div>
+
+    <div class="card">
+        <h2 id="formTitle">Add Bike</h2>
+        <div class="form-row">
+            <input type="text" id="name" placeholder="Bike Name">
+            <input type="text" id="type" placeholder="Type (Bike / Scooty)">
+            <input type="number" id="price" min="1" step="0.01" placeholder="Price per day">
+            <input type="file" id="image" accept="image/*">
+        </div>
+        <div class="form-actions">
+            <button onclick="addBike()" class="add-btn" id="saveBikeButton">Save Bike</button>
+            <button onclick="cancelEdit()" class="secondary-btn" id="cancelEditButton" hidden>Cancel Edit</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Bike List</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Price/Day</th>
+                        <th>Status</th>
+                        <th>Image</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bikeTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="bookingPanel" class="booking-panel">
+        <button onclick="toggleBookingPanel()" class="close-btn">×</button>
+        <h2>📦 Bookings</h2>
+        <button onclick="clearBookings()" class="clear-btn">🧹 Clear All Bookings</button>
+        <div class="booking-table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Bike</th>
+                        <th>Pickup</th>
+                        <th>Days</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="logout-container">
+    <button onclick="logout()" class="logout-btn">Logout</button>
+</div>
+
+<script src="config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

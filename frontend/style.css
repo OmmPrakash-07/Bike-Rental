@@ -1,0 +1,266 @@
+/* ==============================
+   🌙 GLOBAL STYLE
+============================== */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+.container {
+    padding: 20px;
+}
+
+/* ==============================
+   🧱 HEADER
+============================== */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ==============================
+   📦 CARDS
+============================== */
+.card {
+    background: #1e293b;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+/* ==============================
+   📊 ADMIN TABLE SCROLL FIX
+============================== */
+.table-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 10px;
+}
+
+/* Make header fixed */
+thead {
+    position: sticky;
+    top: 0;
+    background: #1e293b;
+    z-index: 10;
+}
+
+/* ==============================
+   📝 INPUTS & BUTTONS
+============================== */
+input {
+    margin: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Add button */
+.add-btn {
+    background: #22c55e;
+    color: white;
+}
+
+/* ==============================
+   📊 TABLE
+============================== */
+table {
+    width: 100%;
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+tr {
+    border-bottom: 1px solid #334155;
+}
+
+/* Images */
+img {
+    border-radius: 5px;
+}
+
+/* ==============================
+   🚪 LOGOUT BUTTON (CENTER)
+============================== */
+.logout-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+/* ==============================
+   📦 BOOKING BUTTON (HEADER)
+============================== */
+.booking-btn {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.booking-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* ==============================
+   📂 BOOKING SIDE PANEL (FIXED)
+============================== */
+.booking-panel {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 450px;   /* 🔥 increased width */
+    height: 100%;
+    background: #1e293b;
+    padding: 20px;
+    transition: 0.4s;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.booking-panel.active {
+    right: 0;
+}
+
+/* Close button */
+.close-btn {
+    background: red;
+    color: white;
+    float: right;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* ==============================
+   📊 BOOKING TABLE FIX
+============================== */
+.booking-panel table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.booking-panel th {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.booking-panel td {
+    font-size: 13px;
+    padding: 8px;
+    word-break: break-word;
+}
+
+/* 🔥 IMPORTANT: fix action column */
+.booking-panel td:last-child {
+    min-width: 110px;
+}
+
+/* ==============================
+   ✅ ❌ BUTTON FIX (MAIN ISSUE)
+============================== */
+.booking-panel td button {
+    display: inline-block;
+    margin: 3px;
+    padding: 6px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+}
+
+/* Approve */
+.booking-panel td button:first-child {
+    background: #22c55e;
+    color: white;
+}
+
+/* Reject */
+.booking-panel td button:last-child {
+    background: #ef4444;
+    color: white;
+}
+
+/* Clear bookings button */
+.clear-btn {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.clear-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+/* ===== Clean-up additions ===== */
+.subtext { color: #94a3b8; margin-top: -8px; }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.form-row input { flex: 1 1 180px; margin: 6px 0; }
+.form-actions { display: flex; gap: 10px; margin-top: 10px; }
+.form-actions button { min-width: 140px; }
+.secondary-btn { background: #475569; color: white; }
+.danger-btn { background: #ef4444 !important; color: white !important; }
+.warning-btn { background: #f59e0b !important; color: #111827 !important; }
+.action-cell { min-width: 260px; }
+.action-cell button { margin: 3px; }
+.status-pill { display: inline-block; padding: 5px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+.status-pill.available { background: rgba(34,197,94,.18); color: #4ade80; }
+.status-pill.unavailable { background: rgba(239,68,68,.18); color: #f87171; }
+.approved-text { color: #4ade80; font-weight: 700; }
+.rejected-text { color: #f87171; font-weight: 700; }
+.completed-text { color: #38bdf8; font-weight: 700; }
+.booking-panel { width: min(1100px, 95vw); }
+.booking-table-wrap { overflow-x: auto; }
+.booking-panel table { min-width: 1000px; }
+@media (max-width: 700px) {
+    .header { align-items: flex-start; gap: 16px; flex-direction: column; }
+    .booking-btn { width: 100%; }
+    .logout-container { position: static; transform: none; padding: 20px; text-align: center; }
+}
