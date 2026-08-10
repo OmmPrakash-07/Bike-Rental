@@ -11,7 +11,15 @@ The frontend is deployed on **Vercel**, while the backend, database, and persist
 - **Backend API:** https://bike-rental-production-6e17.up.railway.app
 - **Health Check:** https://bike-rental-production-6e17.up.railway.app/api/health
 
-> Admin credentials are intended for project/demo use only. Do not expose production credentials in this README.
+### Admin Access
+
+Admin login is available at:
+
+`/login.html`
+
+Admin credentials are managed securely through deployment environment variables and are not stored or published in this repository.
+
+> For security reasons, admin credentials are not included in this README.
 
 ---
 
