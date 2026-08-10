@@ -4,171 +4,162 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0f1e">
-    <title>Bike Rental Admin</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Bike Rental</title>
+    <link rel="stylesheet" href="user.css">
 </head>
 <body>
-<script>
-    if (localStorage.getItem("isLoggedIn") !== "true") {
-        window.location.href = "login.html";
-    }
-</script>
+<nav class="navbar">
+    <a class="logo logo-link" href="user.html" aria-label="Bike Rental home">Bike<span>Rental</span></a>
+    <div class="nav-actions">
+        <a class="nav-link" href="#booking-status">Check booking</a>
+        <a class="nav-phone" href="#help">📞 Need help?</a>
+    </div>
+</nav>
 
-<div class="admin-shell">
-    <header class="admin-header">
-        <div>
-            <a class="brand" href="index.html">Bike<span>Rental</span> <small>Admin</small></a>
-            <p>Manage vehicles, availability and customer bookings.</p>
+<main>
+    <section class="section hero-section">
+        <div class="hero-heading-row">
+            <div>
+                <span class="section-label">LIVE VEHICLE AVAILABILITY</span>
+                <h1>Choose Your <span class="accent">Ride</span></h1>
+                <p class="hero-copy">Pick an available vehicle, send a booking request, and track it using your Booking ID.</p>
+            </div>
         </div>
-        <div class="header-actions">
-            <a class="ghost-link" href="user.html" target="_blank" rel="noopener">View Customer Site ↗</a>
-            <button type="button" onclick="toggleBookingPanel()" class="booking-btn">Bookings <span id="pendingBookingBadge" class="count-badge" hidden>0</span></button>
-            <button type="button" onclick="logout()" class="logout-btn">Logout</button>
-        </div>
-    </header>
 
-    <section class="stats-grid" aria-label="Overview">
-        <article class="stat-card"><span>Total Vehicles</span><strong id="totalBikeCount">—</strong></article>
-        <article class="stat-card"><span>Available</span><strong id="availableBikeCount" class="green-text">—</strong></article>
-        <article class="stat-card"><span>Unavailable</span><strong id="unavailableBikeCount" class="red-text">—</strong></article>
-        <article class="stat-card"><span>Pending Bookings</span><strong id="pendingBookingCount" class="amber-text">—</strong></article>
+        <div class="fleet-toolbar">
+            <div id="vehicleStats" class="vehicle-stats" aria-live="polite"></div>
+            <button id="refreshBikesButton" class="refresh-btn" type="button" onclick="refreshBikes()" aria-label="Refresh vehicle availability">↻ Refresh</button>
+        </div>
+        <div id="bikeContainer" class="grid" aria-live="polite"></div>
     </section>
 
-    <section class="panel-card form-panel">
-        <div class="section-head">
-            <div>
-                <p class="eyebrow">VEHICLE MANAGEMENT</p>
-                <h2 id="formTitle">Add Bike</h2>
+    <section id="booking-status" class="section status-section">
+        <div class="form-card status-card">
+            <span class="section-label">CHECK BOOKING</span>
+            <h2>Already booked?</h2>
+            <p>Enter your Booking ID to see the latest status.</p>
+            <form id="bookingLookupForm" class="status-search-row" novalidate>
+                <div class="field-wrap compact-field">
+                    <label class="sr-only" for="bookingLookupId">Booking ID</label>
+                    <input id="bookingLookupId" type="number" min="1" step="1" inputmode="numeric" placeholder="Booking ID, e.g. 25" aria-describedby="bookingLookupError">
+                    <small id="bookingLookupError" class="field-error" aria-live="polite"></small>
+                </div>
+                <button id="bookingLookupButton" class="btn-primary" type="submit">Check Status</button>
+            </form>
+            <div id="bookingLookupResult" class="lookup-result" hidden aria-live="polite"></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="process-card reveal">
+            <div class="header-group">
+                <p class="subtitle">SIMPLE PROCESS</p>
+                <h2 class="main-title">How It <span class="accent">Works</span></h2>
             </div>
-            <button type="button" onclick="cancelEdit()" class="secondary-btn compact-btn" id="cancelEditButton" hidden>Cancel Edit</button>
+            <div class="steps-grid">
+                <div class="step">
+                    <div class="circle">1</div>
+                    <h3>Browse Vehicles</h3>
+                    <p>See bikes and scooties with live availability.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">2</div>
+                    <h3>Send Booking Request</h3>
+                    <p>Enter your details, pickup date and rental duration.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">3</div>
+                    <h3>Wait for Approval</h3>
+                    <p>Your vehicle stays reserved while the shop reviews your request.</p>
+                </div>
+                <div class="step">
+                    <div class="circle">4</div>
+                    <h3>Pick Up & Ride</h3>
+                    <p>Show your Booking ID at the shop after approval.</p>
+                </div>
+            </div>
         </div>
 
-        <form id="bikeForm" novalidate>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="name">Vehicle Name</label>
-                    <input type="text" id="name" minlength="2" maxlength="80" placeholder="e.g. Yamaha R15 V4" aria-describedby="nameError" required>
-                    <small id="nameError" class="field-error" aria-live="polite"></small>
-                </div>
+        <div id="help" class="help-card reveal delay-2">
+            <h2 class="main-title compact">Need Help? Call Us 📞</h2>
+            <p class="help-text">Contact details below are placeholders—replace them with the rental shop's real information.</p>
+            <div class="contact-info">
+                <div class="info-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
+                <div class="info-item"><span class="icon">📍</span><span>Bhubaneswar, Odisha</span></div>
+                <div class="info-item gray-text"><span class="icon">🕒</span><span>Open 7 AM — 9 PM Daily</span></div>
+            </div>
+        </div>
+    </section>
+</main>
 
-                <div class="form-group">
-                    <label for="type">Vehicle Type</label>
-                    <input type="text" id="type" maxlength="30" list="vehicleTypes" placeholder="Bike / Scooty / Bullet" aria-describedby="typeError" required>
-                    <datalist id="vehicleTypes">
-                        <option value="Bike"></option>
-                        <option value="Scooty"></option>
-                        <option value="Bullet"></option>
-                    </datalist>
-                    <small id="typeError" class="field-error" aria-live="polite"></small>
-                </div>
+<div id="bookingModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeBookingModal()"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+        <button class="modal-close" type="button" onclick="closeBookingModal()" aria-label="Close booking form">×</button>
+        <span class="section-label">BOOK YOUR RIDE</span>
+        <h2 id="bookingModalTitle">Booking Request</h2>
+        <p id="selectedBikeSummary" class="selected-bike-summary"></p>
 
-                <div class="form-group">
-                    <label for="price">Price Per Day (₹)</label>
-                    <input type="number" id="price" min="1" max="1000000" step="0.01" placeholder="e.g. 1500" aria-describedby="priceError" required>
-                    <small id="priceError" class="field-error" aria-live="polite"></small>
-                </div>
+        <form id="bookingForm" novalidate>
+            <input id="selectedBikeId" type="hidden">
 
+            <div class="form-group">
+                <label for="customerName">Your Name</label>
+                <input id="customerName" type="text" minlength="2" maxlength="80" autocomplete="name" placeholder="Enter your full name" aria-describedby="customerNameError" required>
+                <small id="customerNameError" class="field-error" aria-live="polite"></small>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div class="phone-input-wrap">
+                    <span class="phone-prefix">+91</span>
+                    <input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile number" aria-describedby="phoneError" required>
+                </div>
+                <small id="phoneError" class="field-error" aria-live="polite"></small>
+            </div>
+
+            <div class="form-grid-two">
                 <div class="form-group">
-                    <label for="image">Vehicle Image <span class="optional-text">optional while editing</span></label>
-                    <input type="file" id="image" accept="image/png,image/jpeg,image/webp,image/gif" aria-describedby="imageHelp imageError">
-                    <small id="imageHelp" class="field-help">JPG, PNG, WEBP or GIF • max 5 MB</small>
-                    <small id="imageError" class="field-error" aria-live="polite"></small>
+                    <label for="pickupDate">Pickup Date</label>
+                    <input id="pickupDate" type="date" aria-describedby="pickupDateError" required>
+                    <small id="pickupDateError" class="field-error" aria-live="polite"></small>
+                </div>
+                <div class="form-group">
+                    <label for="durationDays">Rental Duration</label>
+                    <div class="duration-input-wrap">
+                        <input id="durationDays" type="number" min="1" max="30" step="1" value="1" aria-describedby="durationDaysError" required>
+                        <span>days</span>
+                    </div>
+                    <small id="durationDaysError" class="field-error" aria-live="polite"></small>
                 </div>
             </div>
 
-            <div id="imagePreviewWrap" class="image-preview-wrap" hidden>
-                <img id="imagePreview" alt="Selected vehicle preview">
-                <span id="imagePreviewText"></span>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="primary-btn" id="saveBikeButton">Save Bike</button>
-                <button type="button" onclick="resetBikeForm()" class="secondary-btn">Clear Form</button>
-            </div>
+            <div id="bookingEstimate" class="estimate-box" aria-live="polite"></div>
+            <p class="form-note">No payment is collected online yet. This sends a booking request to the rental shop.</p>
+            <button id="submitBookingButton" class="btn-primary" type="submit">Send Booking Request</button>
         </form>
-    </section>
-
-    <section class="panel-card">
-        <div class="section-head table-heading">
-            <div>
-                <p class="eyebrow">FLEET</p>
-                <h2>Bike List</h2>
-            </div>
-            <div class="table-tools">
-                <input id="bikeSearch" type="search" placeholder="Search vehicle…" aria-label="Search vehicles">
-                <select id="availabilityFilter" aria-label="Filter by availability">
-                    <option value="ALL">All Status</option>
-                    <option value="AVAILABLE">Available</option>
-                    <option value="UNAVAILABLE">Unavailable</option>
-                </select>
-                <button id="refreshAdminButton" type="button" class="secondary-btn compact-btn" onclick="refreshAdminData()">↻ Refresh</button>
-            </div>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Vehicle</th>
-                        <th>Type</th>
-                        <th>Price/Day</th>
-                        <th>Status</th>
-                        <th>Image</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="bikeTable"></tbody>
-            </table>
-        </div>
-    </section>
+    </div>
 </div>
 
-<div id="panelBackdrop" class="panel-backdrop" onclick="toggleBookingPanel(false)"></div>
-<aside id="bookingPanel" class="booking-panel" aria-hidden="true" aria-labelledby="bookingPanelTitle">
-    <div class="booking-panel-head">
-        <div>
-            <p class="eyebrow">CUSTOMER REQUESTS</p>
-            <h2 id="bookingPanelTitle">Bookings</h2>
-        </div>
-        <button type="button" onclick="toggleBookingPanel(false)" class="close-btn" aria-label="Close bookings panel">×</button>
+<div id="successModal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeSuccessModal()"></div>
+    <div class="modal-card success-card" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+        <button class="modal-close" type="button" onclick="closeSuccessModal()" aria-label="Close booking confirmation">×</button>
+        <div class="success-icon">✓</div>
+        <h2 id="successTitle">Booking Request Sent</h2>
+        <div id="successDetails"></div>
+        <button class="btn-primary" type="button" onclick="closeSuccessModal()">Done</button>
     </div>
-
-    <div class="booking-toolbar">
-        <input id="bookingSearch" type="search" placeholder="Search ID, customer, phone or bike…" aria-label="Search bookings">
-        <select id="bookingStatusFilter" aria-label="Filter booking status">
-            <option value="ALL">All Status</option>
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="COMPLETED">Completed</option>
-            <option value="REJECTED">Rejected</option>
-        </select>
-        <button type="button" onclick="clearBookings()" class="danger-outline-btn">Clear All</button>
-    </div>
-
-    <div class="booking-table-wrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Customer</th>
-                    <th>Phone</th>
-                    <th>Bike</th>
-                    <th>Pickup</th>
-                    <th>Days</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="bookingTable"></tbody>
-        </table>
-    </div>
-</aside>
+</div>
 
 <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+<footer>
+    <div class="logo">Bike<span>Rental</span></div>
+    <div>Simple bike rental management project.</div>
+</footer>
+
 <script src="config.js"></script>
-<script src="script.js"></script>
+<script src="user.js"></script>
 </body>
 </html>

@@ -59,7 +59,7 @@ async function login(event) {
 
         if (res.ok && result === "SUCCESS") {
             localStorage.setItem("isLoggedIn", "true");
-            window.location.href = "index.html";
+            window.location.href = "admin.html";
             return;
         }
 
