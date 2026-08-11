@@ -32,6 +32,26 @@ public class UserAccount {
     @Column(nullable = false)
     private boolean active = true;
 
+    /*
+     * Nullable so Hibernate can add the column safely to an existing database.
+     * NULL is treated as unverified, so older customer accounts must verify once
+     * before receiving a new JWT after this security upgrade.
+     */
+    @Column(name = "email_verified")
+    private Boolean emailVerified;
+
+    @Column(name = "email_otp_hash", length = 100)
+    private String emailOtpHash;
+
+    @Column(name = "email_otp_expires_at")
+    private LocalDateTime emailOtpExpiresAt;
+
+    @Column(name = "email_otp_attempts")
+    private Integer emailOtpAttempts;
+
+    @Column(name = "email_otp_last_sent_at")
+    private LocalDateTime emailOtpLastSentAt;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -52,6 +72,21 @@ public class UserAccount {
 
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+
+    public boolean isEmailVerified() { return Boolean.TRUE.equals(emailVerified); }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public String getEmailOtpHash() { return emailOtpHash; }
+    public void setEmailOtpHash(String emailOtpHash) { this.emailOtpHash = emailOtpHash; }
+
+    public LocalDateTime getEmailOtpExpiresAt() { return emailOtpExpiresAt; }
+    public void setEmailOtpExpiresAt(LocalDateTime emailOtpExpiresAt) { this.emailOtpExpiresAt = emailOtpExpiresAt; }
+
+    public int getEmailOtpAttempts() { return emailOtpAttempts == null ? 0 : emailOtpAttempts; }
+    public void setEmailOtpAttempts(Integer emailOtpAttempts) { this.emailOtpAttempts = emailOtpAttempts; }
+
+    public LocalDateTime getEmailOtpLastSentAt() { return emailOtpLastSentAt; }
+    public void setEmailOtpLastSentAt(LocalDateTime emailOtpLastSentAt) { this.emailOtpLastSentAt = emailOtpLastSentAt; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

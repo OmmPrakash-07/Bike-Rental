@@ -26,7 +26,7 @@
         </div>
 
         <div id="authForms">
-            <div class="auth-tabs" role="tablist" aria-label="Account mode">
+            <div id="authTabs" class="auth-tabs" role="tablist" aria-label="Account mode">
                 <button id="loginTab" class="auth-tab active" type="button" role="tab" aria-selected="true">Login</button>
                 <button id="signupTab" class="auth-tab" type="button" role="tab" aria-selected="false">Sign Up</button>
             </div>
@@ -82,6 +82,28 @@
                 </div>
                 <button id="userSignupButton" class="submit-button" type="submit">Create Account</button>
             </form>
+
+            <div id="emailOtpPanel" class="otp-panel" hidden>
+                <div class="otp-icon" aria-hidden="true">✉</div>
+                <p class="otp-eyebrow">VERIFY YOUR EMAIL</p>
+                <h2>Enter verification code</h2>
+                <p class="otp-copy">We sent a 6-digit code to <strong id="otpEmailDisplay"></strong>. The code expires in 5 minutes.</p>
+
+                <form id="emailOtpForm" novalidate>
+                    <div class="form-group">
+                        <label for="emailOtp">Verification Code</label>
+                        <input id="emailOtp" class="otp-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" required>
+                        <small id="emailOtpError" class="field-error"></small>
+                    </div>
+                    <button id="verifyEmailButton" class="submit-button" type="submit">Verify Email</button>
+                </form>
+
+                <div class="otp-actions">
+                    <button id="resendOtpButton" class="text-button" type="button">Resend code</button>
+                    <span id="resendOtpHint" class="otp-hint"></span>
+                </div>
+                <button id="backToLoginButton" class="secondary-button otp-back" type="button">← Back to login</button>
+            </div>
         </div>
 
         <a class="back-link" href="/">← Back to vehicles</a>

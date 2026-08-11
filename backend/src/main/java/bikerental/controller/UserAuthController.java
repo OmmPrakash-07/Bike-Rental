@@ -6,6 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import bikerental.dto.AuthResponse;
+import bikerental.dto.EmailOtpResendRequest;
+import bikerental.dto.EmailOtpVerifyRequest;
+import bikerental.dto.OtpChallengeResponse;
 import bikerental.dto.UserLoginRequest;
 import bikerental.dto.UserSignupRequest;
 import bikerental.model.UserAccount;
@@ -25,9 +28,19 @@ public class UserAuthController {
     }
 
     @PostMapping("/signup")
-    public AuthResponse signup(@RequestBody(required = false) UserSignupRequest request) {
-        UserAccount user = userService.signup(request);
+    public OtpChallengeResponse signup(@RequestBody(required = false) UserSignupRequest request) {
+        return userService.signup(request);
+    }
+
+    @PostMapping("/verify-email")
+    public AuthResponse verifyEmail(@RequestBody(required = false) EmailOtpVerifyRequest request) {
+        UserAccount user = userService.verifyEmail(request);
         return tokenService.createUserToken(user);
+    }
+
+    @PostMapping("/resend-email-otp")
+    public OtpChallengeResponse resendEmailOtp(@RequestBody(required = false) EmailOtpResendRequest request) {
+        return userService.resendEmailOtp(request);
     }
 
     @PostMapping("/login")
