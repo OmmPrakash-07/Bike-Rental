@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import jakarta.servlet.DispatcherType;
 
 @Configuration
 public class SecurityConfig {
@@ -59,15 +60,18 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/health", "/api/auth/login", "/api/user-auth/**", "/uploads/**").permitAll()
+                        .requestMatchers("/api/health", "/api/auth/login", "/api/user-auth/**", "/uploads/**")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/bikes", "/api/bikes/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/me").hasAuthority("SCOPE_user")
                         .requestMatchers(HttpMethod.POST, "/api/bookings").hasAuthority("SCOPE_user")
                         .requestMatchers(HttpMethod.GET, "/api/bookings/my").hasAuthority("SCOPE_user")
                         .requestMatchers(HttpMethod.GET, "/api/bookings").hasAuthority("SCOPE_admin")
                         .requestMatchers(HttpMethod.PUT, "/api/bookings/*/approve", "/api/bookings/*/reject")
-                            .hasAuthority("SCOPE_admin")
+                        .hasAuthority("SCOPE_admin")
                         .requestMatchers(HttpMethod.DELETE, "/api/bookings/clear").hasAuthority("SCOPE_admin")
                         .requestMatchers(HttpMethod.GET, "/api/bookings/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/bikes", "/api/bikes/upload").hasAuthority("SCOPE_admin")
