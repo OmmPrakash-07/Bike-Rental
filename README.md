@@ -1,41 +1,20 @@
-# 🏍️ Bike Rental Management System
+# 🏍️ Bike Rental System
 
-A full-stack **Bike Rental Management System** built with **Spring Boot, MySQL, HTML, CSS, and JavaScript**. The project provides a customer-facing rental interface and an admin dashboard for managing vehicles, bookings, availability, and uploaded vehicle images.
+A full-stack bike rental web application built with **Spring Boot, MySQL, HTML, CSS, and JavaScript**.
 
-The frontend is deployed on **Vercel**, while the backend, database, and persistent image storage are hosted on **Railway**.
+The project supports secure customer signup/login, email OTP verification, bike booking, booking ownership protection, bike management, and a separate admin dashboard.
 
-## 🌐 Live Project
-
-- **Customer Website:** https://bike-rental-phi.vercel.app/
-- **Admin Login:** https://bike-rental-phi.vercel.app/login.html
-- **Backend API:** https://bike-rental-production-6e17.up.railway.app
-- **Health Check:** https://bike-rental-production-6e17.up.railway.app/api/health
-
-### Admin Access
-
-Admin login is available at:
-
-`/login.html`
-
-Admin credentials are managed securely through deployment environment variables and are not stored or published in this repository.
-
-> For security reasons, admin credentials are not included in this README.
+> **Current Status:** Core MVP is working and deployed. Authentication, OTP verification, booking security, bike management, database persistence, and production deployment have been tested successfully.
 
 ---
 
-## 📸 Screenshots
+## 🌐 Live Application
 
-### Customer Side
-
-![Bike Rental Customer Dashboard](docs/screenshots/user-dashboard.png)
-
-### Admin Dashboard
-
-![Bike Rental Admin Dashboard](docs/screenshots/admin-dashboard.png)
-
-### Booking Management
-
-![Bike Rental Booking Management](docs/screenshots/admin-bookings.png)
+- **Customer Website:** https://bike-rental-phi.vercel.app
+- **Customer Login / Sign Up:** https://bike-rental-phi.vercel.app/account.html
+- **Admin Login:** https://bike-rental-phi.vercel.app/login.html
+- **Backend API:** https://bike-rental-production-6e17.up.railway.app
+- **Health Check:** https://bike-rental-production-6e17.up.railway.app/api/health
 
 ---
 
@@ -43,156 +22,175 @@ Admin credentials are managed securely through deployment environment variables 
 
 ### Customer
 
-- View all rental vehicles with live availability.
-- View vehicle type, image, and rental price per day.
-- Book an available vehicle through a proper booking form.
-- Enter pickup date and rental duration.
-- Automatic total rental amount calculation.
-- Receive a unique **Booking ID** after a successful booking request.
-- Check booking status using the Booking ID.
-- Clear availability states for available and reserved vehicles.
-- Responsive interface for desktop and mobile.
-- Client-side validation for customer name, phone number, pickup date, duration, and Booking ID.
+- User registration
+- Email OTP verification
+- Secure login
+- JWT authentication
+- BCrypt password hashing
+- Browse bikes
+- View bike details
+- Create bookings
+- View own bookings
+- Booking conflict protection
+- Responsive customer UI
+- Account dropdown
+- Logout
 
-### Admin
+### Security
 
-- Admin login interface.
-- Dashboard counters for total, available, unavailable, and pending bookings.
-- Add new vehicles with image upload.
-- Edit vehicle information.
-- Delete vehicles.
-- Mark a vehicle unavailable for offline rental.
-- Mark returned vehicles available again.
-- Search and filter vehicles.
-- View booking requests.
-- Search and filter bookings.
-- Approve or reject pending booking requests.
-- Booking lifecycle management.
-- Uploaded image preview and validation.
+- Passwords are hashed with BCrypt
+- JWT-based authentication
+- OTP stored as a hash
+- OTP expires automatically
+- OTP resend cooldown
+- Maximum OTP attempt protection
+- Backend derives customer identity from JWT
+- Frontend-provided user IDs are not trusted
+- Cross-user booking access is blocked
+- Non-owner booking access returns `404`
+- Admin APIs are protected separately
+- Secrets are stored in environment variables
+
+### Email OTP
+
+Email verification uses the **Brevo Transactional Email API over HTTPS**.
+
+```text
+Sign Up
+   ↓
+6-digit OTP generated
+   ↓
+OTP emailed through Brevo
+   ↓
+User verifies OTP
+   ↓
+Account verified
+   ↓
+Login / JWT access
+```
+
+Current OTP rules:
+
+- 6-digit OTP
+- 5-minute expiry
+- 60-second resend cooldown
+- Maximum 5 incorrect attempts
+- OTP is never returned by the API
+- Unverified accounts cannot log in
+
+### Bike Management
+
+Admin can:
+
+- Add bikes
+- Upload bike images
+- Update bike details
+- Delete bikes
+- Change availability
+- View inventory
+
+Uploaded images are stored on a persistent Railway volume.
+
+### Booking Management
+
+Customers can:
+
+- Select a bike
+- Select pickup date
+- Select rental duration
+- Create a booking
+- View calculated rental amount
+- View only their own bookings
+
+Backend protections include:
+
+- Duplicate/overlapping booking protection
+- Bike reservation handling
+- Booking ownership validation
+- Booking status management
+- Availability synchronization
+
+Admin can:
+
+- View bookings
+- Approve bookings
+- Reject bookings
+- View booking details
+- Manage bike availability
+
+---
+
+## 🧱 Tech Stack
 
 ### Backend
 
-- REST API built with Spring Boot.
-- MySQL persistence using Spring Data JPA.
-- Automatic booking ID generation.
-- Server-side validation.
-- Duplicate/conflicting booking protection.
-- Vehicle reservation when a booking request is created.
-- Approved bookings keep vehicles unavailable.
-- Returning a vehicle completes its active booking.
-- CORS configuration for the deployed frontend.
-- Persistent vehicle image storage using a Railway Volume.
-- Environment-variable based database configuration.
+- Java 17
+- Spring Boot
+- Spring Web
+- Spring Data JPA
+- Spring Security
+- OAuth2 Resource Server / JWT
+- BCrypt
+- MySQL
+- Maven
+- Java HTTP Client
+- Brevo Transactional Email API
 
----
+### Frontend
 
-## 🔄 Booking Flow
+- HTML5
+- CSS3
+- Vanilla JavaScript
+- Fetch API
+- Browser Local Storage
 
-```text
-AVAILABLE VEHICLE
-      ↓
-Customer submits booking request
-      ↓
-PENDING
-      ↓
-Vehicle becomes reserved/unavailable
-      ↓
-Admin reviews request
-   ↙          ↘
-REJECTED     APPROVED
-   ↓             ↓
-Available     Rental active
-                 ↓
-          Vehicle returned
-                 ↓
-             COMPLETED
-                 ↓
-             AVAILABLE
-```
+### Deployment
 
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | HTML5, CSS3, JavaScript |
-| Backend | Java, Spring Boot |
-| API | REST |
-| ORM | Spring Data JPA / Hibernate |
-| Database | MySQL |
-| Backend Hosting | Railway |
-| Database Hosting | Railway MySQL |
-| Image Storage | Railway Volume |
-| Frontend Hosting | Vercel |
-| Version Control | Git & GitHub |
-
----
-
-## 🏗️ Architecture
-
-```text
-                 ┌────────────────────────────┐
-                 │       Vercel Frontend      │
-                 │ HTML + CSS + JavaScript    │
-                 └─────────────┬──────────────┘
-                               │ HTTPS / REST
-                               ▼
-                 ┌────────────────────────────┐
-                 │    Railway Spring Boot     │
-                 │        REST Backend        │
-                 └──────────┬─────────┬───────┘
-                            │         │
-                            │         │ image files
-                            ▼         ▼
-                  ┌──────────────┐  ┌───────────────┐
-                  │ Railway MySQL│  │ Railway Volume│
-                  │ bikes/bookings│ │ /data/uploads │
-                  └──────────────┘  └───────────────┘
-```
+- **Frontend:** Vercel
+- **Backend:** Railway
+- **Database:** Railway MySQL
+- **Persistent Uploads:** Railway Volume
+- **Email:** Brevo
+- **Source Control:** GitHub
 
 ---
 
 ## 📁 Project Structure
 
 ```text
-Bike-Rental/
+Bike Rental/
 │
 ├── backend/
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── bikerental/
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   └── test/
+│   ├── src/main/java/bikerental/
+│   │   ├── config/
+│   │   ├── controller/
+│   │   ├── dto/
+│   │   ├── model/
+│   │   ├── repository/
+│   │   ├── security/
+│   │   └── service/
+│   ├── src/main/resources/
+│   │   └── application.properties
 │   ├── pom.xml
-│   ├── mvnw
 │   └── mvnw.cmd
 │
 ├── frontend/
-│   ├── index.html          # Customer homepage
-│   ├── admin.html          # Admin dashboard
-│   ├── login.html          # Admin login
+│   ├── index.html
+│   ├── account.html
+│   ├── login.html
+│   ├── admin.html
 │   ├── user.js
-│   ├── script.js
-│   ├── config.js
-│   ├── user.css
-│   └── ...
+│   ├── account.js
+│   ├── admin.js
+│   └── *.css
 │
-├── docs/
-│   └── screenshots/
-│       ├── user-dashboard.png
-│       ├── admin-dashboard.png
-│       └── admin-bookings.png
-│
-├── .gitignore
+├── EMAIL-OTP-SETUP.md
 └── README.md
 ```
 
 ---
 
-## 🔌 Main API Endpoints
+## 🔌 Important API Endpoints
 
 ### Health
 
@@ -200,79 +198,162 @@ Bike-Rental/
 GET /api/health
 ```
 
-### Vehicles
+### Customer Authentication
+
+```http
+POST /api/user-auth/signup
+POST /api/user-auth/verify-email
+POST /api/user-auth/resend-otp
+POST /api/user-auth/login
+```
+
+### User Profile
+
+```http
+GET /api/users/me
+```
+
+Requires:
+
+```http
+Authorization: Bearer <USER_JWT>
+```
+
+### Bikes
 
 ```http
 GET    /api/bikes
+GET    /api/bikes/{id}
 POST   /api/bikes
 PUT    /api/bikes/{id}
 DELETE /api/bikes/{id}
-PUT    /api/bikes/{id}/available
-PUT    /api/bikes/{id}/unavailable
 ```
+
+Bike browsing is public. Bike management requires admin authorization.
 
 ### Bookings
 
 ```http
-GET  /api/bookings
-GET  /api/bookings/{id}
 POST /api/bookings
+GET  /api/bookings/my
+GET  /api/bookings/{id}
+GET  /api/bookings
 PUT  /api/bookings/{id}/approve
 PUT  /api/bookings/{id}/reject
 ```
 
-> Exact endpoints may evolve as the project continues. Keep this section synchronized with the backend controllers.
+Customer booking endpoints use the authenticated customer's identity.
 
 ---
 
-## 💻 Run Locally
+## 🛡️ Booking Ownership / IDOR Protection
 
-### Prerequisites
+A customer cannot access another customer's booking by changing the booking ID.
 
-- Java 21+ / compatible JDK
-- MySQL 8+
-- Python 3 (optional, only for serving the static frontend locally)
-- Git
+Example:
 
-### 1. Clone the repository
+```text
+User A owns Booking #28
+
+User B requests:
+GET /api/bookings/28
+
+Result:
+404 Not Found
+```
+
+The backend validates ownership before returning customer booking data.
+
+This behavior has been tested successfully using separate customer accounts.
+
+---
+
+## ⚙️ Environment Variables
+
+Never commit secrets to GitHub.
+
+### Database
+
+```env
+MYSQLHOST=
+MYSQLPORT=
+MYSQLUSER=
+MYSQLPASSWORD=
+MYSQLDATABASE=
+```
+
+### JWT
+
+```env
+JWT_SECRET=
+```
+
+Use a strong secret containing at least 32 bytes.
+
+### Brevo
+
+```env
+BREVO_API_KEY=
+BREVO_SENDER_EMAIL=
+BREVO_SENDER_NAME=BikeRental
+```
+
+### OTP
+
+```env
+EMAIL_OTP_EXPIRY_MINUTES=5
+EMAIL_OTP_RESEND_SECONDS=60
+EMAIL_OTP_MAX_ATTEMPTS=5
+```
+
+### Upload Storage
+
+```env
+UPLOAD_DIR=/data/uploads
+```
+
+### Admin
+
+```env
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+```
+
+Admin credentials must stay private and should only be configured using environment variables.
+
+---
+
+## 🚀 Run Locally
+
+### 1. Clone
 
 ```bash
 git clone https://github.com/OmmPrakash-07/Bike-Rental.git
 cd Bike-Rental
 ```
 
-### 2. Create the database
+### 2. Create Database
 
 ```sql
 CREATE DATABASE bike_rental;
 ```
 
-### 3. Configure backend environment variables
+Configure the required environment variables before starting the backend.
 
-PowerShell example:
-
-```powershell
-$env:MYSQLHOST="localhost"
-$env:MYSQLPORT="3306"
-$env:MYSQLDATABASE="bike_rental"
-$env:MYSQLUSER="root"
-$env:MYSQLPASSWORD="YOUR_MYSQL_PASSWORD"
-```
-
-### 4. Start the backend
+### 3. Start Backend
 
 ```powershell
 cd backend
 .\mvnw.cmd spring-boot:run
 ```
 
-Backend runs at:
+Backend:
 
 ```text
 http://localhost:8080
 ```
 
-### 5. Start the frontend
+### 4. Start Frontend
 
 Open another terminal:
 
@@ -281,152 +362,208 @@ cd frontend
 python -m http.server 5500
 ```
 
-Customer site:
+Frontend:
 
 ```text
-http://localhost:5500/
+http://localhost:5500
 ```
 
-Admin login:
-
-```text
-http://localhost:5500/login.html
-```
-
----
-
-## ⚙️ Frontend API Configuration
-
-The deployed Railway backend URL is configured in:
-
-```text
-frontend/config.js
-```
-
-Example:
+For local frontend development:
 
 ```javascript
-window.BIKE_RENTAL_CONFIG = {
-  API_BASE_URL:
-    localStorage.getItem("bikeRentalApiBaseUrl") ||
-    "https://bike-rental-production-6e17.up.railway.app"
-};
-```
-
-For local development, the browser API override can be changed to:
-
-```text
-http://localhost:8080
+localStorage.setItem("bikeRentalApiBaseUrl", "http://localhost:8080");
+location.reload();
 ```
 
 ---
 
-## 🚀 Deployment
+## 🧪 Tested Flows
 
-### Backend — Railway
-
-The repository contains both frontend and backend. The Railway backend service uses:
-
-```text
-Root Directory: /backend
-```
-
-Required database variables:
-
-```text
-MYSQLHOST
-MYSQLPORT
-MYSQLDATABASE
-MYSQLUSER
-MYSQLPASSWORD
-```
-
-Persistent image storage:
-
-```text
-UPLOAD_DIR=/data/uploads
-```
-
-Railway Volume mount:
-
-```text
-/data/uploads
-```
-
-### Frontend — Vercel
-
-Vercel uses:
-
-```text
-Root Directory: frontend
-```
-
-Production customer homepage:
-
-```text
-/
-```
-
-Admin login:
-
-```text
-/login.html
-```
-
-Admin dashboard:
-
-```text
-/admin.html
-```
+- Backend health check ✅
+- Bike listing ✅
+- Bike creation ✅
+- Bike image upload ✅
+- Bike update ✅
+- Bike availability changes ✅
+- Bike deletion ✅
+- Customer signup ✅
+- Production OTP email delivery ✅
+- OTP verification ✅
+- Verified user login ✅
+- Unverified user login blocked ✅
+- JWT-protected user APIs ✅
+- Booking creation ✅
+- Duplicate booking conflict protection ✅
+- Customer-specific booking listing ✅
+- User A / User B booking isolation ✅
+- Admin booking approval ✅
+- Admin booking rejection ✅
+- Persistent uploaded images after redeployment ✅
+- Railway backend deployment ✅
+- Railway MySQL integration ✅
+- Vercel frontend deployment ✅
 
 ---
 
 ## ✅ Current Project Status
 
+### Completed
+
 - [x] Spring Boot backend
-- [x] MySQL integration
-- [x] Vehicle CRUD
-- [x] Vehicle image upload
-- [x] Persistent Railway image volume
-- [x] Customer vehicle listing
-- [x] Booking form
-- [x] Rental duration
-- [x] Automatic price calculation
-- [x] Booking ID generation
-- [x] Booking status lookup
+- [x] MySQL database
+- [x] Customer frontend
+- [x] Admin frontend
+- [x] Bike CRUD
+- [x] Bike image upload
+- [x] Persistent image storage
+- [x] Booking workflow
+- [x] Booking conflict protection
 - [x] Admin booking management
-- [x] Approve/reject workflow
-- [x] Duplicate booking protection
-- [x] Vehicle availability lifecycle
-- [x] Frontend validation
-- [x] Backend validation
-- [x] Responsive UI polish
+- [x] Customer signup/login
+- [x] BCrypt password hashing
+- [x] JWT authentication
+- [x] Email OTP verification
+- [x] Brevo transactional email integration
+- [x] Booking ownership protection
+- [x] IDOR protection
 - [x] Railway backend deployment
 - [x] Railway MySQL deployment
 - [x] Vercel frontend deployment
 
----
+### Planned
 
-## 🔮 Possible Future Improvements
-
-- Secure admin authentication with Spring Security and hashed credentials.
-- User accounts and rental history.
-- Online payment integration.
-- Booking cancellation workflow.
-- Date-range availability instead of one active reservation per vehicle.
-- Email/SMS booking notifications.
-- Admin analytics and revenue reports.
-- Cloud object storage/CDN for larger-scale image hosting.
-- Automated backend tests and CI/CD checks.
+- [ ] ₹50 online booking confirmation payment
+- [ ] Razorpay Test Mode integration
+- [ ] Backend payment verification
+- [ ] Deduct ₹50 from final rental balance
+- [ ] Improved booking status workflow
+- [ ] Customer cancellation rules
+- [ ] Improved admin analytics
+- [ ] Optional mobile OTP
+- [ ] More automated tests
 
 ---
 
-## 👨‍💻 Project Purpose
+## 💳 Planned Payment Flow
 
-This project was developed as a **major/academic project** to demonstrate practical full-stack development using Java, Spring Boot, MySQL, REST APIs, frontend JavaScript, deployment, persistent storage, validation, and real booking workflow management.
+Online payment is **not implemented yet**.
+
+Planned flow:
+
+```text
+Verified User
+   ↓
+Select Bike
+   ↓
+Enter Booking Details
+   ↓
+Pay ₹50 Confirmation Amount
+   ↓
+Backend Verifies Payment
+   ↓
+Booking Confirmed
+   ↓
+Bike Reserved
+   ↓
+₹50 Adjusted Against Final Rental Amount
+```
+
+Razorpay Test Mode should be used during development.
+
+---
+
+## 🔒 Security Notes
+
+Never commit:
+
+- Database passwords
+- JWT secrets
+- Brevo API keys
+- Admin credentials
+- Payment gateway secrets
+- Authentication tokens
+- OTP values
+
+If a secret is accidentally exposed, rotate it.
+
+Frontend hiding is not security. Authorization and ownership checks must remain enforced by the backend.
+
+---
+
+## 🐞 Known Limitations
+
+- Online payments are not implemented yet.
+- Mobile number ownership is not currently verified.
+- The frontend intentionally uses a simple MVP architecture.
+- Admin authentication can be expanded further in a future version.
+- Automated integration/security tests can be expanded.
+
+---
+
+## 🗺️ Next Development Point
+
+Continue from:
+
+> **₹50 booking confirmation payment using Razorpay Test Mode**
+
+Existing authentication, OTP, booking ownership, and authorization behavior should remain unchanged.
+
+---
+
+## 📦 Architecture
+
+```text
+Customer Browser
+       │
+       ▼
+     Vercel
+ HTML / CSS / JS
+       │
+       │ HTTPS API
+       ▼
+    Railway
+ Spring Boot API
+   │        │
+   │        ├────────► Brevo HTTPS API
+   │        │           Email OTP
+   │
+   ├────────► Railway MySQL
+   │
+   └────────► Railway Volume
+              Bike Images
+```
+
+---
+
+## 📝 Git Workflow
+
+After development changes:
+
+```bash
+git status
+git add .
+git commit -m "Describe your changes"
+git push origin main
+```
+
+For this README update:
+
+```bash
+git add README.md
+git commit -m "Refresh README with current production status"
+git push origin main
+```
 
 ---
 
 ## 📄 License
 
-This project is currently intended for educational and demonstration purposes.
+This project is currently maintained as an educational / portfolio project. Add an appropriate open-source license before wider redistribution.
+
+---
+
+## ⭐ Summary
+
+The Bike Rental System is now a deployed full-stack MVP with secure authentication, email OTP verification, bike management, booking workflows, user-specific booking protection, persistent storage, and an admin interface.
+
+The recommended next phase is **online booking confirmation payment integration**.
