@@ -131,6 +131,86 @@
             color: white !important;
         }
 
+        [hidden] {
+            display: none !important;
+        }
+
+        .service-user-menu {
+            position: relative;
+        }
+
+        .service-user-button {
+            min-height: 42px;
+            padding: 7px 11px 7px 7px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: #111a2b;
+            color: white;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .service-user-avatar {
+            width: 30px;
+            height: 30px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            font-size: 11px;
+            font-weight: 900;
+        }
+
+        .service-user-arrow {
+            color: #8996aa;
+            font-size: 11px;
+        }
+
+        .service-user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            min-width: 180px;
+            padding: 7px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: #101827;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.42);
+            z-index: 100;
+        }
+
+        .service-user-dropdown a,
+        .service-user-dropdown button {
+            width: 100%;
+            padding: 10px 11px;
+            display: block;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: #c9d3e2;
+            text-align: left;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .service-user-dropdown a:hover,
+        .service-user-dropdown button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: white;
+        }
+
+        .service-user-dropdown button:last-child {
+            color: #fca5a5;
+        }
+
         /* HERO */
 
         .hero {
@@ -795,10 +875,16 @@
             max-width: 760px
         ) {
 
-            .nav-links a:not(
-                .login-btn
-            ) {
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links .optional-nav {
                 display: none;
+            }
+
+            .nav-links a {
+                font-size: 13px;
             }
 
             .hero {
@@ -850,7 +936,28 @@
         ) {
 
             .navbar {
-                padding: 0 17px;
+                padding: 0 14px;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                gap: 7px;
+            }
+
+            .service-user-name {
+                display: none;
+            }
+
+            .service-user-button {
+                padding-right: 7px;
+            }
+
+            .login-btn {
+                padding: 9px 11px;
+                font-size: 12px !important;
             }
 
             .panel {
@@ -899,33 +1006,35 @@
 
     <nav class="navbar">
 
-        <a
-            href="index.html"
-            class="logo"
-        >
+        <a href="index.html" class="logo">
             Bike<span>Rental</span>
         </a>
 
         <div class="nav-links">
 
-            <a href="index.html">
-                Home
-            </a>
+            <a href="index.html" class="mobile-essential">Home</a>
 
-            <a href="#daily">
-                Daily Rentals
-            </a>
+            <a href="#daily" class="optional-nav">Daily Rentals</a>
 
-            <a href="#monthly">
-                Monthly Plans
-            </a>
+            <a href="#monthly" class="optional-nav">Monthly Plans</a>
 
-            <a
-                href="account.html"
-                class="login-btn"
-            >
+            <a id="serviceAccountLink" href="account.html?mode=login" class="login-btn">
                 Login / Sign Up
             </a>
+
+            <div id="serviceUserMenu" class="service-user-menu" hidden>
+                <button id="serviceUserButton" class="service-user-button" type="button" aria-expanded="false">
+                    <span id="serviceUserAvatar" class="service-user-avatar">U</span>
+                    <span id="serviceUserName" class="service-user-name">User</span>
+                    <span class="service-user-arrow">⌄</span>
+                </button>
+
+                <div id="serviceUserDropdown" class="service-user-dropdown" hidden>
+                    <a href="account.html">Profile</a>
+                    <a href="index.html#my-bookings">My Bookings</a>
+                    <button id="serviceLogoutButton" type="button">Logout</button>
+                </div>
+            </div>
 
         </div>
 
@@ -1402,6 +1511,133 @@
         </span>
 
     </footer>
+
+    <script src="config.js"></script>
+    <script>
+        (() => {
+            const USER_TOKEN_KEY = "bikeRentalUserToken";
+            const USER_PROFILE_KEY = "bikeRentalUserProfile";
+
+            const accountLink = document.getElementById("serviceAccountLink");
+            const userMenu = document.getElementById("serviceUserMenu");
+            const userButton = document.getElementById("serviceUserButton");
+            const userDropdown = document.getElementById("serviceUserDropdown");
+            const userAvatar = document.getElementById("serviceUserAvatar");
+            const userName = document.getElementById("serviceUserName");
+            const logoutButton = document.getElementById("serviceLogoutButton");
+
+            function token() {
+                return localStorage.getItem(USER_TOKEN_KEY) || "";
+            }
+
+            function savedProfile() {
+                try {
+                    return JSON.parse(localStorage.getItem(USER_PROFILE_KEY) || "null");
+                } catch {
+                    return null;
+                }
+            }
+
+            function initials(fullName) {
+                const parts = String(fullName || "User").trim().split(/\s+/).filter(Boolean);
+                if (!parts.length) return "U";
+                if (parts.length === 1) return parts[0][0].toUpperCase();
+                return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+            }
+
+            function renderSignedOut() {
+                accountLink.hidden = false;
+                userMenu.hidden = true;
+                userDropdown.hidden = true;
+                userButton.setAttribute("aria-expanded", "false");
+            }
+
+            function renderSignedIn(profile) {
+                const fullName = profile?.fullName?.trim() || "User";
+                const firstName = fullName.split(/\s+/)[0] || "User";
+
+                accountLink.hidden = true;
+                userMenu.hidden = false;
+                userName.textContent = firstName;
+                userAvatar.textContent = initials(fullName);
+            }
+
+            function clearSession() {
+                localStorage.removeItem(USER_TOKEN_KEY);
+                localStorage.removeItem(USER_PROFILE_KEY);
+            }
+
+            async function restoreServiceSession() {
+                const currentToken = token();
+                const cachedProfile = savedProfile();
+
+                if (!currentToken) {
+                    renderSignedOut();
+                    return;
+                }
+
+                // Render immediately from the same cached profile used by the main page.
+                renderSignedIn(cachedProfile);
+
+                const apiBase = String(
+                    window.BIKE_RENTAL_CONFIG?.API_BASE_URL || ""
+                ).replace(/\/$/, "");
+
+                if (!apiBase) return;
+
+                try {
+                    const response = await fetch(`${apiBase}/api/users/me`, {
+                        cache: "no-store",
+                        headers: {
+                            Authorization: `Bearer ${currentToken}`
+                        }
+                    });
+
+                    if (response.status === 401) {
+                        clearSession();
+                        renderSignedOut();
+                        return;
+                    }
+
+                    if (!response.ok) return;
+
+                    const profile = await response.json();
+                    localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+                    renderSignedIn(profile);
+                } catch (error) {
+                    // Keep the cached signed-in UI if the API is temporarily unreachable.
+                    console.warn("Services account state check failed:", error.message);
+                }
+            }
+
+            userButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                const open = userDropdown.hidden;
+                userDropdown.hidden = !open;
+                userButton.setAttribute("aria-expanded", String(open));
+            });
+
+            document.addEventListener("click", () => {
+                userDropdown.hidden = true;
+                userButton.setAttribute("aria-expanded", "false");
+            });
+
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Escape") {
+                    userDropdown.hidden = true;
+                    userButton.setAttribute("aria-expanded", "false");
+                }
+            });
+
+            logoutButton.addEventListener("click", () => {
+                clearSession();
+                window.location.href = "index.html";
+            });
+
+            restoreServiceSession();
+        })();
+    </script>
+
 </body>
 
 </html>
