@@ -16,6 +16,9 @@
         </a>
 
         <div class="nav-actions">
+            <a class="nav-services-link" href="services.html">
+                Services
+            </a>
             <button id="myBookingsLink" class="nav-bookings-btn" type="button" onclick="scrollToMyBookings()" hidden>
                 My Bookings
             </button>
@@ -123,7 +126,7 @@
                     <div class="step">
                         <div class="circle">2</div>
                         <h3>Send Booking Request</h3>
-                        <p>Sign in, choose your pickup date and rental duration.</p>
+                        <p>Sign in, choose your pickup date, then select Hours or Days and your rental duration.</p>
                     </div>
                     <div class="step">
                         <div class="circle">3</div>
@@ -170,20 +173,70 @@
                     <small>Name and phone are taken securely from your signed-in account.</small>
                 </div>
 
-                <div class="form-grid-two">
+                <div class="booking-date-first">
                     <div class="form-group">
                         <label for="pickupDate">Pickup Date</label>
                         <input id="pickupDate" type="date" aria-describedby="pickupDateError" required>
                         <small id="pickupDateError" class="field-error" aria-live="polite"></small>
                     </div>
-                    <div class="form-group">
-                        <label for="durationDays">Rental Duration</label>
-                        <div class="duration-input-wrap">
-                            <input id="durationDays" type="number" min="1" max="30" step="1" value="1"
-                                aria-describedby="durationDaysError" required>
-                            <span>days</span>
+                </div>
+
+                <div id="rentalOptionsStage" class="rental-options-stage" hidden>
+                    <div class="rental-stage-heading">
+                        <span>How long do you need the vehicle?</span>
+                        <small>Choose Hours for a short ride or Days for a longer rental.</small>
+                    </div>
+
+                    <div class="rental-type-options">
+                        <label class="rental-type-card">
+                            <input id="rentalHourly" type="radio" name="rentalType" value="HOURLY">
+                            <span class="rental-type-card-content">
+                                <strong>Hours</strong>
+                                <small>1–12 hours</small>
+                            </span>
+                        </label>
+
+                        <label class="rental-type-card">
+                            <input id="rentalDaily" type="radio" name="rentalType" value="DAILY">
+                            <span class="rental-type-card-content">
+                                <strong>Days</strong>
+                                <small>1–30 days</small>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div id="hourlyRentalFields" class="rental-details-grid" hidden>
+                        <div class="form-group">
+                            <label for="pickupTime">Pickup Time</label>
+                            <input id="pickupTime" type="time" step="1800" aria-describedby="pickupTimeError">
+                            <small id="pickupTimeError" class="field-error" aria-live="polite"></small>
                         </div>
-                        <small id="durationDaysError" class="field-error" aria-live="polite"></small>
+
+                        <div class="form-group">
+                            <label for="durationHours">Rental Hours</label>
+                            <select id="durationHours" aria-describedby="durationHoursError">
+                                <option value="1">1 Hour</option>
+                                <option value="2">2 Hours</option>
+                                <option value="3">3 Hours</option>
+                                <option value="4">4 Hours</option>
+                                <option value="6">6 Hours</option>
+                                <option value="8">8 Hours</option>
+                                <option value="12">12 Hours</option>
+                            </select>
+                            <small id="durationHoursError" class="field-error" aria-live="polite"></small>
+                        </div>
+                    </div>
+
+                    <div id="dailyRentalFields" class="rental-details-grid" hidden>
+                        <div class="form-group">
+                            <label for="durationDays">Rental Days</label>
+                            <div class="duration-input-wrap">
+                                <input id="durationDays" type="number" min="1" max="30" step="1" value="1"
+                                    aria-describedby="durationDaysError">
+                                <span>days</span>
+                            </div>
+                            <small id="durationDaysError" class="field-error" aria-live="polite"></small>
+                        </div>
                     </div>
                 </div>
 

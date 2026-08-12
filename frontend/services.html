@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070b14">
+
+    <title>Services | BikeRental</title>
+
+    <style>
+        :root {
+            --bg: #070b14;
+            --surface: #0d1422;
+            --surface2: #121c2e;
+            --line: rgba(255, 255, 255, 0.09);
+
+            --text: #f7f9fc;
+            --muted: #97a6bc;
+
+            --orange: #ff6b00;
+            --orangeSoft: rgba(255, 107, 0, 0.14);
+
+            --green: #35d4a7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            color: var(--text);
+
+            background:
+                radial-gradient(
+                    circle at 50% 5%,
+                    rgba(255, 107, 0, 0.09),
+                    transparent 430px
+                ),
+                var(--bg);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            position: sticky;
+
+            top: 0;
+
+            z-index: 50;
+
+            height: 74px;
+
+            padding: 0 6vw;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            border-bottom: 1px solid var(--line);
+
+            background: rgba(7, 11, 20, 0.9);
+
+            backdrop-filter: blur(18px);
+        }
+
+        .logo {
+            font-size: 23px;
+
+            font-weight: 900;
+
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--orange);
+        }
+
+        .nav-links {
+            display: flex;
+
+            gap: 25px;
+
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #bdc8d9;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .login-btn {
+            padding: 11px 17px;
+
+            border-radius: 10px;
+
+            background: var(--orangeSoft);
+
+            border: 1px solid rgba(255, 107, 0, 0.4);
+
+            color: white !important;
+        }
+
+        /* HERO */
+
+        .hero {
+            max-width: 950px;
+
+            margin: auto;
+
+            padding: 80px 20px 60px;
+
+            text-align: center;
+        }
+
+        .label {
+            color: var(--orange);
+
+            font-size: 12px;
+
+            font-weight: 900;
+
+            letter-spacing: 3px;
+        }
+
+        .hero h1 {
+            margin: 15px auto 20px;
+
+            font-size: clamp(
+                42px,
+                6vw,
+                82px
+            );
+
+            line-height: 0.98;
+
+            letter-spacing: -4px;
+        }
+
+        .hero h1 span {
+            color: var(--orange);
+        }
+
+        .hero p {
+            max-width: 650px;
+
+            margin: auto;
+
+            color: var(--muted);
+
+            line-height: 1.7;
+
+            font-size: 17px;
+        }
+
+        .status-row {
+            margin-top: 27px;
+
+            display: flex;
+
+            gap: 12px;
+
+            justify-content: center;
+
+            flex-wrap: wrap;
+        }
+
+        .status {
+            padding: 9px 13px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 999px;
+
+            background: rgba(
+                255,
+                255,
+                255,
+                0.03
+            );
+
+            color: #c5d0df;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        .live::before {
+            content: "";
+
+            display: inline-block;
+
+            width: 8px;
+
+            height: 8px;
+
+            margin-right: 8px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+        }
+
+        /* MAIN SERVICES */
+
+        .services {
+            width: min(
+                1450px,
+                calc(100% - 40px)
+            );
+
+            margin: auto;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(280px, 1fr)
+                minmax(420px, 1.35fr)
+                minmax(280px, 1fr);
+
+            gap: 20px;
+        }
+
+        .panel,
+        .vehicle-stage {
+            border-radius: 28px;
+
+            border: 1px solid var(--line);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #111b2c,
+                    #0a101c
+                );
+
+            box-shadow:
+                0 30px 70px
+                rgba(0, 0, 0, 0.28);
+        }
+
+        /* SERVICE PANEL */
+
+        .panel {
+            padding: 32px;
+        }
+
+        .tag {
+            display: inline-block;
+
+            padding: 7px 10px;
+
+            border-radius: 8px;
+
+            background:
+                rgba(
+                    53,
+                    212,
+                    167,
+                    0.12
+                );
+
+            color: #6de5c3;
+
+            font-size: 11px;
+
+            font-weight: 900;
+
+            letter-spacing: 1px;
+        }
+
+        .coming-tag {
+            background:
+                rgba(
+                    255,
+                    107,
+                    0,
+                    0.13
+                );
+
+            color: #ffab70;
+        }
+
+        .panel h2 {
+            margin: 18px 0 10px;
+
+            font-size: 40px;
+
+            letter-spacing: -2px;
+        }
+
+        .intro {
+            min-height: 70px;
+
+            margin-bottom: 25px;
+
+            color: var(--muted);
+
+            line-height: 1.6;
+        }
+
+        .feature {
+            display: grid;
+
+            grid-template-columns:
+                38px 1fr;
+
+            gap: 12px;
+
+            padding: 16px 0;
+
+            border-top:
+                1px solid var(--line);
+        }
+
+        .number {
+            width: 34px;
+
+            height: 34px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            background:
+                var(--orangeSoft);
+
+            color: var(--orange);
+
+            font-size: 11px;
+
+            font-weight: 900;
+        }
+
+        .feature h3 {
+            margin: 0 0 5px;
+
+            font-size: 16px;
+        }
+
+        .feature p {
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 13px;
+
+            line-height: 1.6;
+        }
+
+        .primary-btn,
+        .disabled-btn {
+            margin-top: 26px;
+
+            min-height: 52px;
+
+            width: 100%;
+
+            border-radius: 13px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-weight: 900;
+        }
+
+        .primary-btn {
+            background: var(--orange);
+
+            color: white;
+
+            transition:
+                transform 0.2s,
+                filter 0.2s;
+        }
+
+        .primary-btn:hover {
+            transform:
+                translateY(-2px);
+
+            filter:
+                brightness(1.07);
+        }
+
+        .disabled-btn {
+            border: 1px solid var(--line);
+
+            background: #162134;
+
+            color: #768398;
+        }
+
+        /* VEHICLE CENTER */
+
+        .vehicle-stage {
+            min-height: 650px;
+
+            position: relative;
+
+            overflow: hidden;
+
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            align-items: center;
+
+            isolation: isolate;
+        }
+
+        .vehicle-stage::before {
+            content: "";
+
+            position: absolute;
+
+            width: 500px;
+
+            height: 500px;
+
+            left: 50%;
+
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background:
+                conic-gradient(
+                    #ff6b00 0 25%,
+                    rgba(
+                        255,
+                        107,
+                        0,
+                        0.15
+                    ) 25% 50%,
+                    rgba(
+                        255,
+                        107,
+                        0,
+                        0.55
+                    ) 50% 75%,
+                    rgba(
+                        255,
+                        107,
+                        0,
+                        0.08
+                    ) 75%
+                );
+
+            opacity: 0.7;
+
+            z-index: -3;
+        }
+
+        .vehicle-stage::after {
+            content: "";
+
+            position: absolute;
+
+            width: 350px;
+
+            height: 350px;
+
+            left: 50%;
+
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background: var(--surface);
+
+            z-index: -2;
+        }
+
+        .center-line {
+            position: absolute;
+
+            left: 50%;
+
+            top: 10%;
+
+            bottom: 10%;
+
+            width: 1px;
+
+            background:
+                linear-gradient(
+                    transparent,
+                    rgba(
+                        255,
+                        255,
+                        255,
+                        0.14
+                    ),
+                    transparent
+                );
+        }
+
+        .vehicle-box {
+            text-align: center;
+
+            min-width: 0;
+
+            padding: 20px;
+        }
+
+        .vehicle-image {
+            height: 310px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        .vehicle-image img {
+            width: 100%;
+
+            max-width: 330px;
+
+            max-height: 285px;
+
+            object-fit: contain;
+
+            filter:
+                drop-shadow(
+                    0 30px 28px
+                    rgba(
+                        0,
+                        0,
+                        0,
+                        0.45
+                    )
+                );
+        }
+
+        .vehicle-placeholder {
+            font-size: 120px;
+        }
+
+        .vehicle-info {
+            margin-top: 12px;
+        }
+
+        .vehicle-info span {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: var(--orange);
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+        .vehicle-info strong {
+            font-size: 16px;
+        }
+
+        /* COMPARISON */
+
+        .comparison {
+            width: min(
+                1150px,
+                calc(100% - 40px)
+            );
+
+            margin: 90px auto;
+        }
+
+        .section-title {
+            text-align: center;
+
+            margin-bottom: 30px;
+        }
+
+        .section-title h2 {
+            margin: 8px 0;
+
+            font-size: 42px;
+
+            letter-spacing: -2px;
+        }
+
+        .comparison-grid {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 18px;
+        }
+
+        .compare-card {
+            padding: 30px;
+
+            border-radius: 22px;
+
+            border: 1px solid var(--line);
+
+            background: var(--surface);
+        }
+
+        .compare-card span {
+            color: var(--orange);
+
+            font-size: 12px;
+
+            font-weight: 900;
+        }
+
+        .compare-card h3 {
+            margin:
+                12px 0 8px;
+
+            font-size: 23px;
+        }
+
+        .compare-card p {
+            color: var(--muted);
+
+            line-height: 1.6;
+        }
+
+        .compare-card a {
+            color: white;
+
+            font-weight: 800;
+        }
+
+        /* BOTTOM CTA */
+
+        .bottom {
+            width: min(
+                1150px,
+                calc(100% - 40px)
+            );
+
+            margin:
+                0 auto 80px;
+
+            padding: 35px;
+
+            border-radius: 25px;
+
+            border: 1px solid var(--line);
+
+            background:
+                linear-gradient(
+                    120deg,
+                    rgba(
+                        255,
+                        107,
+                        0,
+                        0.15
+                    ),
+                    transparent 45%
+                ),
+                var(--surface);
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 25px;
+        }
+
+        .bottom h2 {
+            margin: 7px 0;
+
+            font-size: 36px;
+
+            letter-spacing: -2px;
+        }
+
+        .bottom p {
+            color: var(--muted);
+
+            margin: 0;
+        }
+
+        .bottom .primary-btn {
+            width: auto;
+
+            min-width: 210px;
+
+            padding: 0 25px;
+
+            margin: 0;
+        }
+
+        footer {
+            min-height: 110px;
+
+            border-top: 1px solid var(--line);
+
+            padding: 30px 6vw;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (
+            max-width: 1100px
+        ) {
+
+            .services {
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+            .vehicle-stage {
+                grid-column:
+                    1 / -1;
+
+                grid-row: 1;
+
+                min-height: 520px;
+            }
+        }
+
+        @media (
+            max-width: 760px
+        ) {
+
+            .nav-links a:not(
+                .login-btn
+            ) {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 60px;
+            }
+
+            .hero h1 {
+                letter-spacing: -2px;
+            }
+
+            .services {
+                width:
+                    calc(100% - 24px);
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .vehicle-stage {
+                grid-column: auto;
+            }
+
+            .comparison-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+            .bottom {
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+            .bottom .primary-btn {
+                width: 100%;
+            }
+
+            footer {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 10px;
+            }
+        }
+
+        @media (
+            max-width: 520px
+        ) {
+
+            .navbar {
+                padding: 0 17px;
+            }
+
+            .panel {
+                padding: 24px 20px;
+            }
+
+            .vehicle-stage {
+                grid-template-columns:
+                    1fr;
+
+                min-height: 650px;
+
+                padding: 20px 0;
+            }
+
+            .center-line {
+                display: none;
+            }
+
+            .vehicle-image {
+                height: 225px;
+            }
+
+            .vehicle-image img {
+                max-height: 210px;
+            }
+
+            .vehicle-stage::before {
+                width: 340px;
+
+                height: 340px;
+            }
+
+            .vehicle-stage::after {
+                width: 235px;
+
+                height: 235px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <a
+            href="index.html"
+            class="logo"
+        >
+            Bike<span>Rental</span>
+        </a>
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="#daily">
+                Daily Rentals
+            </a>
+
+            <a href="#monthly">
+                Monthly Plans
+            </a>
+
+            <a
+                href="account.html"
+                class="login-btn"
+            >
+                Login / Sign Up
+            </a>
+
+        </div>
+
+    </nav>
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="label">
+            SERVICES WE OFFER
+        </div>
+
+        <h1>
+            A plan for
+            <span>every ride.</span>
+        </h1>
+
+        <p>
+            Choose a short-term daily rental
+            today or explore our planned
+            monthly rental option for regular
+            riders.
+        </p>
+
+        <div class="status-row">
+
+            <div class="status live">
+                Daily rentals available
+            </div>
+
+            <div class="status">
+                Monthly plans coming soon
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- SERVICES -->
+
+    <section class="services">
+
+        <!-- DAILY -->
+
+        <article
+            id="daily"
+            class="panel"
+        >
+
+            <span class="tag">
+                AVAILABLE NOW
+            </span>
+
+            <h2>
+                Daily Rentals
+            </h2>
+
+            <p class="intro">
+                Best for short trips,
+                weekend rides, work,
+                college or temporary
+                transportation.
+            </p>
+
+            <div class="feature">
+
+                <div class="number">
+                    01
+                </div>
+
+                <div>
+
+                    <h3>
+                        Flexible Duration
+                    </h3>
+
+                    <p>
+                        Select your pickup
+                        date and required
+                        rental duration.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    02
+                </div>
+
+                <div>
+
+                    <h3>
+                        Live Availability
+                    </h3>
+
+                    <p>
+                        See which vehicles
+                        are currently
+                        available before
+                        booking.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    03
+                </div>
+
+                <div>
+
+                    <h3>
+                        Transparent Pricing
+                    </h3>
+
+                    <p>
+                        View the per-day
+                        price and total
+                        rental estimate.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    04
+                </div>
+
+                <div>
+
+                    <h3>
+                        Secure Booking
+                    </h3>
+
+                    <p>
+                        Every booking is
+                        securely linked
+                        to your verified
+                        account.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <a
+                href="index.html#vehicles"
+                class="primary-btn"
+            >
+                Browse Vehicles →
+            </a>
+
+        </article>
+
+        <!-- VEHICLES -->
+
+        <div class="vehicle-stage">
+
+            <div class="center-line"></div>
+
+            <div class="vehicle-box">
+
+                <div
+                    id="dailyVehicle"
+                    class="vehicle-image"
+                >
+                    <div
+                        class="vehicle-placeholder"
+                    >
+                        🏍️
+                    </div>
+                </div>
+
+                <div class="vehicle-info">
+
+                    <span>
+                        SHORT TERM
+                    </span>
+
+                    <strong
+                        id="dailyVehicleName"
+                    >
+                        Daily Ride
+                    </strong>
+
+                </div>
+
+            </div>
+
+            <div class="vehicle-box">
+
+                <div
+                    id="monthlyVehicle"
+                    class="vehicle-image"
+                >
+                    <div
+                        class="vehicle-placeholder"
+                    >
+                        🛵
+                    </div>
+                </div>
+
+                <div class="vehicle-info">
+
+                    <span>
+                        LONG TERM
+                    </span>
+
+                    <strong
+                        id="monthlyVehicleName"
+                    >
+                        Monthly Ride
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- MONTHLY -->
+
+        <article
+            id="monthly"
+            class="panel"
+        >
+
+            <span
+                class="tag coming-tag"
+            >
+                COMING SOON
+            </span>
+
+            <h2>
+                Monthly Plans
+            </h2>
+
+            <p class="intro">
+                A future long-term rental
+                option for customers who
+                need a vehicle regularly.
+            </p>
+
+            <div class="feature">
+
+                <div class="number">
+                    01
+                </div>
+
+                <div>
+
+                    <h3>
+                        Long-Term Rental
+                    </h3>
+
+                    <p>
+                        Keep a vehicle for
+                        a longer continuous
+                        rental period.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    02
+                </div>
+
+                <div>
+
+                    <h3>
+                        Monthly Billing
+                    </h3>
+
+                    <p>
+                        Planned simple
+                        monthly rental
+                        pricing for regular
+                        riders.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    03
+                </div>
+
+                <div>
+
+                    <h3>
+                        One Account
+                    </h3>
+
+                    <p>
+                        Future subscriptions
+                        will stay connected
+                        to your BikeRental
+                        account.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="feature">
+
+                <div class="number">
+                    04
+                </div>
+
+                <div>
+
+                    <h3>
+                        Regular Use
+                    </h3>
+
+                    <p>
+                        Designed for
+                        commuting, college,
+                        work and longer
+                        mobility needs.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="disabled-btn">
+                Monthly Plans Coming Soon
+            </div>
+
+        </article>
+
+    </section>
+
+    <!-- COMPARISON -->
+
+    <section class="comparison">
+
+        <div class="section-title">
+
+            <div class="label">
+                QUICK COMPARISON
+            </div>
+
+            <h2>
+                Which option is for you?
+            </h2>
+
+        </div>
+
+        <div class="comparison-grid">
+
+            <article class="compare-card">
+
+                <span>
+                    01 — DAILY
+                </span>
+
+                <h3>
+                    Need a ride for
+                    a few days?
+                </h3>
+
+                <p>
+                    Browse the live fleet,
+                    choose an available
+                    vehicle and create your
+                    rental booking.
+                </p>
+
+                <a href="index.html#vehicles">
+                    Start booking →
+                </a>
+
+            </article>
+
+            <article class="compare-card">
+
+                <span>
+                    02 — MONTHLY
+                </span>
+
+                <h3>
+                    Need a vehicle
+                    regularly?
+                </h3>
+
+                <p>
+                    Monthly rental plans
+                    will be added as the
+                    next long-term rental
+                    service.
+                </p>
+
+                <div
+                    style="
+                        color:#78869a;
+                        font-weight:800;
+                    "
+                >
+                    Coming soon
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- CTA -->
+
+    <section class="bottom">
+
+        <div>
+
+            <div class="label">
+                READY TO RIDE?
+            </div>
+
+            <h2>
+                Find your vehicle now.
+            </h2>
+
+            <p>
+                Sign in and book from
+                the currently available
+                fleet.
+            </p>
+
+        </div>
+
+        <a
+            href="index.html#vehicles"
+            class="primary-btn"
+        >
+            Rent a Vehicle →
+        </a>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <a
+            href="index.html"
+            class="logo"
+        >
+            Bike<span>Rental</span>
+        </a>
+
+        <span>
+            Simple, secure bike rental.
+        </span>
+
+    </footer>
+
+    <!-- EXISTING PROJECT CONFIG -->
+
+    <script src="config.js"></script>
+
+    <script>
+
+        /*
+         * Uses the existing Bike Rental API
+         * only to display vehicle images.
+         * No new backend endpoint required.
+         */
+
+        const config =
+            window.BIKE_RENTAL_CONFIG || {};
+
+        const API_BASE =
+            String(
+                config.API_BASE_URL || ""
+            ).replace(/\/$/, "");
+
+        function getImageUrl(
+            imageUrl
+        ) {
+
+            if (!imageUrl) {
+                return "";
+            }
+
+            if (
+                /^https?:\/\//i.test(
+                    imageUrl
+                )
+            ) {
+                return imageUrl;
+            }
+
+            return (
+                API_BASE +
+                "/" +
+                imageUrl.replace(
+                    /^\//,
+                    ""
+                )
+            );
+        }
+
+        function showVehicle(
+            bike,
+            visualId,
+            nameId,
+            fallback
+        ) {
+
+            if (!bike) {
+                return;
+            }
+
+            const visual =
+                document.getElementById(
+                    visualId
+                );
+
+            const name =
+                document.getElementById(
+                    nameId
+                );
+
+            if (name) {
+
+                name.textContent =
+                    bike.name ||
+                    "BikeRental Vehicle";
+
+            }
+
+            if (
+                !visual ||
+                !bike.imageUrl
+            ) {
+
+                return;
+            }
+
+            const image =
+                document.createElement(
+                    "img"
+                );
+
+            image.src =
+                getImageUrl(
+                    bike.imageUrl
+                );
+
+            image.alt =
+                bike.name ||
+                "BikeRental vehicle";
+
+            image.addEventListener(
+                "error",
+                () => {
+
+                    visual.innerHTML =
+                        `<div class="vehicle-placeholder">${fallback}</div>`;
+
+                },
+                {
+                    once: true
+                }
+            );
+
+            visual.innerHTML = "";
+
+            visual.appendChild(
+                image
+            );
+
+        }
+
+        async function loadVehicles() {
+
+            if (!API_BASE) {
+                return;
+            }
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${API_BASE}/api/bikes`,
+                        {
+                            cache:
+                                "no-store"
+                        }
+                    );
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Could not load vehicles"
+                    );
+
+                }
+
+                const bikes =
+                    await response.json();
+
+                if (
+                    !Array.isArray(
+                        bikes
+                    ) ||
+                    bikes.length === 0
+                ) {
+
+                    return;
+
+                }
+
+                const first =
+                    bikes.find(
+                        bike =>
+                            bike.available
+                    ) ||
+                    bikes[0];
+
+                const second =
+                    bikes.find(
+                        bike =>
+                            bike.id !==
+                            first.id &&
+                            /scoot/i.test(
+                                String(
+                                    bike.type ||
+                                    ""
+                                )
+                            )
+                    ) ||
+
+                    bikes.find(
+                        bike =>
+                            bike.id !==
+                            first.id
+                    ) ||
+
+                    first;
+
+                showVehicle(
+                    first,
+                    "dailyVehicle",
+                    "dailyVehicleName",
+                    "🏍️"
+                );
+
+                showVehicle(
+                    second,
+                    "monthlyVehicle",
+                    "monthlyVehicleName",
+                    "🛵"
+                );
+
+            }
+            catch (error) {
+
+                console.warn(
+                    "Services vehicle preview:",
+                    error
+                );
+
+            }
+
+        }
+
+        loadVehicles();
+
+    </script>
+
+</body>
+
+</html>
