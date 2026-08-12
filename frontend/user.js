@@ -250,7 +250,7 @@ async function restoreUserSession() {
   }
 }
 
-function requireUser(returnTarget = "#vehicles") {
+function requireUser(returnTarget = "vehicles.html#vehicles") {
   if (currentUser && userToken()) return true;
   localStorage.setItem("bikeRentalReturnTo", returnTarget);
   window.location.href = "account.html?mode=login";
@@ -695,7 +695,7 @@ function validateBookingForm() {
 }
 
 function openBookingModal(bikeId) {
-  if (!requireUser("#vehicles")) return;
+  if (!requireUser("vehicles.html#vehicles")) return;
 
   selectedBike = bikes.find((bike) => bike.id === bikeId);
 
@@ -865,7 +865,7 @@ function updateBookingEstimate() {
 async function submitBooking(event) {
   event.preventDefault();
 
-  if (!selectedBike || !requireUser("#vehicles")) return;
+  if (!selectedBike || !requireUser("vehicles.html#vehicles")) return;
 
   const values = validateBookingForm();
 

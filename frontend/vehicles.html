@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
+    <title>Bike Rental</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a class="logo logo-link" href="/" aria-label="Bike Rental home">
+            Bike<span>Rental</span>
+        </a>
+
+        <div class="nav-actions">
+            <a class="nav-services-link" href="services.html">Services</a>
+
+            <button id="myBookingsLink" class="nav-bookings-btn" type="button" onclick="scrollToMyBookings()" hidden>
+                My Bookings
+            </button>
+
+            <a id="accountLink" class="login-nav-btn" href="account.html">
+                Login / Sign Up
+            </a>
+
+            <div id="userMenu" class="user-menu" hidden>
+                <button id="userMenuButton" class="user-menu-button" type="button" onclick="toggleUserMenu(event)"
+                    aria-expanded="false">
+                    <span id="userAvatar" class="user-avatar">U</span>
+                    <span id="userMenuName" class="user-menu-name">User</span>
+                    <span class="user-menu-arrow">⌄</span>
+                </button>
+
+                <div id="userMenuDropdown" class="user-menu-dropdown" hidden>
+                    <a href="account.html"><span>Profile</span></a>
+                    <button type="button" onclick="logoutUser()"><span>Logout</span></button>
+                </div>
+            </div>
+
+            <a class="nav-phone" href="#help">☎ Need help?</a>
+        </div>
+
+        <button id="mobileMenuButton" class="mobile-menu-button" type="button"
+            aria-label="Open navigation menu" aria-controls="mobileMenu" aria-expanded="false"
+            onclick="toggleMobileMenu(event)">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
+    <aside id="mobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Site navigation">
+        <div class="mobile-menu-header">
+            <a class="logo mobile-menu-logo" href="index.html" onclick="closeMobileMenu()">
+                Bike<span>Rental</span>
+            </a>
+            <button class="mobile-menu-close" type="button" aria-label="Close navigation menu"
+                onclick="closeMobileMenu()">×</button>
+        </div>
+
+        <div id="mobileUserSummary" class="mobile-user-summary" hidden>
+            <span id="mobileUserAvatar" class="mobile-user-avatar">U</span>
+            <div>
+                <strong id="mobileUserName">User</strong>
+                <small>Signed in</small>
+            </div>
+        </div>
+
+        <nav class="mobile-menu-links" aria-label="Customer menu">
+            <a href="index.html" onclick="closeMobileMenu()">
+                <span>⌂</span> Home
+            </a>
+            <a href="vehicles.html#vehicles" onclick="closeMobileMenu()">
+                <span>🏍</span> Browse Vehicles
+            </a>
+            <a href="services.html" onclick="closeMobileMenu()">
+                <span>◇</span> Services
+            </a>
+            <a href="services.html#daily" onclick="closeMobileMenu()">
+                <span>◷</span> Daily Rentals
+            </a>
+            <a href="services.html#monthly" onclick="closeMobileMenu()">
+                <span>◫</span> Monthly Plans
+            </a>
+            <a href="#my-bookings" onclick="closeMobileMenu()">
+                <span>▣</span> My Bookings
+            </a>
+            <a href="#help" onclick="closeMobileMenu()">
+                <span>☎</span> Need Help?
+            </a>
+        </nav>
+
+        <div class="mobile-menu-account">
+            <a id="mobileAccountLink" class="mobile-menu-primary" href="account.html?mode=login"
+                onclick="closeMobileMenu()">Login / Sign Up</a>
+
+            <a id="mobileProfileLink" href="account.html" onclick="closeMobileMenu()" hidden>Profile</a>
+            <button id="mobileLogoutButton" type="button" onclick="logoutUser(); closeMobileMenu();" hidden>Logout</button>
+        </div>
+    </aside>
+
+    <main>
+        <section class="browse-divider" aria-hidden="true">
+            <span>LIVE FLEET</span>
+            <h2>Browse Vehicles</h2>
+            <p>Choose from the live fleet currently loaded by the backend.</p>
+        </section>
+
+        <section id="vehicles" class="section hero-section">
+            <div class="hero-heading-row">
+                <div>
+                    <span class="section-label">LIVE VEHICLE AVAILABILITY</span>
+                    <h1>Choose Your <span class="accent">Ride</span></h1>
+                    <p class="hero-copy">Pick an available vehicle, send a booking request, and track it using your
+                        Booking ID.</p>
+                </div>
+            </div>
+
+            <div class="fleet-toolbar">
+                <div id="vehicleStats" class="vehicle-stats" aria-live="polite"></div>
+                <button id="refreshBikesButton" class="refresh-btn" type="button" onclick="refreshBikes()"
+                    aria-label="Refresh vehicle availability">↻ Refresh</button>
+            </div>
+            <div id="bikeContainer" class="grid" aria-live="polite"></div>
+        </section>
+
+
+        <section id="my-bookings" class="section my-bookings-section">
+            <div class="form-card bookings-account-card">
+                <div class="section-head-inline">
+                    <div>
+                        <span class="section-label">YOUR ACCOUNT</span>
+                        <h2>My Bookings</h2>
+                        <p>Only bookings linked to your signed-in account are shown here.</p>
+                    </div>
+                    <button class="refresh-btn" type="button" onclick="loadMyBookings()">↻ Refresh</button>
+                </div>
+                <div id="myBookingsAuthNotice" class="auth-required-box">
+                    <strong>Sign in to see your bookings.</strong>
+                    <span>Your booking history is private and protected by your account.</span>
+                    <a class="btn-primary inline-cta" href="account.html?mode=login">Login / Sign Up</a>
+                </div>
+                <div id="myBookingsContent" hidden>
+                    <div id="myBookingsList" class="my-bookings-list" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking-status" class="section status-section">
+            <div class="form-card status-card">
+                <span class="section-label">CHECK BOOKING</span>
+                <h2>Already booked?</h2>
+                <p>Enter one of <strong>your</strong> Booking IDs. Other users' bookings are blocked by the backend.</p>
+                <form id="bookingLookupForm" class="status-search-row" novalidate>
+                    <div class="field-wrap compact-field">
+                        <label class="sr-only" for="bookingLookupId">Booking ID</label>
+                        <input id="bookingLookupId" type="number" min="1" step="1" inputmode="numeric"
+                            placeholder="Booking ID, e.g. 25" aria-describedby="bookingLookupError">
+                        <small id="bookingLookupError" class="field-error" aria-live="polite"></small>
+                    </div>
+                    <button id="bookingLookupButton" class="btn-primary" type="submit">Check Status</button>
+                </form>
+                <div id="bookingLookupResult" class="lookup-result" hidden aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="process-card reveal">
+                <div class="header-group">
+                    <p class="subtitle">SIMPLE PROCESS</p>
+                    <h2 class="main-title">How It <span class="accent">Works</span></h2>
+                </div>
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="circle">1</div>
+                        <h3>Browse Vehicles</h3>
+                        <p>See bikes and scooties with live availability.</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle">2</div>
+                        <h3>Send Booking Request</h3>
+                        <p>Sign in, choose your pickup date, then select Hours or Days and your rental duration.</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle">3</div>
+                        <h3>Wait for Approval</h3>
+                        <p>Your vehicle stays reserved while the shop reviews your request.</p>
+                    </div>
+                    <div class="step">
+                        <div class="circle">4</div>
+                        <h3>Pick Up & Ride</h3>
+                        <p>Show your Booking ID at the shop after approval.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="help" class="help-card reveal delay-2">
+                <h2 class="main-title compact">Need Help? Call Us 📞</h2>
+                <p class="help-text">Contact details below are placeholders—replace them with the rental shop's real
+                    information.</p>
+                <div class="contact-info">
+                    <div class="info-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
+                    <div class="info-item"><span class="icon">📍</span><span>Bhubaneswar, Odisha</span></div>
+                    <div class="info-item gray-text"><span class="icon">🕒</span><span>Open 7 AM — 9 PM Daily</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="bookingModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" onclick="closeBookingModal()"></div>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+            <button class="modal-close" type="button" onclick="closeBookingModal()"
+                aria-label="Close booking form">×</button>
+            <span class="section-label">BOOK YOUR RIDE</span>
+            <h2 id="bookingModalTitle">Booking Request</h2>
+            <p id="selectedBikeSummary" class="selected-bike-summary"></p>
+
+            <form id="bookingForm" novalidate>
+                <input id="selectedBikeId" type="hidden">
+
+                <div class="booking-account-box">
+                    <span>Booking as</span>
+                    <div id="bookingAccountSummary"></div>
+                    <small>Name and phone are taken securely from your signed-in account.</small>
+                </div>
+
+                <div class="booking-date-first">
+                    <div class="form-group">
+                        <label for="pickupDate">Pickup Date</label>
+                        <input id="pickupDate" type="date" aria-describedby="pickupDateError" required>
+                        <small id="pickupDateError" class="field-error" aria-live="polite"></small>
+                    </div>
+                </div>
+
+                <div id="rentalOptionsStage" class="rental-options-stage" hidden>
+                    <div class="rental-stage-heading">
+                        <span>How long do you need the vehicle?</span>
+                        <small>Choose Hours for a short ride or Days for a longer rental.</small>
+                    </div>
+
+                    <div class="rental-type-options">
+                        <label class="rental-type-card">
+                            <input id="rentalHourly" type="radio" name="rentalType" value="HOURLY">
+                            <span class="rental-type-card-content">
+                                <strong>Hours</strong>
+                                <small>1–12 hours</small>
+                            </span>
+                        </label>
+
+                        <label class="rental-type-card">
+                            <input id="rentalDaily" type="radio" name="rentalType" value="DAILY">
+                            <span class="rental-type-card-content">
+                                <strong>Days</strong>
+                                <small>1–30 days</small>
+                            </span>
+                        </label>
+                    </div>
+
+                    <div id="hourlyRentalFields" class="rental-details-grid" hidden>
+                        <div class="form-group">
+                            <label for="pickupTime">Pickup Time</label>
+                            <input id="pickupTime" type="time" step="1800" aria-describedby="pickupTimeError">
+                            <small id="pickupTimeError" class="field-error" aria-live="polite"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="durationHours">Rental Hours</label>
+                            <select id="durationHours" aria-describedby="durationHoursError">
+                                <option value="1">1 Hour</option>
+                                <option value="2">2 Hours</option>
+                                <option value="3">3 Hours</option>
+                                <option value="4">4 Hours</option>
+                                <option value="6">6 Hours</option>
+                                <option value="8">8 Hours</option>
+                                <option value="12">12 Hours</option>
+                            </select>
+                            <small id="durationHoursError" class="field-error" aria-live="polite"></small>
+                        </div>
+                    </div>
+
+                    <div id="dailyRentalFields" class="rental-details-grid" hidden>
+                        <div class="form-group">
+                            <label for="durationDays">Rental Days</label>
+                            <div class="duration-input-wrap">
+                                <input id="durationDays" type="number" min="1" max="30" step="1" value="1"
+                                    aria-describedby="durationDaysError">
+                                <span>days</span>
+                            </div>
+                            <small id="durationDaysError" class="field-error" aria-live="polite"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="bookingEstimate" class="estimate-box" aria-live="polite"></div>
+                <p class="form-note">Your account identity is verified before this booking request is created. ₹50
+                    confirmation payment will be added in the next phase.</p>
+                <button id="submitBookingButton" class="btn-primary" type="submit">Send Booking Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="successModal" class="modal" aria-hidden="true">
+        <div class="modal-backdrop" onclick="closeSuccessModal()"></div>
+        <div class="modal-card success-card" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+            <button class="modal-close" type="button" onclick="closeSuccessModal()"
+                aria-label="Close booking confirmation">×</button>
+            <div class="success-icon">✓</div>
+            <h2 id="successTitle">Booking Request Sent</h2>
+            <div id="successDetails"></div>
+            <button class="btn-primary" type="button" onclick="closeSuccessModal()">Done</button>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <footer>
+        <div class="logo">Bike<span>Rental</span></div>
+        <div>Simple bike rental management project.</div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="user.js"></script>
+</body>
+
+</html>
