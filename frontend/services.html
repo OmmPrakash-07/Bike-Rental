@@ -556,24 +556,40 @@
         }
 
         .vehicle-image img {
-            width: 100%;
+            width: 118%;
 
-            max-width: 330px;
+            max-width: 390px;
 
-            max-height: 285px;
+            max-height: 300px;
 
             object-fit: contain;
 
+            display: block;
+
+            background: transparent;
+
+            user-select: none;
+
+            pointer-events: none;
+
             filter:
                 drop-shadow(
-                    0 30px 28px
+                    0 24px 22px
                     rgba(
                         0,
                         0,
                         0,
-                        0.45
+                        0.48
                     )
                 );
+        }
+
+        .vehicle-box:first-of-type .vehicle-image img {
+            transform: translateX(7px) scale(1.04);
+        }
+
+        .vehicle-box:last-of-type .vehicle-image img {
+            transform: translateX(-7px) scale(1.04);
         }
 
         .vehicle-placeholder {
@@ -1086,11 +1102,12 @@
                     id="dailyVehicle"
                     class="vehicle-image"
                 >
-                    <div
-                        class="vehicle-placeholder"
+                    <img
+                        src="images/bmw_s1000rr_cutout.png"
+                        alt="BMW S 1000 RR"
+                        loading="eager"
+                        decoding="async"
                     >
-                        🏍️
-                    </div>
                 </div>
 
                 <div class="vehicle-info">
@@ -1102,7 +1119,7 @@
                     <strong
                         id="dailyVehicleName"
                     >
-                        Daily Ride
+                        BMW S 1000 RR
                     </strong>
 
                 </div>
@@ -1115,11 +1132,12 @@
                     id="monthlyVehicle"
                     class="vehicle-image"
                 >
-                    <div
-                        class="vehicle-placeholder"
+                    <img
+                        src="images/suzuki_hayabusa_cutout.png"
+                        alt="Suzuki Hayabusa"
+                        loading="eager"
+                        decoding="async"
                     >
-                        🛵
-                    </div>
                 </div>
 
                 <div class="vehicle-info">
@@ -1131,7 +1149,7 @@
                     <strong
                         id="monthlyVehicleName"
                     >
-                        Monthly Ride
+                        Suzuki Hayabusa
                     </strong>
 
                 </div>
@@ -1384,222 +1402,6 @@
         </span>
 
     </footer>
-
-    <!-- EXISTING PROJECT CONFIG -->
-
-    <script src="config.js"></script>
-
-    <script>
-
-        /*
-         * Uses the existing Bike Rental API
-         * only to display vehicle images.
-         * No new backend endpoint required.
-         */
-
-        const config =
-            window.BIKE_RENTAL_CONFIG || {};
-
-        const API_BASE =
-            String(
-                config.API_BASE_URL || ""
-            ).replace(/\/$/, "");
-
-        function getImageUrl(
-            imageUrl
-        ) {
-
-            if (!imageUrl) {
-                return "";
-            }
-
-            if (
-                /^https?:\/\//i.test(
-                    imageUrl
-                )
-            ) {
-                return imageUrl;
-            }
-
-            return (
-                API_BASE +
-                "/" +
-                imageUrl.replace(
-                    /^\//,
-                    ""
-                )
-            );
-        }
-
-        function showVehicle(
-            bike,
-            visualId,
-            nameId,
-            fallback
-        ) {
-
-            if (!bike) {
-                return;
-            }
-
-            const visual =
-                document.getElementById(
-                    visualId
-                );
-
-            const name =
-                document.getElementById(
-                    nameId
-                );
-
-            if (name) {
-
-                name.textContent =
-                    bike.name ||
-                    "BikeRental Vehicle";
-
-            }
-
-            if (
-                !visual ||
-                !bike.imageUrl
-            ) {
-
-                return;
-            }
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-            image.src =
-                getImageUrl(
-                    bike.imageUrl
-                );
-
-            image.alt =
-                bike.name ||
-                "BikeRental vehicle";
-
-            image.addEventListener(
-                "error",
-                () => {
-
-                    visual.innerHTML =
-                        `<div class="vehicle-placeholder">${fallback}</div>`;
-
-                },
-                {
-                    once: true
-                }
-            );
-
-            visual.innerHTML = "";
-
-            visual.appendChild(
-                image
-            );
-
-        }
-
-        async function loadVehicles() {
-
-            if (!API_BASE) {
-                return;
-            }
-
-            try {
-
-                const response =
-                    await fetch(
-                        `${API_BASE}/api/bikes`,
-                        {
-                            cache:
-                                "no-store"
-                        }
-                    );
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Could not load vehicles"
-                    );
-
-                }
-
-                const bikes =
-                    await response.json();
-
-                if (
-                    !Array.isArray(
-                        bikes
-                    ) ||
-                    bikes.length === 0
-                ) {
-
-                    return;
-
-                }
-
-                const first =
-                    bikes.find(
-                        bike =>
-                            bike.available
-                    ) ||
-                    bikes[0];
-
-                const second =
-                    bikes.find(
-                        bike =>
-                            bike.id !==
-                            first.id &&
-                            /scoot/i.test(
-                                String(
-                                    bike.type ||
-                                    ""
-                                )
-                            )
-                    ) ||
-
-                    bikes.find(
-                        bike =>
-                            bike.id !==
-                            first.id
-                    ) ||
-
-                    first;
-
-                showVehicle(
-                    first,
-                    "dailyVehicle",
-                    "dailyVehicleName",
-                    "🏍️"
-                );
-
-                showVehicle(
-                    second,
-                    "monthlyVehicle",
-                    "monthlyVehicleName",
-                    "🛵"
-                );
-
-            }
-            catch (error) {
-
-                console.warn(
-                    "Services vehicle preview:",
-                    error
-                );
-
-            }
-
-        }
-
-        loadVehicles();
-
-    </script>
-
 </body>
 
 </html>
