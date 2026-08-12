@@ -1856,3 +1856,34 @@ body.mobile-menu-open {
         min-height: 48px;
     }
 }
+
+
+/* =========================================================
+   UNIVERSAL HAMBURGER NAVIGATION
+   Use the same right-side drawer on desktop, tablet and mobile.
+========================================================= */
+.navbar .nav-actions {
+    display: none !important;
+}
+
+.navbar .mobile-menu-button {
+    display: flex !important;
+}
+
+@media (min-width: 761px) {
+    .navbar {
+        min-height: 74px;
+    }
+
+    .mobile-menu-drawer {
+        width: min(420px, 34vw);
+        min-width: 340px;
+    }
+}
+
+@media (max-width: 760px) {
+    .mobile-menu-drawer {
+        width: min(88vw, 360px);
+        min-width: 0;
+    }
+}

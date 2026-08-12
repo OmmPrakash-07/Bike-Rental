@@ -1211,6 +1211,24 @@
             }
         }
 
+
+
+        /* UNIVERSAL HAMBURGER NAVIGATION: desktop + tablet + mobile */
+        .navbar .nav-links {
+            display: none !important;
+        }
+
+        .navbar .mobile-menu-button {
+            display: flex !important;
+        }
+
+        @media (min-width: 761px) {
+            .mobile-menu-drawer {
+                width: min(420px, 34vw);
+                min-width: 340px;
+            }
+        }
+
     </style>
 </head>
 
@@ -1257,7 +1275,7 @@
 
     <div id="serviceMobileMenuOverlay" class="mobile-menu-overlay"></div>
 
-    <aside id="serviceMobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Mobile navigation">
+    <aside id="serviceMobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Site navigation">
         <div class="mobile-menu-header">
             <a href="index.html" class="logo">Bike<span>Rental</span></a>
             <button id="serviceMobileMenuClose" class="mobile-menu-close" type="button" aria-label="Close navigation menu">×</button>
@@ -1274,6 +1292,8 @@
         <nav class="mobile-menu-links" aria-label="Customer menu">
             <a href="index.html#vehicles"><span>⌂</span> Home / Browse Vehicles</a>
             <a href="services.html"><span>◇</span> Services</a>
+            <a href="#daily"><span>◷</span> Daily Rentals</a>
+            <a href="#monthly"><span>◫</span> Monthly Plans</a>
             <a href="index.html#my-bookings"><span>▣</span> My Bookings</a>
             <a href="index.html#help"><span>☎</span> Need Help?</a>
         </nav>
