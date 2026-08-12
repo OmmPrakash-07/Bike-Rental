@@ -997,6 +997,220 @@
                 height: 235px;
             }
         }
+
+
+        /* MOBILE-FIRST RIGHT DRAWER */
+        .mobile-menu-button {
+            display: none;
+            width: 44px;
+            height: 44px;
+            padding: 10px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.035);
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .mobile-menu-button span {
+            width: 21px;
+            height: 2px;
+            border-radius: 999px;
+            background: var(--text);
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        .mobile-menu-button[aria-expanded="true"] span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .mobile-menu-button[aria-expanded="true"] span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-button[aria-expanded="true"] span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        .mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 98;
+            background: rgba(2,6,23,.72);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity .22s ease, visibility .22s ease;
+        }
+
+        .mobile-menu-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .mobile-menu-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 99;
+            width: min(88vw, 360px);
+            padding: 18px;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(255,107,0,.12), transparent 240px),
+                #0d1422;
+            border-left: 1px solid var(--line);
+            box-shadow: -22px 0 60px rgba(0,0,0,.45);
+            transform: translateX(105%);
+            transition: transform .24s cubic-bezier(.4,0,.2,1);
+            overflow-y: auto;
+            overscroll-behavior: contain;
+        }
+
+        .mobile-menu-drawer.open { transform: translateX(0); }
+
+        .mobile-menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .mobile-menu-close {
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            background: rgba(255,255,255,.035);
+            color: var(--text);
+            font-size: 1.8rem;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .mobile-user-summary {
+            margin-top: 18px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: rgba(255,255,255,.035);
+        }
+
+        .mobile-user-avatar {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--orange);
+            color: white;
+            font-weight: 900;
+        }
+
+        .mobile-user-summary strong,
+        .mobile-user-summary small { display: block; }
+
+        .mobile-user-summary small {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .mobile-menu-links {
+            display: grid;
+            gap: 6px;
+            margin-top: 18px;
+        }
+
+        .mobile-menu-links a,
+        .mobile-menu-account a,
+        .mobile-menu-account button {
+            min-height: 50px;
+            width: 100%;
+            padding: 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: #dbe4f0;
+            text-decoration: none;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .mobile-menu-links a span {
+            width: 24px;
+            color: var(--orange);
+            text-align: center;
+        }
+
+        .mobile-menu-links a:hover,
+        .mobile-menu-account a:hover,
+        .mobile-menu-account button:hover {
+            background: rgba(255,255,255,.055);
+            border-color: var(--line);
+        }
+
+        .mobile-menu-account {
+            margin-top: 18px;
+            padding-top: 18px;
+            display: grid;
+            gap: 8px;
+            border-top: 1px solid var(--line);
+        }
+
+        .mobile-menu-account .mobile-menu-primary {
+            justify-content: center;
+            background: var(--orange);
+            color: white;
+            border-color: transparent;
+        }
+
+        .mobile-menu-account button:last-child { color: #fca5a5; }
+        body.mobile-menu-open { overflow: hidden; touch-action: none; }
+
+        @media (max-width: 760px) {
+            .navbar {
+                min-height: 66px;
+                height: auto;
+                padding: 0.75rem 1rem;
+            }
+
+            .navbar .logo { font-size: 1.28rem; }
+            .nav-links { display: none !important; }
+            .mobile-menu-button { display: flex; }
+
+            .hero {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .mobile-menu-drawer {
+                width: min(92vw, 340px);
+                padding: 15px;
+            }
+        }
+
     </style>
 </head>
 
@@ -1011,12 +1225,9 @@
         </a>
 
         <div class="nav-links">
-
-            <a href="index.html" class="mobile-essential">Home</a>
-
-            <a href="#daily" class="optional-nav">Daily Rentals</a>
-
-            <a href="#monthly" class="optional-nav">Monthly Plans</a>
+            <a href="index.html">Home</a>
+            <a href="#daily">Daily Rentals</a>
+            <a href="#monthly">Monthly Plans</a>
 
             <a id="serviceAccountLink" href="account.html?mode=login" class="login-btn">
                 Login / Sign Up
@@ -1035,10 +1246,44 @@
                     <button id="serviceLogoutButton" type="button">Logout</button>
                 </div>
             </div>
-
         </div>
 
+        <button id="serviceMobileMenuButton" class="mobile-menu-button" type="button"
+            aria-label="Open navigation menu" aria-controls="serviceMobileMenu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
     </nav>
+
+    <div id="serviceMobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <aside id="serviceMobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Mobile navigation">
+        <div class="mobile-menu-header">
+            <a href="index.html" class="logo">Bike<span>Rental</span></a>
+            <button id="serviceMobileMenuClose" class="mobile-menu-close" type="button" aria-label="Close navigation menu">×</button>
+        </div>
+
+        <div id="serviceMobileUserSummary" class="mobile-user-summary" hidden>
+            <span id="serviceMobileUserAvatar" class="mobile-user-avatar">U</span>
+            <div>
+                <strong id="serviceMobileUserName">User</strong>
+                <small>Signed in</small>
+            </div>
+        </div>
+
+        <nav class="mobile-menu-links" aria-label="Customer menu">
+            <a href="index.html#vehicles"><span>⌂</span> Home / Browse Vehicles</a>
+            <a href="services.html"><span>◇</span> Services</a>
+            <a href="index.html#my-bookings"><span>▣</span> My Bookings</a>
+            <a href="index.html#help"><span>☎</span> Need Help?</a>
+        </nav>
+
+        <div class="mobile-menu-account">
+            <a id="serviceMobileAccountLink" class="mobile-menu-primary" href="account.html?mode=login">Login / Sign Up</a>
+            <a id="serviceMobileProfileLink" href="account.html" hidden>Profile</a>
+            <button id="serviceMobileLogoutButton" type="button" hidden>Logout</button>
+        </div>
+    </aside>
 
     <!-- HERO -->
 
@@ -1525,6 +1770,16 @@
             const userAvatar = document.getElementById("serviceUserAvatar");
             const userName = document.getElementById("serviceUserName");
             const logoutButton = document.getElementById("serviceLogoutButton");
+            const mobileMenuButton = document.getElementById("serviceMobileMenuButton");
+            const mobileMenuClose = document.getElementById("serviceMobileMenuClose");
+            const mobileMenuOverlay = document.getElementById("serviceMobileMenuOverlay");
+            const mobileMenu = document.getElementById("serviceMobileMenu");
+            const mobileUserSummary = document.getElementById("serviceMobileUserSummary");
+            const mobileUserAvatar = document.getElementById("serviceMobileUserAvatar");
+            const mobileUserName = document.getElementById("serviceMobileUserName");
+            const mobileAccountLink = document.getElementById("serviceMobileAccountLink");
+            const mobileProfileLink = document.getElementById("serviceMobileProfileLink");
+            const mobileLogoutButton = document.getElementById("serviceMobileLogoutButton");
 
             function token() {
                 return localStorage.getItem(USER_TOKEN_KEY) || "";
@@ -1550,6 +1805,11 @@
                 userMenu.hidden = true;
                 userDropdown.hidden = true;
                 userButton.setAttribute("aria-expanded", "false");
+
+                mobileUserSummary.hidden = true;
+                mobileAccountLink.hidden = false;
+                mobileProfileLink.hidden = true;
+                mobileLogoutButton.hidden = true;
             }
 
             function renderSignedIn(profile) {
@@ -1560,11 +1820,34 @@
                 userMenu.hidden = false;
                 userName.textContent = firstName;
                 userAvatar.textContent = initials(fullName);
+
+                mobileUserSummary.hidden = false;
+                mobileUserName.textContent = firstName;
+                mobileUserAvatar.textContent = initials(fullName);
+                mobileAccountLink.hidden = true;
+                mobileProfileLink.hidden = false;
+                mobileLogoutButton.hidden = false;
             }
 
             function clearSession() {
                 localStorage.removeItem(USER_TOKEN_KEY);
                 localStorage.removeItem(USER_PROFILE_KEY);
+            }
+
+            function openMobileMenu() {
+                mobileMenu.classList.add("open");
+                mobileMenuOverlay.classList.add("open");
+                mobileMenu.setAttribute("aria-hidden", "false");
+                mobileMenuButton.setAttribute("aria-expanded", "true");
+                document.body.classList.add("mobile-menu-open");
+            }
+
+            function closeMobileMenu() {
+                mobileMenu.classList.remove("open");
+                mobileMenuOverlay.classList.remove("open");
+                mobileMenu.setAttribute("aria-hidden", "true");
+                mobileMenuButton.setAttribute("aria-expanded", "false");
+                document.body.classList.remove("mobile-menu-open");
             }
 
             async function restoreServiceSession() {
@@ -1610,6 +1893,19 @@
                 }
             }
 
+            mobileMenuButton.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (mobileMenu.classList.contains("open")) closeMobileMenu();
+                else openMobileMenu();
+            });
+
+            mobileMenuClose.addEventListener("click", closeMobileMenu);
+            mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+            mobileMenu.querySelectorAll("a").forEach((link) => {
+                link.addEventListener("click", closeMobileMenu);
+            });
+
             userButton.addEventListener("click", (event) => {
                 event.stopPropagation();
                 const open = userDropdown.hidden;
@@ -1626,13 +1922,17 @@
                 if (event.key === "Escape") {
                     userDropdown.hidden = true;
                     userButton.setAttribute("aria-expanded", "false");
+                    closeMobileMenu();
                 }
             });
 
-            logoutButton.addEventListener("click", () => {
+            function logoutAndReturnHome() {
                 clearSession();
                 window.location.href = "index.html";
-            });
+            }
+
+            logoutButton.addEventListener("click", logoutAndReturnHome);
+            mobileLogoutButton.addEventListener("click", logoutAndReturnHome);
 
             restoreServiceSession();
         })();

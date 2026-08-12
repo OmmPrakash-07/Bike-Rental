@@ -1351,7 +1351,11 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 @media (max-width: 720px) {
 
     .nav-services-link {
-        display: none;
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 9px;
+        font-size: 0.78rem;
+        white-space: nowrap;
     }
 
 }
@@ -1596,341 +1600,259 @@ input[type="date"] {
     }
 }
 
-/* =========================================
-   BOOKING MODAL UI UPGRADE
-========================================= */
 
-.modal {
-    padding: 22px;
-}
+/* =========================================================
+   MOBILE-FIRST CUSTOMER NAVIGATION
+   Right-side hamburger drawer for phone/tablet users
+========================================================= */
 
-.modal-card {
-    width: min(680px, 92vw);
-    max-height: 90vh;
-    padding: 26px 28px 24px;
-    border-radius: 24px;
-    background:
-        linear-gradient(180deg, rgba(17, 27, 49, 0.98) 0%, rgba(12, 20, 38, 0.98) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow:
-        0 24px 70px rgba(0, 0, 0, 0.55),
-        inset 0 1px 0 rgba(255, 255, 255, 0.04);
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 107, 0, 0.45) transparent;
-}
-
-.modal-card::-webkit-scrollbar {
-    width: 8px;
-}
-
-.modal-card::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.modal-card::-webkit-scrollbar-thumb {
-    background: rgba(255, 107, 0, 0.35);
-    border-radius: 999px;
-}
-
-.modal-card::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 107, 0, 0.55);
-}
-
-.modal-close {
-    top: 16px;
-    right: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #f8fafc;
-    font-size: 1.4rem;
-}
-
-.modal-close:hover {
-    background: rgba(255, 255, 255, 0.14);
-    box-shadow: none;
-    transform: none;
-}
-
-.modal-card .section-label {
-    margin-bottom: 14px;
-}
-
-.modal-card h2,
-.modal-card .modal-title {
-    font-size: clamp(2rem, 3.2vw, 3rem);
-    line-height: 0.95;
-    letter-spacing: -0.03em;
-    margin: 0 0 10px;
-    max-width: 88%;
-}
-
-.selected-bike-summary {
-    margin: 0 0 20px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--orange);
-}
-
-.booking-account-box {
-    margin: 0 0 18px;
-    padding: 16px 18px;
-    border-radius: 16px;
-    background:
-        linear-gradient(180deg, rgba(10, 20, 39, 0.95), rgba(12, 24, 45, 0.95));
-    border: 1px solid rgba(255, 255, 255, 0.07);
-}
-
-.booking-account-box > span,
-.booking-account-box small {
-    display: block;
-    color: #9fb0c7;
-    font-size: 0.76rem;
-}
-
-#bookingAccountSummary {
-    margin: 6px 0 0;
-    display: grid;
-    gap: 3px;
-}
-
-#bookingAccountSummary strong {
-    color: #f8fafc;
-    font-size: 1.05rem;
-    font-weight: 800;
-}
-
-#bookingAccountSummary span {
-    color: #cbd5e1;
-    font-size: 0.84rem;
-}
-
-.modal-card .form-group {
-    margin-bottom: 16px;
-}
-
-.modal-card label {
-    margin-bottom: 8px;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: #b7c3d7;
-}
-
-.modal-card input,
-.modal-card select,
-.modal-card textarea {
-    height: 50px;
-    border-radius: 14px;
-    background: #243149;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    color: #f8fafc;
-    font-size: 0.94rem;
-    padding: 12px 14px;
-}
-
-.modal-card textarea {
-    min-height: 110px;
-    height: auto;
-}
-
-.modal-card input:focus,
-.modal-card select:focus,
-.modal-card textarea:focus {
-    border-color: rgba(255, 107, 0, 0.45);
-    box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.10);
-}
-
-/* duration selection area */
-.booking-section-card,
-.rental-duration-card,
-.duration-card {
-    margin: 6px 0 16px;
-    padding: 18px 16px 16px;
-    border-radius: 18px;
-    background:
-        linear-gradient(135deg, rgba(18, 29, 51, 0.95), rgba(16, 25, 43, 0.98));
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.booking-section-card h3,
-.rental-duration-card h3,
-.duration-card h3 {
-    margin: 0 0 4px;
-    font-size: 1rem;
-}
-
-.booking-section-card p,
-.rental-duration-card p,
-.duration-card p {
-    margin: 0 0 14px;
-    font-size: 0.82rem;
-    color: #93a4bd;
-}
-
-.booking-mode-grid,
-.rental-mode-grid,
-.duration-mode-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 14px;
-}
-
-.booking-mode-option,
-.rental-mode-option,
-.duration-mode-option {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    min-height: 76px;
-    padding: 14px 16px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    background: rgba(255, 255, 255, 0.03);
-    color: #dce6f5;
-    font-size: 1rem;
-    font-weight: 800;
-    cursor: pointer;
-    transition: 0.22s ease;
-    box-shadow: none;
-}
-
-.booking-mode-option small,
-.rental-mode-option small,
-.duration-mode-option small {
-    display: block;
-    margin-top: 6px;
-    color: #8ea1bb;
-    font-size: 0.76rem;
-    font-weight: 500;
-}
-
-.booking-mode-option:hover,
-.rental-mode-option:hover,
-.duration-mode-option:hover {
-    border-color: rgba(255, 107, 0, 0.35);
-    background: rgba(255, 107, 0, 0.06);
-    transform: translateY(-1px);
-}
-
-.booking-mode-option.active,
-.rental-mode-option.active,
-.duration-mode-option.active {
-    border-color: rgba(255, 107, 0, 0.6);
-    background:
-        linear-gradient(135deg, rgba(255, 107, 0, 0.10), rgba(255, 107, 0, 0.04));
-    box-shadow: inset 0 0 0 1px rgba(255, 107, 0, 0.15);
-}
-
-.modal-card .form-note {
-    margin-top: 4px;
-    margin-bottom: 12px;
-    color: #8ea1bb;
-    font-size: 0.76rem;
-}
-
-.estimate-box,
-.booking-estimate-box {
-    margin: 6px 0 14px;
-    padding: 16px 18px;
-    border-radius: 16px;
-    background:
-        linear-gradient(180deg, rgba(36, 49, 73, 0.95), rgba(31, 43, 66, 0.95));
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    display: grid;
-    grid-template-columns: 1fr auto;
+.mobile-menu-button {
+    display: none;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
     align-items: center;
-    gap: 6px 12px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
-.estimate-box > span,
-.booking-estimate-box > span {
-    color: #cbd5e1;
-    font-size: 0.84rem;
+.mobile-menu-button span {
+    width: 21px;
+    height: 2px;
+    border-radius: 999px;
+    background: var(--text-primary);
+    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.estimate-box > strong,
-.booking-estimate-box > strong {
-    color: var(--orange);
+.mobile-menu-button[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-button[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-button[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+    background: rgba(2, 6, 23, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+}
+
+.mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.mobile-menu-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
+    width: min(88vw, 360px);
+    padding: 18px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(255, 107, 0, 0.12), transparent 240px),
+        #0d1422;
+    border-left: 1px solid var(--border);
+    box-shadow: -22px 0 60px rgba(0, 0, 0, 0.45);
+    transform: translateX(105%);
+    transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.mobile-menu-drawer.open {
+    transform: translateX(0);
+}
+
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.mobile-menu-logo {
+    text-decoration: none;
+}
+
+.mobile-menu-close {
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--text-primary);
     font-size: 1.8rem;
-    font-weight: 800;
     line-height: 1;
+    cursor: pointer;
 }
 
-.estimate-box > small,
-.booking-estimate-box > small {
-    grid-column: 1 / -1;
-    color: #8ea1bb;
-    font-size: 0.78rem;
-}
-
-.modal-card .btn-primary,
-.modal-card button[type="submit"] {
-    height: 54px;
+.mobile-user-summary {
+    margin-top: 18px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid var(--border);
     border-radius: 14px;
-    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+.mobile-user-avatar {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--orange);
+    color: white;
+    font-family: var(--font-display);
     font-weight: 800;
-    background: linear-gradient(180deg, #ff7a1a 0%, #ff6b00 100%);
-    box-shadow: 0 10px 26px rgba(255, 107, 0, 0.28);
 }
 
-.modal-card .btn-primary:hover,
-.modal-card button[type="submit"]:hover {
-    background: linear-gradient(180deg, #ff842c 0%, #ef6500 100%);
-    box-shadow: 0 14px 32px rgba(255, 107, 0, 0.35);
+.mobile-user-summary strong,
+.mobile-user-summary small {
+    display: block;
 }
 
-.modal-card .btn-primary:disabled,
-.modal-card button[type="submit"]:disabled {
-    background: rgba(148, 163, 184, 0.10);
-    color: #94a3b8;
-    box-shadow: none;
-    border: 1px solid rgba(148, 163, 184, 0.15);
+.mobile-user-summary strong {
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    font-size: 0.95rem;
 }
 
-/* make booking button area slightly separated */
-.modal-card .submit-wrap,
-.modal-card .modal-submit-row {
-    margin-top: 12px;
-    padding-top: 8px;
+.mobile-user-summary small {
+    margin-top: 2px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
 }
 
-/* better mobile look */
-@media (max-width: 720px) {
-    .modal {
-        padding: 10px;
+.mobile-menu-links {
+    display: grid;
+    gap: 6px;
+    margin-top: 18px;
+}
+
+.mobile-menu-links a,
+.mobile-menu-account a,
+.mobile-menu-account button {
+    min-height: 50px;
+    width: 100%;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
+    color: #dbe4f0;
+    text-decoration: none;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.mobile-menu-links a span {
+    width: 24px;
+    color: var(--orange);
+    text-align: center;
+    font-size: 1rem;
+}
+
+.mobile-menu-links a:hover,
+.mobile-menu-links a:focus-visible,
+.mobile-menu-account a:hover,
+.mobile-menu-account button:hover {
+    background: rgba(255, 255, 255, 0.055);
+    border-color: var(--border);
+}
+
+.mobile-menu-account {
+    margin-top: 18px;
+    padding-top: 18px;
+    display: grid;
+    gap: 8px;
+    border-top: 1px solid var(--border);
+}
+
+.mobile-menu-account .mobile-menu-primary {
+    justify-content: center;
+    background: var(--orange);
+    color: white;
+    border-color: transparent;
+}
+
+.mobile-menu-account button:last-child {
+    color: #fca5a5;
+}
+
+body.mobile-menu-open {
+    overflow: hidden;
+    touch-action: none;
+}
+
+@media (max-width: 760px) {
+    .navbar {
+        min-height: 66px;
+        padding: 0.75rem 1rem;
     }
 
-    .modal-card {
-        width: 100%;
-        max-height: 92vh;
-        padding: 20px 18px 18px;
-        border-radius: 20px;
+    .navbar .logo {
+        font-size: 1.28rem;
     }
 
-    .modal-card h2,
-    .modal-card .modal-title {
-        font-size: clamp(1.8rem, 8vw, 2.5rem);
-        max-width: 85%;
+    .nav-actions {
+        display: none !important;
     }
 
-    .booking-mode-grid,
-    .rental-mode-grid,
-    .duration-mode-grid {
-        grid-template-columns: 1fr;
+    .mobile-menu-button {
+        display: flex;
     }
 
-    .estimate-box,
-    .booking-estimate-box {
-        grid-template-columns: 1fr;
+    .section {
+        padding-left: 0.9rem;
+        padding-right: 0.9rem;
     }
 
-    .estimate-box > strong,
-    .booking-estimate-box > strong {
-        font-size: 1.55rem;
+    .fleet-toolbar {
+        gap: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .mobile-menu-drawer {
+        width: min(92vw, 340px);
+        padding: 15px;
+    }
+
+    .mobile-menu-links a,
+    .mobile-menu-account a,
+    .mobile-menu-account button {
+        min-height: 48px;
     }
 }

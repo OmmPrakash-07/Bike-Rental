@@ -10,10 +10,6 @@ let selectedBike = null;
 let currentUser = null;
 let lastFocusedElement = null;
 
-const SHOP_OPEN_HOUR = 8;
-const SHOP_CLOSE_HOUR = 22;
-const MIN_OVERNIGHT_HOURS = 12;
-
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -107,6 +103,13 @@ function updateAccountUi() {
   const authNotice = document.getElementById("myBookingsAuthNotice");
   const bookingsContent = document.getElementById("myBookingsContent");
 
+  const mobileUserSummary = document.getElementById("mobileUserSummary");
+  const mobileUserAvatar = document.getElementById("mobileUserAvatar");
+  const mobileUserName = document.getElementById("mobileUserName");
+  const mobileAccountLink = document.getElementById("mobileAccountLink");
+  const mobileProfileLink = document.getElementById("mobileProfileLink");
+  const mobileLogoutButton = document.getElementById("mobileLogoutButton");
+
   if (currentUser) {
     accountLink.hidden = true;
     myBookingsLink.hidden = false;
@@ -114,15 +117,22 @@ function updateAccountUi() {
 
     const fullName = currentUser.fullName?.trim() || "User";
     const names = fullName.split(/\s+/);
-
-    userMenuName.textContent = names[0];
+    const firstName = names[0] || "User";
 
     const initials =
       names.length > 1
         ? `${names[0][0]}${names[names.length - 1][0]}`
-        : names[0][0];
+        : firstName[0];
 
+    userMenuName.textContent = firstName;
     userAvatar.textContent = initials.toUpperCase();
+
+    if (mobileUserSummary) mobileUserSummary.hidden = false;
+    if (mobileUserName) mobileUserName.textContent = firstName;
+    if (mobileUserAvatar) mobileUserAvatar.textContent = initials.toUpperCase();
+    if (mobileAccountLink) mobileAccountLink.hidden = true;
+    if (mobileProfileLink) mobileProfileLink.hidden = false;
+    if (mobileLogoutButton) mobileLogoutButton.hidden = false;
 
     authNotice.hidden = true;
     bookingsContent.hidden = false;
@@ -132,6 +142,11 @@ function updateAccountUi() {
 
     myBookingsLink.hidden = true;
     userMenu.hidden = true;
+
+    if (mobileUserSummary) mobileUserSummary.hidden = true;
+    if (mobileAccountLink) mobileAccountLink.hidden = false;
+    if (mobileProfileLink) mobileProfileLink.hidden = true;
+    if (mobileLogoutButton) mobileLogoutButton.hidden = true;
 
     closeUserMenu();
 
@@ -165,11 +180,52 @@ function closeUserMenu() {
   }
 }
 
+function openMobileMenu() {
+  const drawer = document.getElementById("mobileMenu");
+  const overlay = document.getElementById("mobileMenuOverlay");
+  const button = document.getElementById("mobileMenuButton");
+
+  if (!drawer || !overlay || !button) return;
+
+  drawer.classList.add("open");
+  overlay.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+  button.setAttribute("aria-expanded", "true");
+  document.body.classList.add("mobile-menu-open");
+}
+
+function closeMobileMenu() {
+  const drawer = document.getElementById("mobileMenu");
+  const overlay = document.getElementById("mobileMenuOverlay");
+  const button = document.getElementById("mobileMenuButton");
+
+  if (!drawer || !overlay || !button) return;
+
+  drawer.classList.remove("open");
+  overlay.classList.remove("open");
+  drawer.setAttribute("aria-hidden", "true");
+  button.setAttribute("aria-expanded", "false");
+  document.body.classList.remove("mobile-menu-open");
+}
+
+function toggleMobileMenu(event) {
+  event?.stopPropagation();
+  const drawer = document.getElementById("mobileMenu");
+  if (!drawer) return;
+
+  if (drawer.classList.contains("open")) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
 document.addEventListener("click", closeUserMenu);
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeUserMenu();
+    closeMobileMenu();
   }
 });
 
@@ -402,106 +458,11 @@ function formatPickupTime(time) {
   }
 
   const [hours, minutes] = time.split(":").map(Number);
-  const hour12 = hours % 12 || 12;
-  const period = hours >= 12 ? "PM" : "AM";
 
-  return `${hour12}:${String(minutes).padStart(2, "0")} ${period}`;
-}
+  const tempDate = new Date();
+  tempDate.setHours(hours, minutes, 0, 0);
 
-function enhancePickupTimeSelector() {
-  const currentField = document.getElementById("pickupTime");
-
-  if (!currentField || currentField.tagName === "SELECT") {
-    return;
-  }
-
-  const select = document.createElement("select");
-  select.id = "pickupTime";
-  select.name = "pickupTime";
-  select.className = currentField.className;
-  select.setAttribute(
-    "aria-describedby",
-    currentField.getAttribute("aria-describedby") || "pickupTimeError",
-  );
-
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.textContent = "Select pickup time";
-  select.appendChild(placeholder);
-
-  for (let hour = SHOP_OPEN_HOUR; hour <= SHOP_CLOSE_HOUR; hour += 1) {
-    const value = `${String(hour).padStart(2, "0")}:00`;
-    const option = document.createElement("option");
-    option.value = value;
-    option.textContent = formatPickupTime(value);
-    select.appendChild(option);
-  }
-
-  currentField.replaceWith(select);
-}
-
-function calculateHourlyPreview(date, pickupTime, requestedHours) {
-  if (!date || !pickupTime || !Number.isFinite(requestedHours)) {
-    return null;
-  }
-
-  const start = new Date(`${date}T${pickupTime}:00`);
-
-  if (!Number.isFinite(start.getTime())) {
-    return null;
-  }
-
-  const requestedEnd = new Date(
-    start.getTime() + requestedHours * 60 * 60 * 1000,
-  );
-
-  const closing = new Date(start);
-  closing.setHours(SHOP_CLOSE_HOUR, 0, 0, 0);
-
-  if (requestedEnd.getTime() <= closing.getTime()) {
-    return {
-      overnight: false,
-      billableHours: requestedHours,
-      finalEnd: requestedEnd,
-    };
-  }
-
-  const nextOpening = new Date(start);
-  nextOpening.setDate(nextOpening.getDate() + 1);
-  nextOpening.setHours(SHOP_OPEN_HOUR, 0, 0, 0);
-
-  const minimumOvernightEnd = new Date(
-    start.getTime() + MIN_OVERNIGHT_HOURS * 60 * 60 * 1000,
-  );
-
-  const finalEnd = new Date(
-    Math.max(
-      requestedEnd.getTime(),
-      nextOpening.getTime(),
-      minimumOvernightEnd.getTime(),
-    ),
-  );
-
-  const billableHours = Math.round(
-    (finalEnd.getTime() - start.getTime()) / (60 * 60 * 1000),
-  );
-
-  return {
-    overnight: true,
-    billableHours,
-    finalEnd,
-  };
-}
-
-function formatReturnDateTime(date) {
-  if (!(date instanceof Date) || !Number.isFinite(date.getTime())) {
-    return "";
-  }
-
-  return date.toLocaleString("en-IN", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
+  return tempDate.toLocaleTimeString("en-IN", {
     hour: "numeric",
     minute: "2-digit",
   });
@@ -536,31 +497,31 @@ function updatePickupTimeMinimum() {
 
   if (!pickupDate || !pickupTime) return;
 
-  const options = Array.from(pickupTime.options || []).filter(
-    (option) => option.value,
-  );
-
-  options.forEach((option) => {
-    option.disabled = false;
-  });
+  pickupTime.removeAttribute("min");
 
   if (pickupDate.value !== localToday()) {
     return;
   }
 
   const now = new Date();
-  const nextHour = now.getMinutes() === 0 && now.getSeconds() === 0
-    ? now.getHours() + 1
-    : now.getHours() + 1;
 
-  options.forEach((option) => {
-    const hour = Number(option.value.slice(0, 2));
-    option.disabled = hour < nextHour;
-  });
+  // Move to the next 30-minute slot.
+  now.setSeconds(0, 0);
 
-  const selectedOption = pickupTime.selectedOptions?.[0];
+  const remainder = now.getMinutes() % 30;
 
-  if (selectedOption?.disabled) {
+  if (remainder === 0) {
+    now.setMinutes(now.getMinutes() + 30);
+  } else {
+    now.setMinutes(now.getMinutes() + (30 - remainder));
+  }
+
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+
+  pickupTime.min = `${hours}:${minutes}`;
+
+  if (pickupTime.value && pickupTime.value < pickupTime.min) {
     pickupTime.value = "";
   }
 }
@@ -850,56 +811,34 @@ function updateBookingEstimate() {
       return;
     }
 
-    const requestedHours = Number(
+    const rawHours = Number(
       document.getElementById("durationHours").value,
     );
-    const pickupTime = document.getElementById("pickupTime").value;
 
-    if (!pickupTime) {
-      const total = hourlyPrice * requestedHours;
-      estimate.innerHTML = `
-        <span>Estimated rental total</span>
-        <strong>₹${total.toFixed(2)}</strong>
-        <small>${requestedHours} hour${requestedHours === 1 ? "" : "s"} × ₹${hourlyPrice.toFixed(2)}/hour • Select pickup time</small>`;
-      return;
-    }
+    const allowedHours = [1, 2, 3, 4, 6, 8, 12];
 
-    const preview = calculateHourlyPreview(
-      date,
-      pickupTime,
-      requestedHours,
-    );
+    const hours = allowedHours.includes(rawHours)
+      ? rawHours
+      : 1;
 
-    if (!preview) return;
+    const pickupTime =
+      document.getElementById("pickupTime").value;
 
-    const total = hourlyPrice * preview.billableHours;
-
-    if (preview.overnight) {
-      estimate.innerHTML = `
-        <div class="overnight-estimate-heading">
-          <span class="overnight-badge">Overnight Rental</span>
-          <strong>₹${total.toFixed(2)}</strong>
-        </div>
-        <small class="overnight-message">
-          Your selected rental crosses the 10:00 PM closing time. The bike cannot be returned while the shop is closed.
-        </small>
-        <div class="overnight-summary">
-          <span>Pickup <strong>${escapeHtml(formatPickupTime(pickupTime))}</strong></span>
-          <span>Selected <strong>${requestedHours} hour${requestedHours === 1 ? "" : "s"}</strong></span>
-          <span>Return <strong>${escapeHtml(formatReturnDateTime(preview.finalEnd))}</strong></span>
-          <span>Billable <strong>${preview.billableHours} hours</strong></span>
-        </div>
-        <small>${preview.billableHours} hours × ₹${hourlyPrice.toFixed(2)}/hour</small>`;
-      return;
-    }
+    const total = hourlyPrice * hours;
 
     estimate.innerHTML = `
       <span>Estimated rental total</span>
       <strong>₹${total.toFixed(2)}</strong>
       <small>
-        ${preview.billableHours} hour${preview.billableHours === 1 ? "" : "s"} ×
-        ₹${hourlyPrice.toFixed(2)}/hour • Pickup ${escapeHtml(formatPickupTime(pickupTime))}
+        ${hours} hour${hours === 1 ? "" : "s"} ×
+        ₹${hourlyPrice.toFixed(2)}/hour
+        ${
+          pickupTime
+            ? ` • Pickup ${escapeHtml(formatPickupTime(pickupTime))}`
+            : ""
+        }
       </small>`;
+
     return;
   }
 
@@ -1396,8 +1335,6 @@ function hideModal(id) {
   }
 }
 
-enhancePickupTimeSelector();
-
 document
   .getElementById("bookingForm")
   .addEventListener("submit", submitBooking);
@@ -1420,7 +1357,7 @@ document
 
 document
   .getElementById("pickupTime")
-  .addEventListener("change", () => {
+  .addEventListener("input", () => {
     clearFieldError("pickupTime");
     updateBookingEstimate();
   });

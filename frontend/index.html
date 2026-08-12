@@ -16,9 +16,8 @@
         </a>
 
         <div class="nav-actions">
-            <a class="nav-services-link" href="services.html">
-                Services
-            </a>
+            <a class="nav-services-link" href="services.html">Services</a>
+
             <button id="myBookingsLink" class="nav-bookings-btn" type="button" onclick="scrollToMyBookings()" hidden>
                 My Bookings
             </button>
@@ -30,27 +29,71 @@
             <div id="userMenu" class="user-menu" hidden>
                 <button id="userMenuButton" class="user-menu-button" type="button" onclick="toggleUserMenu(event)"
                     aria-expanded="false">
-
                     <span id="userAvatar" class="user-avatar">U</span>
                     <span id="userMenuName" class="user-menu-name">User</span>
                     <span class="user-menu-arrow">⌄</span>
                 </button>
 
                 <div id="userMenuDropdown" class="user-menu-dropdown" hidden>
-
-                    <a href="account.html">
-                        <span>Profile</span>
-                    </a>
-
-                    <button type="button" onclick="logoutUser()">
-                        <span>Logout</span>
-                    </button>
+                    <a href="account.html"><span>Profile</span></a>
+                    <button type="button" onclick="logoutUser()"><span>Logout</span></button>
                 </div>
             </div>
 
             <a class="nav-phone" href="#help">☎ Need help?</a>
         </div>
+
+        <button id="mobileMenuButton" class="mobile-menu-button" type="button"
+            aria-label="Open navigation menu" aria-controls="mobileMenu" aria-expanded="false"
+            onclick="toggleMobileMenu(event)">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
+
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
+    <aside id="mobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Mobile navigation">
+        <div class="mobile-menu-header">
+            <a class="logo mobile-menu-logo" href="index.html" onclick="closeMobileMenu()">
+                Bike<span>Rental</span>
+            </a>
+            <button class="mobile-menu-close" type="button" aria-label="Close navigation menu"
+                onclick="closeMobileMenu()">×</button>
+        </div>
+
+        <div id="mobileUserSummary" class="mobile-user-summary" hidden>
+            <span id="mobileUserAvatar" class="mobile-user-avatar">U</span>
+            <div>
+                <strong id="mobileUserName">User</strong>
+                <small>Signed in</small>
+            </div>
+        </div>
+
+        <nav class="mobile-menu-links" aria-label="Customer menu">
+            <a href="index.html#vehicles" onclick="closeMobileMenu()">
+                <span>⌂</span> Home / Browse Vehicles
+            </a>
+            <a href="services.html" onclick="closeMobileMenu()">
+                <span>◇</span> Services
+            </a>
+            <a href="#my-bookings" onclick="closeMobileMenu()">
+                <span>▣</span> My Bookings
+            </a>
+            <a href="#help" onclick="closeMobileMenu()">
+                <span>☎</span> Need Help?
+            </a>
+        </nav>
+
+        <div class="mobile-menu-account">
+            <a id="mobileAccountLink" class="mobile-menu-primary" href="account.html?mode=login"
+                onclick="closeMobileMenu()">Login / Sign Up</a>
+
+            <a id="mobileProfileLink" href="account.html" onclick="closeMobileMenu()" hidden>Profile</a>
+            <button id="mobileLogoutButton" type="button" onclick="logoutUser(); closeMobileMenu();" hidden>Logout</button>
+        </div>
+    </aside>
 
     <main>
         <section id="vehicles" class="section hero-section">
