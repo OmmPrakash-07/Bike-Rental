@@ -5736,3 +5736,199 @@ button.vehicle-filter-option.is-active:hover {
         height: 240px;
     }
 }
+
+
+/* =========================================================
+   HERO V12 - polished circle + cleaner spacing + click animation
+========================================================= */
+.home-hero-v3 .hero-v3-panel {
+    isolation: isolate;
+}
+
+.home-hero-v3 .hero-v3-sun {
+    width: 500px;
+    height: 500px;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+    border-radius: 50%;
+    background: conic-gradient(from 210deg, #ff6b00 0deg, #ff8412 120deg, #ff6b00 240deg, #d65500 360deg);
+    box-shadow:
+        0 0 0 18px rgba(255, 107, 0, 0.05),
+        0 0 40px rgba(255, 107, 0, 0.30),
+        0 0 90px rgba(255, 107, 0, 0.16);
+    z-index: 1;
+}
+
+.home-hero-v3 .hero-v3-sun::before {
+    content: '';
+    position: absolute;
+    inset: -18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 124, 26, 0.22) 0%, rgba(255, 124, 26, 0.06) 45%, transparent 72%);
+    filter: blur(14px);
+    z-index: -1;
+}
+
+.home-hero-v3 .hero-v3-sun::after {
+    inset: 66px;
+    background: radial-gradient(circle at 50% 45%, #091224 0%, #07101f 58%, #050a16 100%);
+    box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.45);
+}
+
+.home-hero-v3 .hero-v3-road {
+    left: 10%;
+    right: 6%;
+    bottom: 70px;
+    height: 118px;
+    border-width: 2px;
+    opacity: 0.5;
+}
+
+.home-hero-v3 .hero-v3-bike {
+    cursor: pointer;
+    transform-origin: center center;
+    transition:
+        transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+        filter 0.45s ease,
+        opacity 0.35s ease;
+    will-change: transform, filter;
+    z-index: 3;
+}
+
+.home-hero-v3 .hero-v3-bike:focus-visible {
+    outline: 2px solid rgba(255, 107, 0, 0.85);
+    outline-offset: 6px;
+    border-radius: 18px;
+}
+
+.home-hero-v3 .hero-v3-bike.is-passive {
+    opacity: 0.94;
+}
+
+.home-hero-v3 .hero-v3-bike.is-active {
+    opacity: 1;
+    z-index: 6;
+}
+
+.home-hero-v3 .hero-v3-bike-main.is-active {
+    transform: translate(-50%, -50%) rotate(-4deg) scale(1.04) translateY(-8px);
+    filter: drop-shadow(0 28px 38px rgba(0, 0, 0, 0.42));
+}
+
+.home-hero-v3 .hero-v3-bike-secondary.is-active {
+    transform: translate(-50%, -50%) rotate(4deg) scale(1.04) translateY(-8px);
+    filter: drop-shadow(0 28px 38px rgba(0, 0, 0, 0.42));
+}
+
+.home-hero-v3 .hero-v3-bike-main.is-passive {
+    transform: translate(-50%, -50%) rotate(-4deg) scale(0.98);
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.30));
+}
+
+.home-hero-v3 .hero-v3-bike-secondary.is-passive {
+    transform: translate(-50%, -50%) rotate(4deg) scale(0.97);
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.28));
+}
+
+.home-hero-v3 .hero-v3-bike:hover {
+    filter: drop-shadow(0 24px 34px rgba(0, 0, 0, 0.38));
+}
+
+.home-hero-v3 .hero-v3-bike.is-popping {
+    animation: heroBikePop 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes heroBikePop {
+    0% { transform: translate(-50%, -50%) scale(0.96); }
+    55% { transform: translate(-50%, -50%) scale(1.06); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Better gap/placement on desktop */
+@media (min-width: 941px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 575px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        width: min(435px, 60%);
+        height: 332px;
+        left: 34%;
+        top: 57%;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        width: min(345px, 46%);
+        height: 285px;
+        left: 76%;
+        top: 43%;
+        transform: translate(-50%, -50%) rotate(4deg);
+    }
+}
+
+/* Tablet */
+@media (min-width: 701px) and (max-width: 940px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 500px;
+    }
+
+    .home-hero-v3 .hero-v3-sun {
+        width: 390px;
+        height: 390px;
+    }
+
+    .home-hero-v3 .hero-v3-sun::after {
+        inset: 54px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        width: min(360px, 58%);
+        height: 280px;
+        left: 35%;
+        top: 56%;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        width: min(285px, 42%);
+        height: 240px;
+        left: 76%;
+        top: 43%;
+        transform: translate(-50%, -50%) rotate(4deg);
+    }
+}
+
+/* Mobile: clean single-bike scene */
+@media (max-width: 700px) {
+    .home-hero-v3 .hero-v3-sun {
+        width: 300px;
+        height: 300px;
+    }
+
+    .home-hero-v3 .hero-v3-sun::after {
+        inset: 44px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        width: 118%;
+        max-width: 420px;
+        height: 270px;
+        left: 50%;
+        top: 52%;
+        transform: translate(-50%, -50%) rotate(-3deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: none !important;
+    }
+
+    .home-hero-v3 .hero-v3-road {
+        left: -4%;
+        right: -4%;
+        bottom: 34px;
+        height: 78px;
+        opacity: 0.42;
+    }
+}

@@ -138,8 +138,8 @@
                         <div class="hero-v3-sun"></div>
                         <div class="hero-v3-road"></div>
                         <span class="hero-v3-label hero-v3-label-top">HOURLY & DAILY</span>
-                        <img class="hero-v3-bike hero-v3-bike-main" src="images/bmw_s1000rr_cutout.png" alt="Sport bike available for rental">
-                        <img class="hero-v3-bike hero-v3-bike-secondary" src="images/suzuki_hayabusa_cutout.png" alt="Second sport bike available for rental">
+                        <img class="hero-v3-bike hero-v3-bike-main" id="heroBikeBMW" tabindex="0" role="button" aria-label="Highlight BMW rental bike" src="images/bmw_s1000rr_cutout.png" alt="Sport bike available for rental">
+                        <img class="hero-v3-bike hero-v3-bike-secondary" id="heroBikeHayabusa" tabindex="0" role="button" aria-label="Highlight Hayabusa rental bike" src="images/suzuki_hayabusa_cutout.png" alt="Second sport bike available for rental">
 
                         <div class="hero-v3-float hero-v3-float-live">
                             <span class="hero-live-dot"></span>
@@ -313,6 +313,41 @@
 
     <script src="config.js"></script>
     <script src="home.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const bikes = Array.from(document.querySelectorAll('.hero-v3-bike'));
+            if (!bikes.length) return;
+
+            function activateBike(target) {
+                bikes.forEach(function (bike) {
+                    const active = bike === target;
+                    bike.classList.toggle('is-active', active);
+                    bike.classList.toggle('is-passive', !active);
+                    if (active) {
+                        bike.classList.remove('is-popping');
+                        void bike.offsetWidth;
+                        bike.classList.add('is-popping');
+                    }
+                });
+            }
+
+            bikes.forEach(function (bike) {
+                bike.addEventListener('click', function () {
+                    activateBike(bike);
+                });
+                bike.addEventListener('keydown', function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        activateBike(bike);
+                    }
+                });
+            });
+
+            activateBike(document.getElementById('heroBikeBMW') || bikes[0]);
+        });
+    </script>
 </body>
+
 
 </html>
