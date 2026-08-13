@@ -4732,3 +4732,739 @@ button.vehicle-filter-option.is-active:hover {
         top: 70%;
     }
 }
+
+
+/* =========================================================
+   HOMEPAGE HERO V9
+   Closely matches the approved reference:
+   - open cinematic right-side scene, no boxed panel
+   - BMW C 400 GT large/front/lower-left
+   - BMW S1000RR elevated/back/upper-right
+   - orange ring + two glowing platforms + floor lighting
+   - desktop, tablet and mobile responsive
+========================================================= */
+
+.home-hero-v9 {
+    position: relative;
+    min-height: calc(100vh - 82px);
+    overflow: hidden;
+    padding:
+        clamp(42px, 5vw, 72px)
+        max(18px, 4.4vw)
+        clamp(70px, 6vw, 96px);
+    background:
+        radial-gradient(circle at 74% 46%, rgba(255, 92, 0, .12), transparent 26%),
+        radial-gradient(circle at 65% 85%, rgba(255, 107, 0, .09), transparent 30%),
+        linear-gradient(180deg, #09101e 0%, #070d18 100%);
+}
+
+.home-hero-v9::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            118deg,
+            transparent 58%,
+            rgba(255,107,0,.018) 58%,
+            rgba(255,107,0,.018) 64%,
+            transparent 64%
+        );
+}
+
+.hero-v9-shell {
+    position: relative;
+    z-index: 2;
+    width: min(1450px, 100%);
+    min-height: 665px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns:
+        minmax(0, .80fr)
+        minmax(640px, 1.20fr);
+    align-items: center;
+    gap: clamp(26px, 4vw, 66px);
+}
+
+/* ---------- LEFT COPY ---------- */
+
+.hero-v9-copy {
+    position: relative;
+    z-index: 10;
+    max-width: 590px;
+}
+
+.hero-v9-copy h1 {
+    margin: 16px 0 20px;
+    color: #f5f7fb;
+    font-family: var(--font-display);
+    font-size: clamp(3.7rem, 5.25vw, 5.9rem);
+    line-height: .82;
+    letter-spacing: -.055em;
+}
+
+.hero-v9-copy h1 span {
+    color: var(--orange);
+}
+
+.hero-v9-copy > p {
+    max-width: 545px;
+    margin: 0;
+    color: #b2bdcc;
+    font-size: clamp(.98rem, 1.08vw, 1.08rem);
+    line-height: 1.65;
+}
+
+.hero-v9-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.hero-v9-actions .home-primary-cta,
+.hero-v9-actions .home-secondary-cta {
+    min-height: 54px;
+    padding-inline: 24px;
+}
+
+.hero-v9-actions .home-primary-cta {
+    box-shadow: 0 14px 36px rgba(255,107,0,.25);
+}
+
+/* ---------- LEFT FEATURE CARDS ---------- */
+
+.hero-v9-highlights {
+    max-width: 585px;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.hero-v9-highlights > div {
+    min-width: 0;
+    min-height: 103px;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 15px 13px;
+    border: 1px solid rgba(255,255,255,.095);
+    border-radius: 17px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,27,46,.78),
+            rgba(7,14,27,.90)
+        );
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 16px 38px rgba(0,0,0,.18);
+}
+
+.hero-v9-icon {
+    flex: 0 0 35px;
+    width: 35px;
+    height: 35px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(255,107,0,.14);
+    color: var(--orange);
+    font-weight: 900;
+}
+
+.hero-v9-highlights strong,
+.hero-v9-highlights small {
+    display: block;
+}
+
+.hero-v9-highlights strong {
+    color: #f5f8fc;
+    font-family: var(--font-display);
+    font-size: .78rem;
+    line-height: 1.25;
+}
+
+.hero-v9-highlights small {
+    margin-top: 5px;
+    color: #7d8ba0;
+    font-size: .61rem;
+    line-height: 1.4;
+}
+
+/* ---------- CINEMATIC RIGHT SCENE ---------- */
+
+.hero-v9-scene {
+    position: relative;
+    min-width: 0;
+    min-height: 640px;
+    overflow: visible;
+    isolation: isolate;
+}
+
+.hero-v9-back-glow {
+    position: absolute;
+    z-index: -5;
+    width: 88%;
+    height: 76%;
+    right: -1%;
+    top: 10%;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,105,15,.20) 0%,
+            rgba(255,105,15,.08) 35%,
+            transparent 70%
+        );
+    filter: blur(10px);
+}
+
+.hero-v9-orange-ring {
+    position: absolute;
+    z-index: -2;
+    width: 440px;
+    aspect-ratio: 1;
+    right: 5%;
+    top: 7%;
+    border-radius: 50%;
+    border: 54px solid #ff6800;
+    box-shadow:
+        0 0 60px rgba(255,102,0,.28),
+        inset 0 0 30px rgba(255,102,0,.09);
+}
+
+.hero-v9-dots {
+    position: absolute;
+    z-index: 1;
+    width: 120px;
+    height: 82px;
+    top: 26px;
+    right: 46%;
+    opacity: .62;
+    background-image:
+        radial-gradient(
+            circle,
+            rgba(255,107,0,.9) 1.4px,
+            transparent 1.7px
+        );
+    background-size: 14px 14px;
+}
+
+.hero-v9-floor-glow {
+    position: absolute;
+    z-index: -4;
+    left: -10%;
+    right: -7%;
+    bottom: -42px;
+    height: 235px;
+    border-radius: 50%;
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(255,112,22,.24),
+            rgba(255,87,0,.08) 38%,
+            transparent 70%
+        );
+    filter: blur(16px);
+}
+
+/* ---------- GLOWING PLATFORMS ---------- */
+
+.hero-v9-platform {
+    position: absolute;
+    z-index: 1;
+    border-radius: 50%;
+    border: 3px solid rgba(255,111,11,.94);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(57,42,42,.60),
+            rgba(11,14,23,.75)
+        );
+    box-shadow:
+        0 0 9px rgba(255,104,0,.95),
+        0 0 28px rgba(255,83,0,.55),
+        inset 0 -10px 26px rgba(255,102,0,.12);
+}
+
+.hero-v9-platform::after {
+    content: "";
+    position: absolute;
+    inset: 9px 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,194,141,.22);
+}
+
+.hero-v9-platform-bike {
+    width: 440px;
+    height: 112px;
+    right: -1%;
+    top: 54%;
+    transform: translateY(-50%) rotate(1deg);
+}
+
+.hero-v9-platform-scooty {
+    width: 475px;
+    height: 120px;
+    left: -1%;
+    bottom: 6px;
+    transform: rotate(-2deg);
+}
+
+/* ---------- VEHICLES ---------- */
+
+.hero-v9-vehicle {
+    position: absolute;
+    display: block;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    filter:
+        drop-shadow(0 34px 28px rgba(0,0,0,.62));
+    transition:
+        transform .32s ease,
+        filter .32s ease;
+}
+
+/* elevated/back BMW S1000RR */
+.hero-v9-bike {
+    z-index: 4;
+    width: min(470px, 55%);
+    left: 73%;
+    top: 35%;
+    transform:
+        translate(-50%, -50%)
+        rotate(-2deg);
+}
+
+/* large/front BMW C 400 GT */
+.hero-v9-scooty {
+    z-index: 6;
+    width: min(555px, 68%);
+    left: 32%;
+    top: 67%;
+    transform:
+        translate(-50%, -50%)
+        rotate(-2deg);
+}
+
+.hero-v9-scene:hover .hero-v9-bike {
+    transform:
+        translate(-50%, -50%)
+        rotate(-1deg)
+        translateY(-4px);
+}
+
+.hero-v9-scene:hover .hero-v9-scooty {
+    transform:
+        translate(-50%, -50%)
+        rotate(-1deg)
+        translateY(-4px);
+}
+
+/* ---------- VEHICLE LABELS ---------- */
+
+.hero-v9-callout {
+    position: absolute;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 154px;
+    padding: 12px 13px;
+    border: 1px solid rgba(146,169,205,.34);
+    border-radius: 15px;
+    background: rgba(8,14,26,.92);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 18px 42px rgba(0,0,0,.32);
+}
+
+.hero-v9-callout-icon {
+    flex: 0 0 30px;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    color: var(--orange);
+    border-radius: 9px;
+    background: rgba(255,107,0,.12);
+}
+
+.hero-v9-callout strong,
+.hero-v9-callout small,
+.hero-v9-callout span {
+    display: block;
+}
+
+.hero-v9-callout strong {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: .76rem;
+}
+
+.hero-v9-callout small {
+    margin-top: 2px;
+    color: #8493a8;
+    font-size: .57rem;
+}
+
+.hero-v9-callout span {
+    width: fit-content;
+    margin-top: 7px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255,92,0,.16);
+    color: #ff9d56;
+    font-size: .52rem;
+    font-weight: 900;
+}
+
+.hero-v9-callout-bike {
+    top: 5%;
+    right: 0;
+}
+
+.hero-v9-callout-scooty {
+    top: 48%;
+    left: -2%;
+}
+
+/* ---------- SCROLL ---------- */
+
+.hero-v9-scroll {
+    bottom: 18px;
+}
+
+/* =========================================================
+   RESPONSIVE — COMPACT DESKTOP
+========================================================= */
+
+@media (min-width: 961px) and (max-width: 1220px) {
+    .hero-v9-shell {
+        grid-template-columns:
+            minmax(0, .84fr)
+            minmax(535px, 1.16fr);
+        gap: 28px;
+    }
+
+    .hero-v9-copy h1 {
+        font-size: clamp(3.3rem, 5.1vw, 5rem);
+    }
+
+    .hero-v9-scene {
+        min-height: 570px;
+    }
+
+    .hero-v9-orange-ring {
+        width: 390px;
+        border-width: 48px;
+    }
+
+    .hero-v9-bike {
+        width: min(405px, 54%);
+        left: 74%;
+        top: 35%;
+    }
+
+    .hero-v9-scooty {
+        width: min(485px, 67%);
+        left: 32%;
+        top: 67%;
+    }
+
+    .hero-v9-platform-bike {
+        width: 370px;
+    }
+
+    .hero-v9-platform-scooty {
+        width: 420px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (min-width: 701px) and (max-width: 960px) {
+    .home-hero-v9 {
+        min-height: auto;
+        padding-top: 50px;
+    }
+
+    .hero-v9-shell {
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 34px;
+    }
+
+    .hero-v9-copy {
+        max-width: 760px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .hero-v9-copy > p {
+        margin-inline: auto;
+    }
+
+    .hero-v9-actions {
+        justify-content: center;
+    }
+
+    .hero-v9-highlights {
+        width: min(620px, 100%);
+        margin-inline: auto;
+    }
+
+    .hero-v9-scene {
+        width: min(760px, 100%);
+        min-height: 525px;
+        margin: 0 auto;
+    }
+
+    .hero-v9-orange-ring {
+        width: 382px;
+        right: 5%;
+        top: 5%;
+        border-width: 47px;
+    }
+
+    .hero-v9-bike {
+        width: min(350px, 48%);
+        left: 74%;
+        top: 35%;
+    }
+
+    .hero-v9-scooty {
+        width: min(430px, 60%);
+        left: 31%;
+        top: 67%;
+    }
+
+    .hero-v9-platform-bike {
+        width: 300px;
+        height: 82px;
+        right: 1%;
+    }
+
+    .hero-v9-platform-scooty {
+        width: 380px;
+        height: 96px;
+        left: 0;
+    }
+
+    .hero-v9-callout-bike {
+        right: 1%;
+    }
+
+    .hero-v9-callout-scooty {
+        left: 0;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+    .home-hero-v9 {
+        min-height: auto;
+        padding: 32px 14px 52px;
+    }
+
+    .hero-v9-shell {
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .hero-v9-copy {
+        max-width: none;
+        text-align: left;
+    }
+
+    .hero-v9-copy h1 {
+        margin: 11px 0 15px;
+        font-size: clamp(2.55rem, 13vw, 3.8rem);
+        line-height: .87;
+    }
+
+    .hero-v9-copy > p {
+        font-size: .89rem;
+        line-height: 1.6;
+    }
+
+    .hero-v9-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-top: 21px;
+    }
+
+    .hero-v9-actions .home-primary-cta,
+    .hero-v9-actions .home-secondary-cta {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-v9-scene {
+        order: 2;
+        min-height: 370px;
+        width: 100%;
+        margin-top: 2px;
+    }
+
+    .hero-v9-orange-ring {
+        width: 250px;
+        right: -28px;
+        top: 52px;
+        border-width: 34px;
+    }
+
+    .hero-v9-dots {
+        width: 76px;
+        height: 50px;
+        top: 26px;
+        right: 29%;
+        background-size: 10px 10px;
+    }
+
+    .hero-v9-floor-glow {
+        left: -22%;
+        right: -22%;
+        bottom: -28px;
+        height: 160px;
+    }
+
+    .hero-v9-platform-bike {
+        width: 205px;
+        height: 60px;
+        right: -4%;
+        top: 49%;
+    }
+
+    .hero-v9-platform-scooty {
+        width: 248px;
+        height: 68px;
+        left: -4%;
+        bottom: 17px;
+    }
+
+    .hero-v9-bike {
+        width: min(235px, 59%);
+        left: 73%;
+        top: 39%;
+        z-index: 4;
+    }
+
+    .hero-v9-scooty {
+        width: min(292px, 73%);
+        left: 30%;
+        top: 68%;
+        z-index: 6;
+    }
+
+    .hero-v9-callout {
+        min-width: 104px;
+        padding: 8px 9px;
+        gap: 6px;
+        border-radius: 11px;
+    }
+
+    .hero-v9-callout-icon {
+        display: none;
+    }
+
+    .hero-v9-callout strong {
+        font-size: .55rem;
+    }
+
+    .hero-v9-callout small {
+        font-size: .45rem;
+    }
+
+    .hero-v9-callout span {
+        margin-top: 5px;
+        padding: 3px 6px;
+        font-size: .43rem;
+    }
+
+    .hero-v9-callout-bike {
+        top: 5px;
+        right: 3px;
+    }
+
+    .hero-v9-callout-scooty {
+        top: 46%;
+        left: 2px;
+    }
+
+    .hero-v9-highlights {
+        order: 3;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: -4px;
+    }
+
+    .hero-v9-highlights > div {
+        min-height: 78px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 4px;
+        text-align: center;
+    }
+
+    .hero-v9-icon {
+        width: 29px;
+        height: 29px;
+        flex-basis: 29px;
+        border-radius: 9px;
+    }
+
+    .hero-v9-highlights strong {
+        font-size: .57rem;
+    }
+
+    .hero-v9-highlights small {
+        display: none;
+    }
+
+    .hero-v9-scroll {
+        display: none;
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-v9-scene {
+        min-height: 342px;
+    }
+
+    .hero-v9-orange-ring {
+        width: 228px;
+        right: -34px;
+        top: 47px;
+        border-width: 31px;
+    }
+
+    .hero-v9-bike {
+        width: 57%;
+        left: 74%;
+        top: 39%;
+    }
+
+    .hero-v9-scooty {
+        width: 74%;
+        left: 29%;
+        top: 69%;
+    }
+
+    .hero-v9-callout-scooty {
+        top: 47%;
+    }
+}
