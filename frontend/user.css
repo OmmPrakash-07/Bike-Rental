@@ -5544,3 +5544,195 @@ button.vehicle-filter-option.is-active:hover {
         height: 245px;
     }
 }
+
+
+/* =========================================================
+   HERO V11 — OPEN CIRCLE / TWO-BIKE LAYOUT
+   - Removes the large rectangular showcase box.
+   - Keeps the orange circle as the visual anchor.
+   - BMW sits outward on the left.
+   - Hayabusa sits outward on the right.
+   - Tablet keeps both bikes.
+   - Mobile keeps one clean main BMW bike.
+========================================================= */
+
+/* Remove the large right-side box completely */
+.home-hero-v3 .hero-v3-visual {
+    overflow: visible;
+}
+
+.home-hero-v3 .hero-v3-panel {
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.home-hero-v3 .hero-v3-panel::before {
+    display: none !important;
+}
+
+/* Make the orange ring the main visual, not the rectangle */
+.home-hero-v3 .hero-v3-sun {
+    width: 455px;
+    height: 455px;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+    opacity: .96;
+    z-index: 1;
+}
+
+.home-hero-v3 .hero-v3-sun::after {
+    inset: 64px;
+    background: #080d19;
+}
+
+/* Keep the road subtle under the bikes */
+.home-hero-v3 .hero-v3-road {
+    left: 3%;
+    right: 3%;
+    bottom: 72px;
+    height: 118px;
+    opacity: .65;
+}
+
+/* Hide panel-only floating UI so the open scene stays clean */
+.home-hero-v3 .hero-v3-label,
+.home-hero-v3 .hero-v3-float,
+.home-hero-v3 .hero-v3-choice-card {
+    display: none !important;
+}
+
+/* Desktop: bikes sit on opposite sides of the circle */
+@media (min-width: 941px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 570px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        display: block !important;
+        width: min(455px, 64%);
+        height: 345px;
+        left: 31%;
+        top: 53%;
+        z-index: 5;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(375px, 52%);
+        height: 330px;
+        left: 78%;
+        top: 42%;
+        z-index: 4;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(4deg);
+    }
+}
+
+/* Tablet: still show both vehicles, balanced around the circle */
+@media (min-width: 701px) and (max-width: 940px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 490px;
+    }
+
+    .home-hero-v3 .hero-v3-sun {
+        width: 365px;
+        height: 365px;
+    }
+
+    .home-hero-v3 .hero-v3-sun::after {
+        inset: 52px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        display: block !important;
+        width: min(370px, 58%);
+        height: 285px;
+        left: 30%;
+        top: 55%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(305px, 46%);
+        height: 270px;
+        left: 78%;
+        top: 42%;
+        z-index: 4;
+        transform: translate(-50%, -50%) rotate(4deg);
+    }
+
+    .home-hero-v3 .hero-v3-road {
+        bottom: 55px;
+        height: 95px;
+    }
+}
+
+/* Mobile: keep the cleaner single-bike composition */
+@media (max-width: 700px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 350px;
+    }
+
+    .home-hero-v3 .hero-v3-sun {
+        width: 285px;
+        height: 285px;
+        right: 50%;
+        top: 49%;
+        transform: translate(50%, -50%);
+    }
+
+    .home-hero-v3 .hero-v3-sun::after {
+        inset: 42px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: none !important;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        display: block !important;
+        width: 122%;
+        max-width: 420px;
+        height: 265px;
+        left: 50%;
+        top: 51%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-3deg);
+    }
+
+    .home-hero-v3 .hero-v3-road {
+        left: -8%;
+        right: -8%;
+        bottom: 30px;
+        height: 82px;
+    }
+}
+
+@media (max-width: 390px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 325px;
+    }
+
+    .home-hero-v3 .hero-v3-sun {
+        width: 250px;
+        height: 250px;
+    }
+
+    .home-hero-v3 .hero-v3-sun::after {
+        inset: 38px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        width: 120%;
+        max-width: 355px;
+        height: 240px;
+    }
+}
