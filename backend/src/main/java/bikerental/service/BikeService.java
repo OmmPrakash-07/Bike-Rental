@@ -1,6 +1,7 @@
 package bikerental.service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,9 @@ public class BikeService {
 
     private static final Set<String> ACTIVE_BOOKING_STATUSES =
             Set.of("PENDING", "APPROVED");
+
+    private static final Set<String> ALLOWED_FUEL_TYPES =
+            Set.of("PETROL", "ELECTRIC");
 
     private final BikeRepository bikeRepository;
     private final BookingRepository bookingRepository;
@@ -69,6 +73,10 @@ public class BikeService {
         bike.setType(
                 bike.getType().trim());
 
+        bike.setFuelType(
+                normalizeFuelType(
+                        bike.getFuelType()));
+
         /*
          * New bikes are operationally available
          * by default.
@@ -101,6 +109,10 @@ public class BikeService {
 
         bike.setType(
                 newBike.getType().trim());
+
+        bike.setFuelType(
+                normalizeFuelType(
+                        newBike.getFuelType()));
 
         bike.setPricePerDay(
                 newBike.getPricePerDay());
@@ -276,6 +288,29 @@ public class BikeService {
                     "Bike type must be 30 characters or fewer");
         }
 
+        // ---------------- FUEL TYPE ----------------
+
+        if (bike.getFuelType() == null
+                || bike.getFuelType()
+                        .isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Fuel type is required");
+        }
+
+        String fuelType =
+                normalizeFuelType(
+                        bike.getFuelType());
+
+        if (!ALLOWED_FUEL_TYPES.contains(
+                fuelType)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Fuel type must be PETROL or ELECTRIC");
+        }
+
         // ---------------- DAILY PRICE ----------------
 
         if (!Double.isFinite(
@@ -344,4 +379,15 @@ public class BikeService {
                     "Price per hour cannot exceed price per day");
         }
     }
+
+    private String normalizeFuelType(
+            String value) {
+
+        return value == null
+                ? ""
+                : value.trim()
+                        .toUpperCase(
+                                Locale.ROOT);
+    }
+
 }

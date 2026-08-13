@@ -222,6 +222,38 @@
 
                 </div>
 
+                <!-- FUEL TYPE -->
+
+                <div class="form-group">
+
+                    <label for="fuelType">
+                        Fuel Type
+                    </label>
+
+                    <select
+                        id="fuelType"
+                        aria-describedby="fuelTypeError"
+                        required
+                    >
+                        <option value="">
+                            Select fuel type
+                        </option>
+                        <option value="PETROL">
+                            Petrol
+                        </option>
+                        <option value="ELECTRIC">
+                            Electric
+                        </option>
+                    </select>
+
+                    <small
+                        id="fuelTypeError"
+                        class="field-error"
+                        aria-live="polite"
+                    ></small>
+
+                </div>
+
                 <!-- DAILY PRICE -->
 
                 <div class="form-group">
@@ -437,6 +469,8 @@
                         <th>Vehicle</th>
 
                         <th>Type</th>
+
+                        <th>Fuel</th>
 
                         <th>Price/Hour</th>
 

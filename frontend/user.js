@@ -368,7 +368,17 @@ async function loadBikes({ quiet = false } = {}) {
 
         <div class="card-body">
           <div class="card-name">${escapeHtml(bike.name)}</div>
-          <p class="card-type">${escapeHtml(bike.type)}</p>
+          <p class="card-type">
+            ${escapeHtml(bike.type)}
+            ${
+              bike.fuelType
+                ? ` • ${escapeHtml(
+                    bike.fuelType.charAt(0).toUpperCase() +
+                    bike.fuelType.slice(1).toLowerCase()
+                  )}`
+                : ""
+            }
+          </p>
 
           ${priceHtml}
 

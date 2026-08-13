@@ -19,6 +19,10 @@ public class Bike {
     // Bike / Scooty / Bullet etc.
     private String type;
 
+    // PETROL / ELECTRIC
+    // Nullable for existing database rows until the admin edits them.
+    private String fuelType;
+
     // Daily rental price
     private double pricePerDay;
 

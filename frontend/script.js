@@ -350,6 +350,7 @@ function validateBikeForm() {
     [
         "name",
         "type",
+        "fuelType",
         "price",
         "hourlyPrice",
         "image"
@@ -380,6 +381,16 @@ function validateBikeForm() {
                 /\s+/g,
                 " "
             );
+
+    const fuelType =
+        document
+            .getElementById(
+                "fuelType"
+            )
+            .value
+            .trim()
+            .toUpperCase();
+
 
     const price =
         Number(
@@ -463,6 +474,25 @@ function validateBikeForm() {
 
         firstInvalid ??=
             "type";
+    }
+
+
+    // FUEL TYPE
+
+    if (
+        !["PETROL", "ELECTRIC"]
+            .includes(
+                fuelType
+            )
+    ) {
+
+        setFieldError(
+            "fuelType",
+            "Choose Petrol or Electric."
+        );
+
+        firstInvalid ??=
+            "fuelType";
     }
 
 
@@ -600,6 +630,8 @@ function validateBikeForm() {
 
         type,
 
+        fuelType,
+
         price,
 
         hourlyPrice,
@@ -709,7 +741,8 @@ function renderBikes() {
                     [
                         bike.id,
                         bike.name,
-                        bike.type
+                        bike.type,
+                        bike.fuelType
                     ]
                         .some(
                             value =>
@@ -765,7 +798,7 @@ function renderBikes() {
             <tr>
                 <td
                     class="empty-row"
-                    colspan="8"
+                    colspan="9"
                 >
                     No vehicles match this filter.
                 </td>
@@ -816,6 +849,15 @@ function renderBikes() {
                 <td>
                     ${escapeHtml(
                         bike.type
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        bike.fuelType
+                            ? bike.fuelType.charAt(0).toUpperCase() +
+                              bike.fuelType.slice(1).toLowerCase()
+                            : "Not set"
                     )}
                 </td>
 
@@ -1156,6 +1198,9 @@ async function saveBike(
             type:
                 values.type,
 
+            fuelType:
+                values.fuelType,
+
             pricePerDay:
                 values.price,
 
@@ -1273,6 +1318,7 @@ function editBike(
     [
         "name",
         "type",
+        "fuelType",
         "price",
         "hourlyPrice",
         "image"
@@ -1295,6 +1341,18 @@ function editBike(
         )
         .value =
             bike.type;
+
+
+    document
+        .getElementById(
+            "fuelType"
+        )
+        .value =
+            bike.fuelType
+                ? String(
+                      bike.fuelType
+                  ).toUpperCase()
+                : "";
 
 
     document
@@ -1440,6 +1498,7 @@ function resetBikeForm() {
     [
         "name",
         "type",
+        "fuelType",
         "price",
         "hourlyPrice",
         "image"
