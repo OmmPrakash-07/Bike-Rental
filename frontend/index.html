@@ -138,8 +138,29 @@
                         <div class="hero-v3-sun"></div>
                         <div class="hero-v3-road"></div>
                         <span class="hero-v3-label hero-v3-label-top">HOURLY & DAILY</span>
-                        <img class="hero-v3-bike hero-v3-bike-main" id="heroBikeBMW" tabindex="0" role="button" aria-label="Highlight BMW rental bike" src="images/bmw_s1000rr_cutout.png" alt="Sport bike available for rental">
-                        <img class="hero-v3-bike hero-v3-bike-secondary" id="heroBikeHayabusa" tabindex="0" role="button" aria-label="Highlight Hayabusa rental bike" src="images/suzuki_hayabusa_cutout.png" alt="Second sport bike available for rental">
+                        <img class="hero-v3-bike hero-v3-bike-main" id="heroBikeBMW" tabindex="0" role="button" aria-label="Highlight BMW S1000RR" data-name="BMW S1000RR" data-tag="Superbike" data-fuel="Petrol" src="images/bmw_s1000rr_cutout.png" alt="Sport bike available for rental">
+                        <img class="hero-v3-bike hero-v3-bike-secondary" id="heroBikeHayabusa" tabindex="0" role="button" aria-label="Highlight Suzuki Hayabusa" data-name="Suzuki Hayabusa" data-tag="Sport Bike" data-fuel="Petrol" src="images/suzuki_hayabusa_cutout.png" alt="Second sport bike available for rental">
+
+                        <button class="hero-bike-label hero-bike-label-bmw" type="button"
+                            data-bike-target="heroBikeBMW" aria-label="Select BMW S1000RR">
+                            <strong>BMW S1000RR</strong>
+                            <small>Superbike</small>
+                        </button>
+
+                        <button class="hero-bike-label hero-bike-label-hayabusa" type="button"
+                            data-bike-target="heroBikeHayabusa" aria-label="Select Suzuki Hayabusa">
+                            <strong>Suzuki Hayabusa</strong>
+                            <small>Sport Bike</small>
+                        </button>
+
+                        <div id="heroSelectedRide" class="hero-selected-ride" aria-live="polite">
+                            <small>SELECTED RIDE</small>
+                            <strong id="heroSelectedName">BMW S1000RR</strong>
+                            <div class="hero-selected-tags">
+                                <span id="heroSelectedTag">Superbike</span>
+                                <span id="heroSelectedFuel">Petrol</span>
+                            </div>
+                        </div>
 
                         <div class="hero-v3-float hero-v3-float-live">
                             <span class="hero-live-dot"></span>
@@ -317,30 +338,78 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const bikes = Array.from(document.querySelectorAll('.hero-v3-bike'));
+            const labels = Array.from(document.querySelectorAll('.hero-bike-label'));
+            const selectedCard = document.getElementById('heroSelectedRide');
+            const selectedName = document.getElementById('heroSelectedName');
+            const selectedTag = document.getElementById('heroSelectedTag');
+            const selectedFuel = document.getElementById('heroSelectedFuel');
+
             if (!bikes.length) return;
+
+            function refreshSelectedCard(bike) {
+                if (!bike) return;
+
+                if (selectedName) {
+                    selectedName.textContent = bike.dataset.name || 'Selected Bike';
+                }
+
+                if (selectedTag) {
+                    selectedTag.textContent = bike.dataset.tag || 'Bike';
+                }
+
+                if (selectedFuel) {
+                    selectedFuel.textContent = bike.dataset.fuel || 'Petrol';
+                }
+
+                if (selectedCard) {
+                    selectedCard.classList.remove('is-changing');
+                    void selectedCard.offsetWidth;
+                    selectedCard.classList.add('is-changing');
+                }
+            }
 
             function activateBike(target) {
                 bikes.forEach(function (bike) {
                     const active = bike === target;
+
                     bike.classList.toggle('is-active', active);
                     bike.classList.toggle('is-passive', !active);
+                    bike.setAttribute('aria-pressed', active ? 'true' : 'false');
+
                     if (active) {
                         bike.classList.remove('is-popping');
                         void bike.offsetWidth;
                         bike.classList.add('is-popping');
                     }
                 });
+
+                labels.forEach(function (label) {
+                    label.classList.toggle(
+                        'is-active',
+                        label.dataset.bikeTarget === target.id
+                    );
+                });
+
+                refreshSelectedCard(target);
             }
 
             bikes.forEach(function (bike) {
                 bike.addEventListener('click', function () {
                     activateBike(bike);
                 });
+
                 bike.addEventListener('keydown', function (event) {
                     if (event.key === 'Enter' || event.key === ' ') {
                         event.preventDefault();
                         activateBike(bike);
                     }
+                });
+            });
+
+            labels.forEach(function (label) {
+                label.addEventListener('click', function () {
+                    const bike = document.getElementById(label.dataset.bikeTarget);
+                    if (bike) activateBike(bike);
                 });
             });
 
