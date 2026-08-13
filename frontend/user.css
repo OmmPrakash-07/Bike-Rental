@@ -8989,3 +8989,193 @@ main {
         min-height: 30px;
     }
 }
+
+
+/* =========================================================
+   VEHICLE DETAILS V2 — CLEAN IMAGE STAGE + SMART LONG TITLES
+========================================================= */
+
+/* Make the left image look intentional instead of like a pasted white photo. */
+.vehicle-detail-visual {
+    min-height: 560px !important;
+    align-content: center;
+}
+
+.vehicle-detail-orbit {
+    width: min(420px, 70%) !important;
+    border-width: clamp(34px, 4.5vw, 54px) !important;
+    opacity: .9;
+    transform: translateY(8px);
+}
+
+.vehicle-detail-image-frame {
+    position: relative;
+    width: min(590px, 96%) !important;
+    min-height: 0 !important;
+    aspect-ratio: 4 / 3;
+    padding: 18px !important;
+    overflow: hidden;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.10);
+    background:
+        linear-gradient(145deg, #ffffff 0%, #f2f3f5 100%);
+    box-shadow:
+        0 28px 60px rgba(0,0,0,.30),
+        0 0 0 1px rgba(255,255,255,.025);
+}
+
+.vehicle-detail-image-frame::after {
+    content: "";
+    position: absolute;
+    left: 16%;
+    right: 16%;
+    bottom: 9%;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.08);
+    filter: blur(12px);
+    pointer-events: none;
+}
+
+.vehicle-detail-image-frame img {
+    position: relative;
+    z-index: 2;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    padding: 0 !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    border-radius: 18px;
+    background: transparent;
+    filter: none !important;
+    transform: none !important;
+}
+
+.vehicle-detail-visual:hover .vehicle-detail-image-frame img {
+    transform: scale(1.015) !important;
+}
+
+/* Keep the orange ring as a background accent, not behind/through the photo. */
+.vehicle-detail-orbit {
+    z-index: -2 !important;
+}
+
+.vehicle-detail-mini-trust {
+    bottom: 4px !important;
+}
+
+/* Title should never split awkwardly like CBR1000RR-R / Fireblade / SP. */
+.vehicle-detail-copy h1 {
+    max-width: 100%;
+    margin-top: 16px !important;
+    margin-bottom: 14px !important;
+    font-size: clamp(3rem, 4.4vw, 5rem) !important;
+    line-height: .97 !important;
+    letter-spacing: -.045em !important;
+    text-wrap: balance;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+}
+
+.vehicle-detail-copy h1.vehicle-title-long {
+    font-size: clamp(2.65rem, 3.8vw, 4.25rem) !important;
+    line-height: .98 !important;
+}
+
+.vehicle-detail-copy h1.vehicle-title-very-long {
+    font-size: clamp(2.25rem, 3.2vw, 3.55rem) !important;
+    line-height: 1 !important;
+    letter-spacing: -.035em !important;
+}
+
+/* Give long titles more usable horizontal room. */
+.vehicle-detail-copy {
+    max-width: 680px !important;
+    min-width: 0;
+}
+
+/* Keep right-side content from stretching outside its column. */
+.vehicle-detail-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+@media (max-width: 1100px) and (min-width: 961px) {
+    .vehicle-detail-copy h1 {
+        font-size: clamp(2.6rem, 4vw, 4rem) !important;
+    }
+
+    .vehicle-detail-copy h1.vehicle-title-long {
+        font-size: clamp(2.35rem, 3.4vw, 3.45rem) !important;
+    }
+
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        font-size: clamp(2.05rem, 2.8vw, 3rem) !important;
+    }
+}
+
+/* Tablet */
+@media (max-width: 960px) {
+    .vehicle-detail-visual {
+        min-height: 440px !important;
+    }
+
+    .vehicle-detail-image-frame {
+        width: min(620px, 94%) !important;
+        aspect-ratio: 4 / 3;
+    }
+
+    .vehicle-detail-copy h1,
+    .vehicle-detail-copy h1.vehicle-title-long,
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        max-width: 760px;
+        font-size: clamp(2.55rem, 7vw, 4.3rem) !important;
+        line-height: .98 !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .vehicle-detail-visual {
+        min-height: 310px !important;
+    }
+
+    .vehicle-detail-orbit {
+        width: 230px !important;
+        border-width: 30px !important;
+    }
+
+    .vehicle-detail-image-frame {
+        width: min(100%, 430px) !important;
+        aspect-ratio: 4 / 3;
+        padding: 10px !important;
+        border-radius: 20px;
+    }
+
+    .vehicle-detail-image-frame img {
+        border-radius: 13px;
+    }
+
+    .vehicle-detail-mini-trust {
+        display: none !important;
+    }
+
+    .vehicle-detail-copy h1,
+    .vehicle-detail-copy h1.vehicle-title-long,
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        font-size: clamp(2.1rem, 10.7vw, 3.2rem) !important;
+        line-height: 1 !important;
+        letter-spacing: -.035em !important;
+        text-wrap: pretty;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-detail-copy h1,
+    .vehicle-detail-copy h1.vehicle-title-long,
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        font-size: clamp(1.9rem, 10.2vw, 2.75rem) !important;
+    }
+}

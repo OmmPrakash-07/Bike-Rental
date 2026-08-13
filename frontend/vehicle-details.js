@@ -249,8 +249,22 @@ function renderDetailBike(bike) {
     fallback.hidden = false;
   }
 
-  document.getElementById("vehicleDetailName").textContent = bike.name || "Vehicle";
-  document.title = `${bike.name || "Vehicle"} | BikeRental`;
+  const titleElement = document.getElementById("vehicleDetailName");
+  const vehicleName = String(bike.name || "Vehicle").trim();
+
+  titleElement.textContent = vehicleName;
+  titleElement.classList.remove(
+    "vehicle-title-long",
+    "vehicle-title-very-long"
+  );
+
+  if (vehicleName.length > 28) {
+    titleElement.classList.add("vehicle-title-very-long");
+  } else if (vehicleName.length > 18) {
+    titleElement.classList.add("vehicle-title-long");
+  }
+
+  document.title = `${vehicleName} | BikeRental`;
 
   const typePill = document.getElementById("vehicleTypePill");
   typePill.textContent = category;
