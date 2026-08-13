@@ -3388,3 +3388,120 @@ button.vehicle-filter-option.is-active:hover {
         display: none;
     }
 }
+
+/* =========================================================
+   HOMEPAGE HERO V4
+   Two-bike desktop composition, one-bike mobile composition.
+========================================================= */
+@media (min-width: 701px) {
+    .hero-v3-panel {
+        min-height: 585px;
+        overflow: hidden;
+    }
+
+    .hero-v3-sun {
+        width: 430px;
+        height: 430px;
+        right: -18px;
+        top: 66px;
+        opacity: .9;
+    }
+
+    .hero-v3-sun::after {
+        inset: 62px;
+    }
+
+    .hero-v3-bike {
+        position: absolute;
+        z-index: 3;
+        object-fit: contain;
+        filter: drop-shadow(0 34px 34px rgba(0,0,0,.58));
+        transition: transform .25s ease;
+    }
+
+    .hero-v3-bike-main {
+        width: min(440px, 64%);
+        height: 330px;
+        left: 34%;
+        top: 59%;
+        transform: translate(-50%, -50%) rotate(-3deg);
+    }
+
+    .hero-v3-bike-secondary {
+        width: min(380px, 55%);
+        height: 285px;
+        left: 72%;
+        top: 38%;
+        transform: translate(-50%, -50%) rotate(2.5deg);
+        z-index: 4;
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-main {
+        transform: translate(-50%, -50%) rotate(-2deg) translateY(-3px);
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-secondary {
+        transform: translate(-50%, -50%) rotate(1.5deg) translateY(-4px);
+    }
+
+    .hero-v3-road {
+        left: 1%;
+        right: -11%;
+        bottom: 46px;
+        height: 158px;
+        transform: rotate(-7deg);
+    }
+
+    .hero-v3-float-live {
+        left: 24px;
+        bottom: 24px;
+    }
+
+    .hero-v3-float-duration {
+        top: 24px;
+        right: 24px;
+    }
+
+    .hero-v3-choice-card {
+        right: 24px;
+        bottom: 24px;
+    }
+}
+
+@media (min-width: 701px) and (max-width: 1180px) {
+    .hero-v3-bike-main {
+        width: min(390px, 63%);
+        height: 300px;
+        left: 33%;
+        top: 60%;
+    }
+
+    .hero-v3-bike-secondary {
+        width: min(330px, 54%);
+        height: 255px;
+        left: 72%;
+        top: 39%;
+    }
+}
+
+@media (max-width: 700px) {
+    .hero-v3-bike-secondary {
+        display: none !important;
+    }
+
+    .hero-v3-bike-main {
+        width: 122%;
+        max-width: 460px;
+        height: 265px;
+        left: 48%;
+        top: 48%;
+        transform: translate(-50%, -50%) rotate(-1.5deg);
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-v3-bike-main {
+        width: 126%;
+        height: 245px;
+    }
+}
