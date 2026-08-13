@@ -6807,3 +6807,187 @@ button.vehicle-filter-option.is-active:hover {
         padding: 14px 16px 18px;
     }
 }
+
+
+/* =========================================================
+   LONG-RIDE SAVINGS V16 — DARK BIKERENTAL THEME
+   Matches the rest of the homepage instead of switching to a white section.
+========================================================= */
+
+.long-ride-savings {
+    color: var(--text-primary);
+    background:
+        radial-gradient(circle at 18% 18%, rgba(255,107,0,.10), transparent 24%),
+        radial-gradient(circle at 82% 76%, rgba(255,107,0,.06), transparent 26%),
+        linear-gradient(180deg, #0a0f1e 0%, #080d19 100%);
+    border-top: 1px solid rgba(255,255,255,.045);
+    border-bottom: 1px solid rgba(255,255,255,.045);
+}
+
+.long-ride-savings::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .16;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,.15) 1px, transparent 1px);
+    background-size: 28px 28px;
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent);
+}
+
+.long-ride-shell {
+    position: relative;
+    z-index: 1;
+}
+
+.long-ride-kicker {
+    color: var(--orange);
+}
+
+.long-ride-heading h2 {
+    color: var(--text-primary);
+}
+
+.long-ride-heading p {
+    color: var(--text-secondary);
+}
+
+.long-ride-heading p strong {
+    color: #ffffff;
+}
+
+.long-ride-discount-note {
+    border: 1px solid rgba(255,107,0,.20);
+    background:
+        linear-gradient(145deg, rgba(255,107,0,.09), rgba(255,255,255,.025));
+    box-shadow: 0 18px 38px rgba(0,0,0,.24);
+}
+
+.long-ride-discount-note strong {
+    color: #ff9a52;
+}
+
+.long-ride-discount-note span {
+    color: #94a3b8;
+}
+
+/* Dark premium cards */
+.long-ride-card {
+    border: 1px solid rgba(255,255,255,.075);
+    background:
+        linear-gradient(145deg, #121b2c 0%, #0d1524 100%);
+    box-shadow:
+        0 20px 42px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.02);
+}
+
+.long-ride-card:hover {
+    border-color: rgba(255,107,0,.30);
+    box-shadow:
+        0 28px 58px rgba(0,0,0,.38),
+        0 0 0 1px rgba(255,107,0,.08);
+}
+
+/* Keep the Royal Brothers-style warm vehicle backdrop,
+   but make it fit the dark BikeRental palette. */
+.long-ride-image-wrap {
+    background:
+        radial-gradient(circle at 52% 42%, rgba(255,151,65,.24), transparent 44%),
+        linear-gradient(145deg, #302219 0%, #1b1718 100%);
+    border: 1px solid rgba(255,107,0,.13);
+}
+
+.long-ride-image-wrap::before {
+    background: rgba(0,0,0,.30);
+}
+
+.long-ride-card-body {
+    color: var(--text-primary);
+}
+
+.long-ride-fuel {
+    color: #ffb16e;
+    background: rgba(255,107,0,.12);
+    border: 1px solid rgba(255,107,0,.18);
+}
+
+.long-ride-fuel.electric {
+    color: #63dfbd;
+    background: rgba(53,212,167,.10);
+    border-color: rgba(53,212,167,.18);
+}
+
+.long-ride-daily {
+    color: #8795aa;
+}
+
+.long-ride-card h3 {
+    color: #f5f8fc;
+}
+
+.long-ride-price-row {
+    background: rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.045);
+}
+
+.long-ride-price-row strong {
+    color: #aeb9ca;
+}
+
+.long-ride-price-row b {
+    color: #ffffff;
+}
+
+.long-ride-price-row span {
+    color: #ff9f59;
+    background: rgba(255,107,0,.10);
+}
+
+.long-ride-card-link {
+    color: #f5f8fc;
+}
+
+.long-ride-card-link:hover {
+    color: var(--orange);
+}
+
+.long-ride-footer {
+    justify-content: flex-end;
+    border-top-color: rgba(255,255,255,.06);
+}
+
+.long-ride-footer a {
+    color: var(--orange);
+}
+
+.long-ride-footer a:hover {
+    color: #ff9a52;
+}
+
+.long-ride-card-loading .long-ride-image-wrap {
+    background: #121b2c;
+}
+
+.long-ride-skeleton {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.035),
+            rgba(255,255,255,.085),
+            rgba(255,255,255,.035)
+        );
+    background-size: 200% 100%;
+}
+
+.long-ride-error {
+    color: #94a3b8;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+}
+
+@media (max-width: 700px) {
+    .long-ride-discount-note {
+        background: rgba(255,107,0,.07);
+    }
+}
