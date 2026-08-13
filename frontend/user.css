@@ -5468,3 +5468,79 @@ button.vehicle-filter-option.is-active:hover {
         top: 47%;
     }
 }
+
+
+/* =========================================================
+   HERO V10 — RESTORE PREVIOUS APPROVED TWO-BIKE UI
+   Desktop/tablet: BMW S1000RR + Suzuki Hayabusa.
+   Mobile: one main BMW bike for a cleaner compact hero.
+========================================================= */
+
+@media (min-width: 701px) {
+    .home-hero-v3 .hero-v3-bike-main {
+        display: block !important;
+        width: min(430px, 62%);
+        height: 330px;
+        left: 38%;
+        top: 48%;
+        z-index: 5;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(350px, 49%);
+        height: 320px;
+        left: 72%;
+        top: 39%;
+        z-index: 4;
+        opacity: .98;
+        transform: translate(-50%, -50%) rotate(3deg);
+    }
+}
+
+@media (min-width: 701px) and (max-width: 940px) {
+    .home-hero-v3 .hero-v3-panel {
+        min-height: 500px;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        width: min(365px, 58%);
+        height: 285px;
+        left: 38%;
+        top: 50%;
+    }
+
+    .home-hero-v3 .hero-v3-bike-secondary {
+        width: min(295px, 45%);
+        height: 270px;
+        left: 72%;
+        top: 39%;
+    }
+}
+
+@media (max-width: 700px) {
+    .home-hero-v3 .hero-v3-bike-secondary {
+        display: none !important;
+    }
+
+    .home-hero-v3 .hero-v3-bike-main {
+        display: block !important;
+        width: 122%;
+        max-width: 430px;
+        height: 265px;
+        left: 50%;
+        top: 50%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-3deg);
+    }
+}
+
+@media (max-width: 390px) {
+    .home-hero-v3 .hero-v3-bike-main {
+        width: 120%;
+        max-width: 360px;
+        height: 245px;
+    }
+}
