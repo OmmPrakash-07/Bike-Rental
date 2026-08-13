@@ -190,6 +190,14 @@ function longRideFindBike(bikes, config) {
   }) || null;
 }
 
+
+function longRideSlug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function longRideCardMarkup(config, bike) {
   const daily = Number(bike?.pricePerDay) || config.fallbackDaily;
   const fuel = String(
@@ -200,6 +208,7 @@ function longRideCardMarkup(config, bike) {
 
   const image = longRideImageUrl(bike?.imageUrl || "");
   const electric = fuel.toLowerCase() === "electric";
+  const scooterSlug = longRideSlug(config.name);
 
   const priceRows = LONG_RIDE_PACKAGES.map((pkg) => {
     const price = longRidePackagePrice(
@@ -218,11 +227,11 @@ function longRideCardMarkup(config, bike) {
   }).join("");
 
   const imageMarkup = image
-    ? `<img src="${image}" alt="${config.name} scooter" loading="lazy">`
+    ? `<img class="long-ride-scooter-image long-ride-scooter-image--${scooterSlug}" src="${image}" alt="${config.name} scooter" loading="lazy">`
     : `<div class="long-ride-image-fallback">Scooter</div>`;
 
   return `
-    <article class="long-ride-card">
+    <article class="long-ride-card long-ride-card--${scooterSlug}">
       <div class="long-ride-image-wrap">
         ${imageMarkup}
       </div>

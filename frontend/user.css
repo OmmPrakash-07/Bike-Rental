@@ -6991,3 +6991,336 @@ button.vehicle-filter-option.is-active:hover {
         background: rgba(255,107,0,.07);
     }
 }
+
+
+/* =========================================================
+   LONG-RIDE V17 — CONSISTENT SCOOTER IMAGE FIT
+   Goal: make every scooter sit in the card like Yamaha RayZR 125.
+========================================================= */
+
+.long-ride-image-wrap {
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.long-ride-image-wrap::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background:
+        radial-gradient(circle at 50% 48%, rgba(255,107,0,.16), transparent 48%),
+        linear-gradient(145deg, #302219 0%, #17151a 100%);
+}
+
+.long-ride-image-wrap::before {
+    z-index: 1;
+}
+
+.long-ride-image-wrap img.long-ride-scooter-image {
+    position: relative !important;
+    z-index: 2 !important;
+    inset: auto !important;
+    width: 92% !important;
+    max-width: 92% !important;
+    height: 92% !important;
+    max-height: 205px !important;
+    margin: auto !important;
+    transform: none !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    border-radius: 18px;
+    filter:
+        contrast(1.04)
+        saturate(1.04)
+        drop-shadow(0 18px 18px rgba(0,0,0,.34));
+}
+
+/* These source images have bright/white studio backgrounds.
+   Multiply removes the white box against our dark warm stage. */
+.long-ride-scooter-image--honda-activa,
+.long-ride-scooter-image--suzuki-access-125,
+.long-ride-scooter-image--bajaj-chetak {
+    mix-blend-mode: multiply;
+    filter:
+        brightness(1.22)
+        contrast(1.08)
+        saturate(1.06)
+        drop-shadow(0 18px 18px rgba(0,0,0,.30)) !important;
+}
+
+/* Yamaha already has the cleanest source crop; use it as the reference. */
+.long-ride-scooter-image--yamaha-rayzr-125 {
+    width: 90% !important;
+    height: 90% !important;
+    mix-blend-mode: normal;
+}
+
+/* Keep all four image stages the exact same height on desktop. */
+@media (min-width: 1051px) {
+    .long-ride-image-wrap {
+        height: 215px !important;
+    }
+
+    .long-ride-image-wrap img.long-ride-scooter-image {
+        max-height: 198px !important;
+    }
+}
+
+@media (max-width: 1050px) {
+    .long-ride-image-wrap img.long-ride-scooter-image {
+        width: 88% !important;
+        max-width: 88% !important;
+        height: 88% !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .long-ride-image-wrap img.long-ride-scooter-image {
+        width: 86% !important;
+        max-width: 86% !important;
+        height: 86% !important;
+        max-height: 205px !important;
+    }
+}
+
+/* =========================================================
+   CREATIVE INDEX SECTION — RIDE MATCH
+========================================================= */
+
+.ride-match-section {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(68px, 7vw, 106px) max(18px, 4.5vw);
+    background:
+        radial-gradient(circle at 14% 5%, rgba(255,107,0,.10), transparent 27%),
+        radial-gradient(circle at 88% 88%, rgba(255,107,0,.055), transparent 30%),
+        #080d19;
+    border-top: 1px solid rgba(255,255,255,.045);
+}
+
+.ride-match-section::before {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -180px;
+    top: -230px;
+    border-radius: 50%;
+    border: 70px solid rgba(255,107,0,.055);
+    pointer-events: none;
+}
+
+.ride-match-shell {
+    position: relative;
+    z-index: 1;
+    width: min(1380px, 100%);
+    margin: 0 auto;
+}
+
+.ride-match-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 34px;
+}
+
+.ride-match-heading > div > span {
+    color: var(--orange);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+}
+
+.ride-match-heading h2 {
+    max-width: 760px;
+    margin-top: 10px;
+    font-size: clamp(2.3rem, 4vw, 4.6rem);
+    line-height: .98;
+    letter-spacing: -.045em;
+}
+
+.ride-match-heading p {
+    max-width: 670px;
+    margin-top: 13px;
+    color: #8d9bb0;
+    font-size: .88rem;
+}
+
+.ride-match-main-link {
+    flex: 0 0 auto;
+    color: #fff;
+    text-decoration: none;
+    font-size: .76rem;
+    font-weight: 900;
+}
+
+.ride-match-main-link:hover {
+    color: var(--orange);
+}
+
+.ride-match-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.ride-match-card {
+    position: relative;
+    min-height: 330px;
+    padding: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 24px;
+    background:
+        linear-gradient(145deg, rgba(19,29,46,.96), rgba(10,16,28,.98));
+    box-shadow: 0 20px 48px rgba(0,0,0,.22);
+    transition:
+        transform .34s cubic-bezier(.16,1,.3,1),
+        border-color .28s ease,
+        box-shadow .28s ease;
+}
+
+.ride-match-card::before {
+    content: "";
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    right: -95px;
+    bottom: -100px;
+    border-radius: 50%;
+    border: 34px solid rgba(255,107,0,.055);
+}
+
+.ride-match-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(255,107,0,.28);
+    box-shadow: 0 28px 58px rgba(0,0,0,.30);
+}
+
+.ride-match-card.featured {
+    border-color: rgba(255,107,0,.23);
+    background:
+        radial-gradient(circle at 90% 8%, rgba(255,107,0,.14), transparent 30%),
+        linear-gradient(145deg, #172033, #0b1220);
+}
+
+.ride-match-number {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    color: rgba(255,255,255,.08);
+    font-family: var(--font-display);
+    font-size: 3.4rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.ride-match-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 28px;
+    border-radius: 13px;
+    background: rgba(255,107,0,.12);
+    color: var(--orange);
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.ride-match-label {
+    color: #ff9951;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .14em;
+}
+
+.ride-match-card h3 {
+    margin-top: 7px;
+    font-size: clamp(1.55rem, 2.25vw, 2.35rem);
+}
+
+.ride-match-card p {
+    max-width: 410px;
+    margin-top: 11px;
+    color: #8897aa;
+    font-size: .8rem;
+    line-height: 1.65;
+}
+
+.ride-match-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 20px;
+}
+
+.ride-match-tags span {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.05);
+    color: #aeb9c9;
+    font-size: .55rem;
+    font-weight: 800;
+}
+
+.ride-match-card.featured .ride-match-tags span:first-child {
+    background: rgba(255,107,0,.12);
+    color: #ff9951;
+}
+
+.ride-match-card > a {
+    position: absolute;
+    left: 28px;
+    bottom: 26px;
+    color: #f5f8fc;
+    text-decoration: none;
+    font-size: .72rem;
+    font-weight: 900;
+}
+
+.ride-match-card > a:hover {
+    color: var(--orange);
+}
+
+@media (max-width: 900px) {
+    .ride-match-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ride-match-card {
+        min-height: 285px;
+    }
+}
+
+@media (max-width: 700px) {
+    .ride-match-section {
+        padding: 54px 14px;
+    }
+
+    .ride-match-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-bottom: 24px;
+    }
+
+    .ride-match-main-link {
+        display: none;
+    }
+
+    .ride-match-card {
+        min-height: 270px;
+        padding: 22px;
+        border-radius: 20px;
+    }
+
+    .ride-match-card > a {
+        left: 22px;
+        bottom: 22px;
+    }
+}
