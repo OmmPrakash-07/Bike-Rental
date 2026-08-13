@@ -9179,3 +9179,52 @@ main {
         font-size: clamp(1.9rem, 10.2vw, 2.75rem) !important;
     }
 }
+
+
+/* =========================================================
+   VEHICLE DETAILS V3 — AVAILABILITY BADGE POSITION
+   Badge now sits inside the vehicle image card instead of floating outside.
+========================================================= */
+
+.vehicle-detail-image-frame {
+    position: relative !important;
+}
+
+.vehicle-detail-availability {
+    position: absolute !important;
+    z-index: 6 !important;
+    top: 16px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    min-height: 30px !important;
+    padding: 0 11px !important;
+
+    border-radius: 999px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,.12);
+    backdrop-filter: blur(10px);
+}
+
+.vehicle-detail-availability.is-available {
+    color: #0d8b63 !important;
+    border: 1px solid rgba(20,155,111,.20) !important;
+    background: rgba(236,255,248,.92) !important;
+}
+
+.vehicle-detail-availability.is-unavailable {
+    color: #c64545 !important;
+    border: 1px solid rgba(198,69,69,.18) !important;
+    background: rgba(255,241,241,.94) !important;
+}
+
+/* Keep the image comfortably away from the badge on smaller screens. */
+@media (max-width: 700px) {
+    .vehicle-detail-availability {
+        top: 10px !important;
+        right: 10px !important;
+        min-height: 27px !important;
+        padding: 0 9px !important;
+        font-size: .54rem !important;
+    }
+}
