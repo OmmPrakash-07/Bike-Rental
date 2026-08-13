@@ -6388,3 +6388,422 @@ button.vehicle-filter-option.is-active:hover {
         transform: translateX(0);
     }
 }
+
+
+/* =========================================================
+   INDEX — LONG-RIDE SCOOTER SAVINGS
+   Inspired by the reference "SAVE BIG" layout.
+   This section exists only on index.html.
+========================================================= */
+
+.long-ride-savings {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(64px, 7vw, 104px) max(18px, 4.5vw);
+    color: #171717;
+    background:
+        radial-gradient(circle at 20% 18%, rgba(255,107,0,.08), transparent 22%),
+        repeating-radial-gradient(
+            ellipse at 50% 50%,
+            rgba(18,18,18,.035) 0 1px,
+            transparent 1px 34px
+        ),
+        #f8f6ef;
+}
+
+.long-ride-shell {
+    width: min(1380px, 100%);
+    margin: 0 auto;
+}
+
+.long-ride-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 46px;
+}
+
+.long-ride-kicker {
+    display: block;
+    margin-bottom: 10px;
+    color: #ff6b00;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .16em;
+}
+
+.long-ride-heading h2 {
+    margin: 0;
+    color: #151515;
+    font-size: clamp(3rem, 5.4vw, 5.8rem);
+    line-height: .88;
+    letter-spacing: -.055em;
+}
+
+.long-ride-heading p {
+    margin-top: 14px;
+    color: #3f3f3f;
+    font-size: clamp(1.05rem, 1.5vw, 1.45rem);
+    font-weight: 600;
+}
+
+.long-ride-heading p strong {
+    color: #151515;
+}
+
+.long-ride-discount-note {
+    flex: 0 0 auto;
+    max-width: 360px;
+    padding: 14px 17px;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 16px;
+    background: rgba(255,255,255,.72);
+    box-shadow: 0 16px 34px rgba(0,0,0,.06);
+}
+
+.long-ride-discount-note strong,
+.long-ride-discount-note span {
+    display: block;
+}
+
+.long-ride-discount-note strong {
+    color: #0e5961;
+    font-size: .82rem;
+}
+
+.long-ride-discount-note span {
+    margin-top: 4px;
+    color: #606060;
+    font-size: .72rem;
+}
+
+.long-ride-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(16px, 2vw, 28px);
+    align-items: end;
+}
+
+.long-ride-card {
+    position: relative;
+    min-width: 0;
+    min-height: 430px;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 28px;
+    background: rgba(255,255,255,.82);
+    box-shadow: 0 20px 42px rgba(37,31,18,.09);
+    overflow: visible;
+    transition:
+        transform .3s cubic-bezier(.16,1,.3,1),
+        box-shadow .3s ease;
+}
+
+.long-ride-card:nth-child(2),
+.long-ride-card:nth-child(4) {
+    transform: translateY(38px);
+}
+
+.long-ride-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 28px 55px rgba(37,31,18,.14);
+}
+
+.long-ride-card:nth-child(2):hover,
+.long-ride-card:nth-child(4):hover {
+    transform: translateY(30px);
+}
+
+.long-ride-image-wrap {
+    position: relative;
+    height: 215px;
+    margin: 18px 18px 0;
+    border-radius: 24px;
+    background:
+        linear-gradient(145deg, #fff2bf, #ffe6a1);
+    overflow: visible;
+}
+
+.long-ride-image-wrap::before {
+    content: "";
+    position: absolute;
+    width: 72%;
+    height: 30px;
+    left: 14%;
+    bottom: 10px;
+    border-radius: 50%;
+    background: rgba(67,49,22,.13);
+    filter: blur(12px);
+}
+
+.long-ride-image-wrap img {
+    position: absolute;
+    z-index: 2;
+    width: 112%;
+    height: 220px;
+    left: 50%;
+    bottom: -6px;
+    transform: translateX(-50%);
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 20px 20px rgba(42,29,10,.24));
+}
+
+.long-ride-card-body {
+    padding: 18px 20px 22px;
+}
+
+.long-ride-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.long-ride-fuel {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 0 9px;
+    border-radius: 999px;
+    color: #76500c;
+    background: #fff1be;
+    font-size: .58rem;
+    font-weight: 900;
+}
+
+.long-ride-fuel.electric {
+    color: #087657;
+    background: #dff9ec;
+}
+
+.long-ride-daily {
+    color: #686868;
+    font-size: .62rem;
+    font-weight: 700;
+}
+
+.long-ride-card h3 {
+    margin: 0 0 14px;
+    color: #171717;
+    font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+    line-height: 1.16;
+}
+
+.long-ride-prices {
+    display: grid;
+    gap: 7px;
+}
+
+.long-ride-price-row {
+    display: grid;
+    grid-template-columns: minmax(64px, .85fr) auto auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 39px;
+    padding: 0 9px;
+    border-radius: 10px;
+    background: #fffaf0;
+}
+
+.long-ride-price-row strong {
+    color: #232323;
+    font-size: .88rem;
+}
+
+.long-ride-price-row b {
+    color: #151515;
+    font-size: .93rem;
+}
+
+.long-ride-price-row span {
+    padding: 3px 6px;
+    border-radius: 999px;
+    color: #7e5b13;
+    background: #fff0b3;
+    font-size: .5rem;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.long-ride-card-link {
+    display: inline-flex;
+    align-items: center;
+    margin-top: 14px;
+    color: #171717;
+    font-size: .72rem;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.long-ride-card-link:hover {
+    color: #ff6b00;
+}
+
+.long-ride-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin-top: 70px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(0,0,0,.08);
+}
+
+.long-ride-footer span {
+    color: #656565;
+    font-size: .7rem;
+}
+
+.long-ride-footer a {
+    color: #0e5961;
+    font-size: .74rem;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.long-ride-card-loading {
+    overflow: hidden;
+}
+
+.long-ride-card-loading .long-ride-image-wrap {
+    background: #f0eadb;
+}
+
+.long-ride-skeleton {
+    width: 70%;
+    height: 13px;
+    margin-top: 11px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #eee8dc, #faf7f0, #eee8dc);
+    background-size: 200% 100%;
+    animation: longRideLoading 1.15s linear infinite;
+}
+
+.long-ride-skeleton.long {
+    width: 88%;
+    height: 20px;
+}
+
+@keyframes longRideLoading {
+    to { background-position: -200% 0; }
+}
+
+.long-ride-error {
+    grid-column: 1 / -1;
+    padding: 28px;
+    border-radius: 18px;
+    text-align: center;
+    color: #645a4b;
+    background: rgba(255,255,255,.74);
+}
+
+/* Tablet */
+@media (max-width: 1050px) {
+    .long-ride-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 26px;
+    }
+
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        transform: none;
+    }
+
+    .long-ride-card:nth-child(2):hover,
+    .long-ride-card:nth-child(4):hover {
+        transform: translateY(-8px);
+    }
+
+    .long-ride-footer {
+        margin-top: 34px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .long-ride-savings {
+        padding: 54px 14px;
+    }
+
+    .long-ride-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-bottom: 28px;
+    }
+
+    .long-ride-heading h2 {
+        font-size: clamp(3.2rem, 17vw, 4.8rem);
+    }
+
+    .long-ride-discount-note {
+        width: 100%;
+        max-width: none;
+    }
+
+    .long-ride-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .long-ride-card {
+        min-height: 0;
+        display: grid;
+        grid-template-columns: minmax(130px, .9fr) minmax(0, 1.1fr);
+        border-radius: 22px;
+    }
+
+    .long-ride-image-wrap {
+        height: auto;
+        min-height: 230px;
+        margin: 12px 0 12px 12px;
+        border-radius: 18px;
+    }
+
+    .long-ride-image-wrap img {
+        width: 122%;
+        height: 220px;
+        bottom: 2px;
+    }
+
+    .long-ride-card-body {
+        align-self: center;
+        padding: 16px 14px 16px 12px;
+    }
+
+    .long-ride-price-row {
+        grid-template-columns: 1fr auto;
+        gap: 5px;
+        min-height: 36px;
+    }
+
+    .long-ride-price-row span {
+        display: none;
+    }
+
+    .long-ride-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        margin-top: 28px;
+    }
+}
+
+@media (max-width: 440px) {
+    .long-ride-card {
+        grid-template-columns: 1fr;
+    }
+
+    .long-ride-image-wrap {
+        min-height: 205px;
+        margin: 12px 12px 0;
+    }
+
+    .long-ride-image-wrap img {
+        width: 112%;
+        height: 205px;
+    }
+
+    .long-ride-card-body {
+        padding: 14px 16px 18px;
+    }
+}

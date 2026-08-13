@@ -118,3 +118,182 @@ document.addEventListener("keydown", (event) => {
 });
 
 homeUpdateAccountUi();
+
+
+/* =========================================================
+   INDEX ONLY — LONG-RIDE SCOOTER SAVINGS
+   Uses the current /api/bikes data and daily prices.
+========================================================= */
+
+const LONG_RIDE_SCOOTERS = [
+  {
+    name: "Honda Activa",
+    aliases: ["Honda Activa"],
+    fallbackDaily: 700,
+    fallbackFuel: "Petrol"
+  },
+  {
+    name: "Suzuki Access 125",
+    aliases: ["Suzuki Access 125", "Suzuki Access"],
+    fallbackDaily: 799,
+    fallbackFuel: "Petrol"
+  },
+  {
+    name: "Yamaha RayZR 125",
+    aliases: ["Yamaha RayZR 125", "Yamaha RayZR"],
+    fallbackDaily: 940,
+    fallbackFuel: "Petrol"
+  },
+  {
+    name: "Bajaj Chetak",
+    aliases: ["Bajaj Chetak"],
+    fallbackDaily: 549,
+    fallbackFuel: "Electric"
+  }
+];
+
+const LONG_RIDE_PACKAGES = [
+  { days: 7, discount: 0.10 },
+  { days: 15, discount: 0.20 },
+  { days: 30, discount: 0.30 }
+];
+
+function longRideImageUrl(imageUrl) {
+  const base = String(window.BIKE_RENTAL_CONFIG?.API_BASE_URL || "").replace(/\/$/, "");
+
+  if (!imageUrl) return "";
+
+  if (/^https?:\/\//i.test(imageUrl)) {
+    return imageUrl;
+  }
+
+  return `${base}/${String(imageUrl).replace(/^\//, "")}`;
+}
+
+function longRideMoney(value) {
+  return `₹${Math.round(Number(value) || 0).toLocaleString("en-IN")}`;
+}
+
+function longRidePackagePrice(dailyRate, days, discount) {
+  const raw = Number(dailyRate) * days * (1 - discount);
+
+  // Round to the nearest ₹10 so the package price stays clean.
+  return Math.round(raw / 10) * 10;
+}
+
+function longRideFindBike(bikes, config) {
+  const aliases = config.aliases.map((item) => item.toLowerCase());
+
+  return bikes.find((bike) => {
+    const name = String(bike?.name || "").trim().toLowerCase();
+    return aliases.includes(name);
+  }) || null;
+}
+
+function longRideCardMarkup(config, bike) {
+  const daily = Number(bike?.pricePerDay) || config.fallbackDaily;
+  const fuel = String(
+    bike?.fuelType ||
+    config.fallbackFuel ||
+    "Petrol"
+  ).trim();
+
+  const image = longRideImageUrl(bike?.imageUrl || "");
+  const electric = fuel.toLowerCase() === "electric";
+
+  const priceRows = LONG_RIDE_PACKAGES.map((pkg) => {
+    const price = longRidePackagePrice(
+      daily,
+      pkg.days,
+      pkg.discount
+    );
+
+    return `
+      <div class="long-ride-price-row">
+        <strong>${pkg.days} Days</strong>
+        <b>${longRideMoney(price)}</b>
+        <span>Save ${Math.round(pkg.discount * 100)}%</span>
+      </div>
+    `;
+  }).join("");
+
+  const imageMarkup = image
+    ? `<img src="${image}" alt="${config.name} scooter" loading="lazy">`
+    : `<div class="long-ride-image-fallback">Scooter</div>`;
+
+  return `
+    <article class="long-ride-card">
+      <div class="long-ride-image-wrap">
+        ${imageMarkup}
+      </div>
+
+      <div class="long-ride-card-body">
+        <div class="long-ride-meta">
+          <span class="long-ride-fuel ${electric ? "electric" : ""}">
+            ${electric ? "⚡" : "⛽"} ${fuel}
+          </span>
+          <span class="long-ride-daily">${longRideMoney(daily)} / day</span>
+        </div>
+
+        <h3>${config.name}</h3>
+
+        <div class="long-ride-prices">
+          ${priceRows}
+        </div>
+
+        <a class="long-ride-card-link" href="vehicles.html">
+          View scooter →
+        </a>
+      </div>
+    </article>
+  `;
+}
+
+async function loadLongRideScooterDeals() {
+  const container = document.getElementById("longRideDeals");
+
+  // Section does not exist outside index.html, so this safely does nothing.
+  if (!container) return;
+
+  const base = String(
+    window.BIKE_RENTAL_CONFIG?.API_BASE_URL || ""
+  ).replace(/\/$/, "");
+
+  try {
+    const response = await fetch(`${base}/api/bikes`, {
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error(`Bike API returned ${response.status}`);
+    }
+
+    const payload = await response.json();
+    const bikes = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
+
+    container.innerHTML = LONG_RIDE_SCOOTERS.map((config) => {
+      const bike = longRideFindBike(bikes, config);
+      return longRideCardMarkup(config, bike);
+    }).join("");
+  } catch (error) {
+    console.warn("Could not load live long-ride scooter prices:", error);
+
+    // Still render the section using current known fallback daily prices.
+    container.innerHTML = LONG_RIDE_SCOOTERS.map((config) =>
+      longRideCardMarkup(config, null)
+    ).join("");
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    loadLongRideScooterDeals
+  );
+} else {
+  loadLongRideScooterDeals();
+}
