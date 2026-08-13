@@ -226,6 +226,7 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeUserMenu();
     closeMobileMenu();
+    closeMobileFleetSheets();
   }
 });
 
@@ -434,6 +435,20 @@ function updateVehicleFilterUi() {
       `<strong>${filteredVehicles().length}</strong> ${fuelLabel}${categoryLabel}${searchLabel} found`;
   }
 
+  document.querySelectorAll("[data-mobile-category-filter]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.mobileCategoryFilter === vehicleCategoryFilter
+    );
+  });
+
+  document.querySelectorAll("[data-mobile-fuel-filter]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.mobileFuelFilter === vehicleFuelFilter
+    );
+  });
+
   updateVehicleDiscoveryUi();
 }
 
@@ -541,6 +556,52 @@ function updateVehicleDiscoveryUi() {
   }
 
   summaryText.textContent = parts.join(" • ");
+
+  updateMobileFleetToolbarUi();
+}
+
+function activeVehicleFilterCount() {
+  let count = 0;
+  if (vehicleCategoryFilter !== "ALL") count++;
+  if (vehicleFuelFilter !== "ALL") count++;
+  return count;
+}
+
+function updateMobileFleetToolbarUi() {
+  const count = activeVehicleFilterCount();
+  const countBadge = document.getElementById("mobileFilterCount");
+  const resultCount = document.getElementById("mobileFilterResultCount");
+  const sortLabel = document.getElementById("mobileSortButtonLabel");
+
+  if (countBadge) {
+    countBadge.textContent = String(count);
+    countBadge.hidden = count === 0;
+  }
+
+  if (resultCount) {
+    resultCount.textContent = String(filteredVehicles().length);
+  }
+
+  if (sortLabel) {
+    const shortLabels = {
+      DEFAULT: "Recommended",
+      AVAILABLE_FIRST: "Available first",
+      PRICE_DAY_ASC: "Day ₹ low → high",
+      PRICE_DAY_DESC: "Day ₹ high → low",
+      PRICE_HOUR_ASC: "Hour ₹ low → high",
+      PRICE_HOUR_DESC: "Hour ₹ high → low",
+      NAME_ASC: "Name A → Z"
+    };
+
+    sortLabel.textContent = shortLabels[vehicleSortMode] || "Recommended";
+  }
+
+  document.querySelectorAll("[data-mobile-sort]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.mobileSort === vehicleSortMode
+    );
+  });
 }
 
 function resetVehicleDiscovery() {
@@ -556,6 +617,74 @@ function resetVehicleDiscovery() {
   renderBikes();
 }
 
+
+
+function mobileFleetSheetElements() {
+  return {
+    overlay: document.getElementById("mobileFleetSheetOverlay"),
+    filterSheet: document.getElementById("mobileFilterSheet"),
+    sortSheet: document.getElementById("mobileSortSheet"),
+    filterButton: document.getElementById("mobileFilterButton"),
+    sortButton: document.getElementById("mobileSortButton")
+  };
+}
+
+function openMobileFleetSheet(type) {
+  const {
+    overlay,
+    filterSheet,
+    sortSheet,
+    filterButton,
+    sortButton
+  } = mobileFleetSheetElements();
+
+  if (!overlay || !filterSheet || !sortSheet) return;
+
+  const openFilter = type === "filter";
+
+  filterSheet.classList.toggle("is-open", openFilter);
+  sortSheet.classList.toggle("is-open", !openFilter);
+
+  filterSheet.setAttribute("aria-hidden", String(!openFilter));
+  sortSheet.setAttribute("aria-hidden", String(openFilter));
+
+  overlay.classList.add("is-open");
+  overlay.setAttribute("aria-hidden", "false");
+
+  filterButton?.setAttribute("aria-expanded", String(openFilter));
+  sortButton?.setAttribute("aria-expanded", String(!openFilter));
+
+  document.body.classList.add("mobile-fleet-sheet-open");
+  updateMobileFleetToolbarUi();
+}
+
+function closeMobileFleetSheets() {
+  const {
+    overlay,
+    filterSheet,
+    sortSheet,
+    filterButton,
+    sortButton
+  } = mobileFleetSheetElements();
+
+  filterSheet?.classList.remove("is-open");
+  sortSheet?.classList.remove("is-open");
+  overlay?.classList.remove("is-open");
+
+  filterSheet?.setAttribute("aria-hidden", "true");
+  sortSheet?.setAttribute("aria-hidden", "true");
+  overlay?.setAttribute("aria-hidden", "true");
+
+  filterButton?.setAttribute("aria-expanded", "false");
+  sortButton?.setAttribute("aria-expanded", "false");
+
+  document.body.classList.remove("mobile-fleet-sheet-open");
+}
+
+function chooseMobileSort(value) {
+  setVehicleSortMode(value);
+  closeMobileFleetSheets();
+}
 
 function resetAllVehicleDiscovery() {
   vehicleCategoryFilter = "ALL";

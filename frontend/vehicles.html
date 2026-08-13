@@ -475,6 +475,181 @@
 
     <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+
+    <!-- MOBILE FILTER + SORT — STEP 3 -->
+    <div id="mobileFleetToolbar" class="mobile-fleet-toolbar" aria-label="Mobile vehicle controls">
+        <button id="mobileFilterButton" class="mobile-fleet-control" type="button"
+            onclick="openMobileFleetSheet('filter')" aria-controls="mobileFilterSheet" aria-expanded="false">
+            <span class="mobile-fleet-control-icon">⌁</span>
+            <span class="mobile-fleet-control-copy">
+                <small>Refine</small>
+                <strong>Filter</strong>
+            </span>
+            <span id="mobileFilterCount" class="mobile-fleet-count" hidden>0</span>
+        </button>
+
+        <span class="mobile-fleet-divider" aria-hidden="true"></span>
+
+        <button id="mobileSortButton" class="mobile-fleet-control" type="button"
+            onclick="openMobileFleetSheet('sort')" aria-controls="mobileSortSheet" aria-expanded="false">
+            <span class="mobile-fleet-control-icon">↕</span>
+            <span class="mobile-fleet-control-copy">
+                <small>Order</small>
+                <strong id="mobileSortButtonLabel">Recommended</strong>
+            </span>
+        </button>
+    </div>
+
+    <div id="mobileFleetSheetOverlay" class="mobile-fleet-sheet-overlay"
+        onclick="closeMobileFleetSheets()" aria-hidden="true"></div>
+
+    <section id="mobileFilterSheet" class="mobile-fleet-sheet" aria-hidden="true"
+        aria-labelledby="mobileFilterSheetTitle">
+        <div class="mobile-fleet-sheet-handle" aria-hidden="true"></div>
+
+        <div class="mobile-fleet-sheet-head">
+            <div>
+                <span>REFINE YOUR RIDE</span>
+                <h2 id="mobileFilterSheetTitle">Filters</h2>
+            </div>
+            <button type="button" class="mobile-fleet-sheet-close"
+                onclick="closeMobileFleetSheets()" aria-label="Close filters">×</button>
+        </div>
+
+        <div class="mobile-fleet-sheet-body">
+            <div class="mobile-filter-section">
+                <div class="mobile-filter-section-head">
+                    <span>01</span>
+                    <div>
+                        <strong>Vehicle Type</strong>
+                        <small>Choose what you want to ride.</small>
+                    </div>
+                </div>
+
+                <div class="mobile-filter-choice-grid">
+                    <button type="button" class="mobile-filter-choice is-active"
+                        data-mobile-category-filter="ALL"
+                        onclick="setVehicleCategoryFilter('ALL')">
+                        <span>✦</span>
+                        <strong>All</strong>
+                    </button>
+
+                    <button type="button" class="mobile-filter-choice"
+                        data-mobile-category-filter="BIKE"
+                        onclick="setVehicleCategoryFilter('BIKE')">
+                        <span>🏍</span>
+                        <strong>Bikes</strong>
+                    </button>
+
+                    <button type="button" class="mobile-filter-choice"
+                        data-mobile-category-filter="SCOOTY"
+                        onclick="setVehicleCategoryFilter('SCOOTY')">
+                        <span>🛵</span>
+                        <strong>Scooties</strong>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mobile-filter-section">
+                <div class="mobile-filter-section-head">
+                    <span>02</span>
+                    <div>
+                        <strong>Fuel Type</strong>
+                        <small>Petrol or electric.</small>
+                    </div>
+                </div>
+
+                <div class="mobile-filter-choice-grid mobile-filter-fuel-grid">
+                    <button type="button" class="mobile-filter-choice is-active"
+                        data-mobile-fuel-filter="ALL"
+                        onclick="setVehicleFuelFilter('ALL')">
+                        <span>◉</span>
+                        <strong>All</strong>
+                    </button>
+
+                    <button type="button" class="mobile-filter-choice"
+                        data-mobile-fuel-filter="PETROL"
+                        onclick="setVehicleFuelFilter('PETROL')">
+                        <span>⛽</span>
+                        <strong>Petrol</strong>
+                    </button>
+
+                    <button type="button" class="mobile-filter-choice"
+                        data-mobile-fuel-filter="ELECTRIC"
+                        onclick="setVehicleFuelFilter('ELECTRIC')">
+                        <span>⚡</span>
+                        <strong>Electric</strong>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="mobile-fleet-sheet-footer">
+            <button type="button" class="mobile-sheet-reset" onclick="clearVehicleFilters()">Clear filters</button>
+            <button type="button" class="mobile-sheet-apply" onclick="closeMobileFleetSheets()">
+                Show <span id="mobileFilterResultCount">0</span> vehicles
+            </button>
+        </div>
+    </section>
+
+    <section id="mobileSortSheet" class="mobile-fleet-sheet" aria-hidden="true"
+        aria-labelledby="mobileSortSheetTitle">
+        <div class="mobile-fleet-sheet-handle" aria-hidden="true"></div>
+
+        <div class="mobile-fleet-sheet-head">
+            <div>
+                <span>ORDER RESULTS</span>
+                <h2 id="mobileSortSheetTitle">Sort vehicles</h2>
+            </div>
+            <button type="button" class="mobile-fleet-sheet-close"
+                onclick="closeMobileFleetSheets()" aria-label="Close sort options">×</button>
+        </div>
+
+        <div class="mobile-fleet-sheet-body mobile-sort-options">
+            <button type="button" class="mobile-sort-option is-active"
+                data-mobile-sort="DEFAULT" onclick="chooseMobileSort('DEFAULT')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Recommended</strong><small>Default fleet order</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="AVAILABLE_FIRST" onclick="chooseMobileSort('AVAILABLE_FIRST')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Available first</strong><small>Ready-to-book vehicles first</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="PRICE_DAY_ASC" onclick="chooseMobileSort('PRICE_DAY_ASC')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Daily price: Low to High</strong><small>Lowest daily rent first</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="PRICE_DAY_DESC" onclick="chooseMobileSort('PRICE_DAY_DESC')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Daily price: High to Low</strong><small>Highest daily rent first</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="PRICE_HOUR_ASC" onclick="chooseMobileSort('PRICE_HOUR_ASC')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Hourly price: Low to High</strong><small>Lowest hourly rent first</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="PRICE_HOUR_DESC" onclick="chooseMobileSort('PRICE_HOUR_DESC')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Hourly price: High to Low</strong><small>Highest hourly rent first</small></div>
+            </button>
+
+            <button type="button" class="mobile-sort-option"
+                data-mobile-sort="NAME_ASC" onclick="chooseMobileSort('NAME_ASC')">
+                <span class="mobile-sort-radio"></span>
+                <div><strong>Name: A to Z</strong><small>Alphabetical vehicle order</small></div>
+            </button>
+        </div>
+    </section>
+
     <footer>
         <div class="logo">Bike<span>Rental</span></div>
         <div>Simple bike rental management project.</div>
