@@ -742,11 +742,45 @@ function renderBikes() {
 
   visibleBikes.forEach((bike, index) => {
     const card = document.createElement("article");
-    card.className = `card reveal delay-${Math.min(index + 1, 4)}`;
+    const category = normalizedVehicleCategory(bike);
+    const fuel = normalizedFuelType(bike);
+
+    card.className = [
+      "card",
+      "vehicle-card",
+      bike.available ? "is-available" : "is-unavailable",
+      `vehicle-card-${category.toLowerCase()}`,
+      `vehicle-card-${fuel.toLowerCase()}`,
+      "reveal",
+      `delay-${Math.min(index + 1, 4)}`
+    ].join(" ");
+
+    const availabilityBadge = `
+      <span class="vehicle-card-availability ${bike.available ? "available" : "unavailable"}">
+        <span class="vehicle-card-status-dot"></span>
+        ${bike.available ? "Available" : "Unavailable"}
+      </span>`;
 
     const image = bike.imageUrl
-      ? `<a class="vehicle-card-image-link" href="vehicle.html?id=${encodeURIComponent(bike.id)}" aria-label="View ${escapeHtml(bike.name)} details"><div class="card-image-wrap"><img loading="lazy" src="${escapeHtml(imageSrc(bike.imageUrl))}" alt="${escapeHtml(bike.name)}"></div></a>`
-      : `<div class="image-placeholder">🏍️</div>`;
+      ? `
+        <a class="vehicle-card-image-link"
+           href="vehicle.html?id=${encodeURIComponent(bike.id)}"
+           aria-label="View ${escapeHtml(bike.name)} details">
+          <div class="card-image-wrap">
+            ${availabilityBadge}
+            <span class="vehicle-card-image-accent" aria-hidden="true"></span>
+            <img loading="lazy"
+                 src="${escapeHtml(imageSrc(bike.imageUrl))}"
+                 alt="${escapeHtml(bike.name)}">
+            <span class="vehicle-card-image-cta">View ride →</span>
+          </div>
+        </a>`
+      : `
+        <div class="card-image-wrap vehicle-card-placeholder-wrap">
+          ${availabilityBadge}
+          <span class="vehicle-card-image-accent" aria-hidden="true"></span>
+          <div class="image-placeholder">🏍️</div>
+        </div>`;
 
     const hourlyPrice = Number(bike.pricePerHour);
     const hourlyConfigured = Number.isFinite(hourlyPrice) && hourlyPrice > 0;
@@ -754,28 +788,64 @@ function renderBikes() {
     const safeDailyPrice = Number.isFinite(dailyPrice) && dailyPrice >= 0 ? dailyPrice : 0;
 
     const priceHtml = hourlyConfigured
-      ? `<div class="card-price-stack"><div class="card-price"><strong>₹${hourlyPrice.toFixed(0)}</strong><span>/ hour</span></div><div class="card-price secondary-price"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span>/ day</span></div></div>`
-      : `<div class="card-price-stack"><div class="card-price"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span>/ day</span></div><div class="card-price secondary-price price-muted"><strong>Hourly</strong><span>not configured</span></div></div>`;
-
-    const category = normalizedVehicleCategory(bike);
-    const fuel = normalizedFuelType(bike);
+      ? `
+        <div class="vehicle-price-grid">
+          <div class="vehicle-price-item vehicle-price-primary">
+            <span class="vehicle-price-label">Hourly</span>
+            <div><strong>₹${hourlyPrice.toFixed(0)}</strong><small>/ hour</small></div>
+          </div>
+          <div class="vehicle-price-item">
+            <span class="vehicle-price-label">Daily</span>
+            <div><strong>₹${safeDailyPrice.toFixed(0)}</strong><small>/ day</small></div>
+          </div>
+        </div>`
+      : `
+        <div class="vehicle-price-grid">
+          <div class="vehicle-price-item vehicle-price-primary">
+            <span class="vehicle-price-label">Daily</span>
+            <div><strong>₹${safeDailyPrice.toFixed(0)}</strong><small>/ day</small></div>
+          </div>
+          <div class="vehicle-price-item is-muted">
+            <span class="vehicle-price-label">Hourly</span>
+            <div><strong>—</strong><small>Not set</small></div>
+          </div>
+        </div>`;
     const categoryLabel = category === "SCOOTY" ? "Scooty" : category === "BIKE" ? "Bike" : String(bike.type || "Vehicle");
     const fuelLabel = fuel === "PETROL" ? "Petrol" : fuel === "ELECTRIC" ? "Electric" : "Fuel not set";
 
     card.innerHTML = `
-      <span class="badge ${bike.available ? "available" : "unavailable"}">${bike.available ? "Available" : "Unavailable"}</span>
       ${image}
-      <div class="card-body">
-        <div class="vehicle-card-meta">
-          <span class="vehicle-meta-pill">${escapeHtml(categoryLabel)}</span>
-          <span class="vehicle-meta-pill fuel-${fuel.toLowerCase()}">${fuel === "ELECTRIC" ? "⚡" : fuel === "PETROL" ? "⛽" : "•"} ${escapeHtml(fuelLabel)}</span>
+      <div class="card-body vehicle-card-body">
+        <div class="vehicle-card-topline">
+          <div class="vehicle-card-meta">
+            <span class="vehicle-meta-pill vehicle-type-pill">${escapeHtml(categoryLabel)}</span>
+            <span class="vehicle-meta-pill fuel-${fuel.toLowerCase()}">${fuel === "ELECTRIC" ? "⚡" : fuel === "PETROL" ? "⛽" : "•"} ${escapeHtml(fuelLabel)}</span>
+          </div>
+          <span class="vehicle-card-id">#${escapeHtml(String(bike.id ?? ""))}</span>
         </div>
-        <a class="card-name vehicle-card-name-link" href="vehicle.html?id=${encodeURIComponent(bike.id)}">${escapeHtml(bike.name)}</a>
-        <p class="card-type">${escapeHtml(String(bike.type || "Vehicle"))}${fuel !== "UNSET" ? ` • ${escapeHtml(fuelLabel)}` : ""}</p>
+
+        <a class="card-name vehicle-card-name-link"
+           href="vehicle.html?id=${encodeURIComponent(bike.id)}">
+          ${escapeHtml(bike.name)}
+        </a>
+
+        <p class="card-type vehicle-card-description">
+          ${escapeHtml(String(bike.type || "Vehicle"))}${fuel !== "UNSET" ? ` • ${escapeHtml(fuelLabel)}` : ""}
+        </p>
+
         ${priceHtml}
+
         <div class="vehicle-card-actions">
-          <a class="vehicle-details-btn" href="vehicle.html?id=${encodeURIComponent(bike.id)}">View Details</a>
-          <button class="${bike.available ? "btn-primary" : "unavailable-btn"}" ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>${bike.available ? "Book Now" : "Currently Unavailable"}</button>
+          <a class="vehicle-details-btn"
+             href="vehicle.html?id=${encodeURIComponent(bike.id)}">
+            Details
+          </a>
+
+          <button
+            class="${bike.available ? "btn-primary vehicle-card-book-btn" : "unavailable-btn vehicle-card-book-btn"}"
+            ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>
+            ${bike.available ? "Book Now" : "Unavailable"}
+          </button>
         </div>
       </div>`;
 
