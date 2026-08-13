@@ -223,31 +223,313 @@ async function fetchDetailBike(id) {
   return found;
 }
 
+
+let vehicleCutoutObjectUrl = null;
+
+function vehicleCutoutSetLoading(loading) {
+  const loader = document.getElementById("vehicleCutoutLoader");
+  const frame = document.getElementById("vehicleDetailImageFrame");
+
+  if (loader) loader.hidden = !loading;
+  if (frame) frame.classList.toggle("is-processing", loading);
+}
+
+function loadImageElement(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Vehicle image could not be decoded"));
+    image.src = src;
+  });
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => blob ? resolve(blob) : reject(new Error("Could not create cutout image")),
+      "image/png",
+      0.96
+    );
+  });
+}
+
+function averageCornerColor(data, width, height) {
+  const sampleSize = Math.max(4, Math.min(18, Math.round(Math.min(width, height) * 0.018)));
+
+  const origins = [
+    [0, 0],
+    [Math.max(0, width - sampleSize), 0],
+    [0, Math.max(0, height - sampleSize)],
+    [Math.max(0, width - sampleSize), Math.max(0, height - sampleSize)]
+  ];
+
+  const samples = [];
+
+  for (const [startX, startY] of origins) {
+    let r = 0;
+    let g = 0;
+    let b = 0;
+    let count = 0;
+
+    for (let y = startY; y < Math.min(height, startY + sampleSize); y++) {
+      for (let x = startX; x < Math.min(width, startX + sampleSize); x++) {
+        const i = (y * width + x) * 4;
+
+        if (data[i + 3] < 20) continue;
+
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+        count++;
+      }
+    }
+
+    if (count) {
+      samples.push({
+        r: r / count,
+        g: g / count,
+        b: b / count
+      });
+    }
+  }
+
+  if (!samples.length) {
+    return { r: 255, g: 255, b: 255, consistent: false };
+  }
+
+  const avg = samples.reduce(
+    (acc, item) => ({
+      r: acc.r + item.r,
+      g: acc.g + item.g,
+      b: acc.b + item.b
+    }),
+    { r: 0, g: 0, b: 0 }
+  );
+
+  avg.r /= samples.length;
+  avg.g /= samples.length;
+  avg.b /= samples.length;
+
+  const spread = Math.max(
+    ...samples.map((item) =>
+      Math.sqrt(
+        (item.r - avg.r) ** 2 +
+        (item.g - avg.g) ** 2 +
+        (item.b - avg.b) ** 2
+      )
+    )
+  );
+
+  return {
+    ...avg,
+    consistent: spread < 55
+  };
+}
+
+function isLikelyStudioBackground(r, g, b, background) {
+  const distance = Math.sqrt(
+    (r - background.r) ** 2 +
+    (g - background.g) ** 2 +
+    (b - background.b) ** 2
+  );
+
+  const brightness = (r + g + b) / 3;
+  const backgroundBrightness =
+    (background.r + background.g + background.b) / 3;
+
+  // Designed for white / light-gray studio backgrounds.
+  return (
+    background.consistent &&
+    backgroundBrightness > 150 &&
+    brightness > 120 &&
+    distance < 58
+  );
+}
+
+async function createAutomaticVehicleCutout(imageUrl) {
+  const response = await fetch(imageUrl, {
+    cache: "force-cache",
+    mode: "cors"
+  });
+
+  if (!response.ok) {
+    throw new Error(`Vehicle image returned ${response.status}`);
+  }
+
+  const sourceBlob = await response.blob();
+  const sourceUrl = URL.createObjectURL(sourceBlob);
+
+  try {
+    const sourceImage = await loadImageElement(sourceUrl);
+
+    const naturalWidth = sourceImage.naturalWidth || sourceImage.width;
+    const naturalHeight = sourceImage.naturalHeight || sourceImage.height;
+
+    if (!naturalWidth || !naturalHeight) {
+      throw new Error("Vehicle image dimensions are invalid");
+    }
+
+    const maxDimension = 1100;
+    const scale = Math.min(1, maxDimension / Math.max(naturalWidth, naturalHeight));
+    const width = Math.max(1, Math.round(naturalWidth * scale));
+    const height = Math.max(1, Math.round(naturalHeight * scale));
+
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d", {
+      willReadFrequently: true
+    });
+
+    if (!context) {
+      throw new Error("Canvas is not supported");
+    }
+
+    context.drawImage(sourceImage, 0, 0, width, height);
+
+    const imageData = context.getImageData(0, 0, width, height);
+    const pixels = imageData.data;
+
+    // If the source already contains transparent pixels, keep it as-is.
+    let transparentSampleFound = false;
+    const alphaStep = Math.max(1, Math.floor((width * height) / 2500));
+
+    for (let p = 0; p < width * height; p += alphaStep) {
+      if (pixels[p * 4 + 3] < 245) {
+        transparentSampleFound = true;
+        break;
+      }
+    }
+
+    if (!transparentSampleFound) {
+      const background = averageCornerColor(pixels, width, height);
+
+      if (background.consistent) {
+        const total = width * height;
+        const visited = new Uint8Array(total);
+        const queue = new Int32Array(total);
+        let head = 0;
+        let tail = 0;
+
+        const enqueueIfBackground = (index) => {
+          if (index < 0 || index >= total || visited[index]) return;
+
+          const offset = index * 4;
+
+          if (
+            isLikelyStudioBackground(
+              pixels[offset],
+              pixels[offset + 1],
+              pixels[offset + 2],
+              background
+            )
+          ) {
+            visited[index] = 1;
+            queue[tail++] = index;
+          }
+        };
+
+        // Seed flood-fill from all outer edges.
+        for (let x = 0; x < width; x++) {
+          enqueueIfBackground(x);
+          enqueueIfBackground((height - 1) * width + x);
+        }
+
+        for (let y = 0; y < height; y++) {
+          enqueueIfBackground(y * width);
+          enqueueIfBackground(y * width + (width - 1));
+        }
+
+        while (head < tail) {
+          const index = queue[head++];
+          const x = index % width;
+          const y = Math.floor(index / width);
+
+          const offset = index * 4;
+          pixels[offset + 3] = 0;
+
+          if (x > 0) enqueueIfBackground(index - 1);
+          if (x + 1 < width) enqueueIfBackground(index + 1);
+          if (y > 0) enqueueIfBackground(index - width);
+          if (y + 1 < height) enqueueIfBackground(index + width);
+        }
+
+        context.putImageData(imageData, 0, 0);
+      }
+    }
+
+    const cutoutBlob = await canvasToBlob(canvas);
+    return URL.createObjectURL(cutoutBlob);
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+async function applyVehicleDetailImage(imageUrl, altText) {
+  const image = document.getElementById("vehicleDetailImage");
+  const fallback = document.getElementById("vehicleDetailImageFallback");
+  const frame = document.getElementById("vehicleDetailImageFrame");
+
+  if (!image || !fallback || !frame) return;
+
+  if (vehicleCutoutObjectUrl) {
+    URL.revokeObjectURL(vehicleCutoutObjectUrl);
+    vehicleCutoutObjectUrl = null;
+  }
+
+  if (!imageUrl) {
+    image.hidden = true;
+    fallback.hidden = false;
+    frame.classList.add("is-fallback");
+    vehicleCutoutSetLoading(false);
+    return;
+  }
+
+  image.alt = altText;
+  image.hidden = true;
+  fallback.hidden = true;
+  frame.classList.remove("is-fallback", "cutout-ready", "cutout-fallback");
+  vehicleCutoutSetLoading(true);
+
+  try {
+    vehicleCutoutObjectUrl = await createAutomaticVehicleCutout(imageUrl);
+
+    image.src = vehicleCutoutObjectUrl;
+    image.hidden = false;
+    frame.classList.add("cutout-ready");
+  } catch (error) {
+    console.warn("Automatic vehicle cutout unavailable; using original image.", error);
+
+    // Safe fallback: still show the admin-uploaded main image.
+    image.src = imageUrl;
+    image.hidden = false;
+    frame.classList.add("cutout-fallback");
+  } finally {
+    vehicleCutoutSetLoading(false);
+  }
+
+  image.onerror = () => {
+    image.hidden = true;
+    fallback.hidden = false;
+    frame.classList.add("is-fallback");
+    vehicleCutoutSetLoading(false);
+  };
+}
+
 function renderDetailBike(bike) {
   detailBike = bike;
 
   const category = detailCategory(bike);
   const fuel = detailFuel(bike);
 
-  const image = document.getElementById("vehicleDetailImage");
-  const fallback = document.getElementById("vehicleDetailImageFallback");
-
   const imageUrl = detailImageSrc(bike.imageUrl);
 
-  if (imageUrl) {
-    image.src = imageUrl;
-    image.alt = `${bike.name} ${category}`;
-    image.hidden = false;
-    fallback.hidden = true;
-
-    image.onerror = () => {
-      image.hidden = true;
-      fallback.hidden = false;
-    };
-  } else {
-    image.hidden = true;
-    fallback.hidden = false;
-  }
+  applyVehicleDetailImage(
+    imageUrl,
+    `${bike.name || "Vehicle"} ${category}`
+  );
 
   const titleElement = document.getElementById("vehicleDetailName");
   const vehicleName = String(bike.name || "Vehicle").trim();

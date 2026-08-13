@@ -9228,3 +9228,335 @@ main {
         font-size: .54rem !important;
     }
 }
+
+
+/* =========================================================
+   VEHICLE DETAILS V4 — AUTO ORANGE-CIRCLE VEHICLE CUTOUT
+   One admin-uploaded main photo is reused automatically.
+========================================================= */
+
+.vehicle-detail-visual {
+    min-height: 570px !important;
+    position: relative;
+    display: grid !important;
+    place-items: center !important;
+    isolation: isolate;
+}
+
+.vehicle-detail-orbit {
+    position: absolute !important;
+    z-index: -2 !important;
+    width: min(470px, 76%) !important;
+    aspect-ratio: 1 !important;
+    border: 0 !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+    transform: none !important;
+
+    background:
+        radial-gradient(
+            circle at 42% 38%,
+            #ff9b45 0%,
+            #ff7a18 24%,
+            #ff6500 58%,
+            #e94f00 100%
+        ) !important;
+
+    box-shadow:
+        0 0 0 14px rgba(255,107,0,.035),
+        0 0 62px rgba(255,107,0,.28),
+        0 34px 72px rgba(0,0,0,.32) !important;
+}
+
+.vehicle-detail-orbit::before {
+    content: "";
+    position: absolute;
+    inset: 10%;
+    border-radius: inherit;
+    border: 1px solid rgba(255,255,255,.17);
+}
+
+.vehicle-detail-orbit::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 124%;
+    height: 31%;
+    left: -12%;
+    bottom: -15%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,126,38,.26);
+    transform: rotate(-7deg);
+}
+
+.vehicle-detail-orbit-inner {
+    position: absolute;
+    inset: 25%;
+    border-radius: 50%;
+    background: rgba(13,18,30,.10);
+    filter: blur(20px);
+}
+
+.vehicle-detail-image-frame {
+    position: relative !important;
+    z-index: 3 !important;
+
+    width: min(650px, 100%) !important;
+    min-height: 455px !important;
+    aspect-ratio: auto !important;
+
+    display: grid !important;
+    place-items: center !important;
+
+    padding: 0 !important;
+    overflow: visible !important;
+
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.vehicle-detail-image-frame::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: 17%;
+    right: 17%;
+    bottom: 6%;
+    height: 29px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.26) !important;
+    filter: blur(15px) !important;
+    pointer-events: none;
+}
+
+.vehicle-detail-image-stage {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    min-height: 455px;
+    display: grid;
+    place-items: center;
+}
+
+.vehicle-detail-image-frame img {
+    position: relative !important;
+    z-index: 3 !important;
+
+    width: 100% !important;
+    max-width: 630px !important;
+    height: 430px !important;
+    max-height: 430px !important;
+
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+
+    object-fit: contain !important;
+    object-position: center !important;
+
+    filter:
+        drop-shadow(0 28px 22px rgba(0,0,0,.36))
+        drop-shadow(0 8px 8px rgba(0,0,0,.17)) !important;
+
+    transform: translateY(5px) scale(.98) !important;
+    opacity: 1;
+    transition:
+        opacity .28s ease,
+        transform .38s cubic-bezier(.16,1,.3,1) !important;
+}
+
+.vehicle-detail-image-frame.cutout-ready img {
+    mix-blend-mode: normal !important;
+}
+
+.vehicle-detail-visual:hover .vehicle-detail-image-frame img {
+    transform: translateY(-2px) scale(1.005) !important;
+}
+
+/* If automatic background cleanup is blocked by the image host,
+   keep the original photo usable instead of breaking the page. */
+.vehicle-detail-image-frame.cutout-fallback {
+    width: min(600px, 96%) !important;
+}
+
+.vehicle-detail-image-frame.cutout-fallback .vehicle-detail-image-stage {
+    min-height: 420px;
+    overflow: hidden;
+    padding: 16px;
+    border-radius: 28px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: #ffffff;
+    box-shadow: 0 28px 58px rgba(0,0,0,.26);
+}
+
+.vehicle-detail-image-frame.cutout-fallback img {
+    height: 390px !important;
+    max-height: 390px !important;
+    filter: none !important;
+    transform: none !important;
+}
+
+.vehicle-detail-image-frame.cutout-fallback::after {
+    display: none;
+}
+
+.vehicle-cutout-loader {
+    position: absolute;
+    z-index: 8;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.vehicle-cutout-loader[hidden] {
+    display: none !important;
+}
+
+.vehicle-cutout-loader span {
+    width: 34px;
+    height: 34px;
+    border: 3px solid rgba(255,255,255,.15);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: vehicleCutoutSpin .8s linear infinite;
+}
+
+.vehicle-cutout-loader small {
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(8,13,25,.66);
+    color: #cbd5e1;
+    font-size: .55rem;
+    backdrop-filter: blur(8px);
+}
+
+@keyframes vehicleCutoutSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Availability stays attached to the visual but no longer floats awkwardly. */
+.vehicle-detail-availability {
+    top: 25px !important;
+    right: 36px !important;
+    z-index: 9 !important;
+}
+
+.vehicle-detail-availability.is-available {
+    color: #52e2aa !important;
+    border: 1px solid rgba(82,226,170,.21) !important;
+    background: rgba(8,30,28,.76) !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,.18);
+}
+
+.vehicle-detail-availability.is-unavailable {
+    color: #ff9696 !important;
+    border: 1px solid rgba(255,105,105,.22) !important;
+    background: rgba(45,15,20,.78) !important;
+}
+
+.vehicle-detail-mini-trust {
+    z-index: 5 !important;
+    left: 5% !important;
+    bottom: 18px !important;
+}
+
+/* Tablet */
+@media (max-width: 960px) {
+    .vehicle-detail-visual {
+        min-height: 490px !important;
+    }
+
+    .vehicle-detail-orbit {
+        width: min(430px, 68%) !important;
+    }
+
+    .vehicle-detail-image-frame,
+    .vehicle-detail-image-stage {
+        min-height: 420px !important;
+    }
+
+    .vehicle-detail-image-frame img {
+        height: 390px !important;
+        max-height: 390px !important;
+    }
+}
+
+/* Mobile: same orange-circle concept, scaled cleanly. */
+@media (max-width: 700px) {
+    .vehicle-detail-visual {
+        min-height: 345px !important;
+    }
+
+    .vehicle-detail-orbit {
+        width: 260px !important;
+        max-width: 72vw !important;
+    }
+
+    .vehicle-detail-image-frame {
+        width: 100% !important;
+        min-height: 300px !important;
+    }
+
+    .vehicle-detail-image-stage {
+        min-height: 300px !important;
+    }
+
+    .vehicle-detail-image-frame img {
+        width: 100% !important;
+        max-width: 390px !important;
+        height: 285px !important;
+        max-height: 285px !important;
+        transform: translateY(4px) scale(.98) !important;
+    }
+
+    .vehicle-detail-availability {
+        top: 7px !important;
+        right: 8px !important;
+    }
+
+    .vehicle-detail-mini-trust {
+        display: flex !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: 0 !important;
+        transform: translateX(-50%);
+        width: max-content;
+        max-width: 94%;
+    }
+
+    .vehicle-detail-mini-trust span {
+        font-size: .48rem;
+    }
+
+    .vehicle-detail-image-frame.cutout-fallback {
+        width: 100% !important;
+    }
+
+    .vehicle-detail-image-frame.cutout-fallback .vehicle-detail-image-stage {
+        min-height: 270px !important;
+        padding: 8px;
+        border-radius: 20px;
+    }
+
+    .vehicle-detail-image-frame.cutout-fallback img {
+        height: 250px !important;
+        max-height: 250px !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-detail-orbit {
+        width: 230px !important;
+    }
+
+    .vehicle-detail-image-frame img {
+        height: 255px !important;
+        max-height: 255px !important;
+    }
+}

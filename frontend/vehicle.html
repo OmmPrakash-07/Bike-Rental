@@ -94,17 +94,26 @@
 
             <article id="vehicleDetailContent" class="vehicle-detail-layout" hidden>
                 <div class="vehicle-detail-visual">
-                    <div class="vehicle-detail-orbit" aria-hidden="true"></div>
+                    <div class="vehicle-detail-orbit" aria-hidden="true">
+                        <div class="vehicle-detail-orbit-inner"></div>
+                    </div>
 
-                    <div class="vehicle-detail-image-frame">
+                    <div id="vehicleDetailImageFrame" class="vehicle-detail-image-frame">
                         <span id="vehicleAvailabilityBadge" class="vehicle-detail-availability">Available</span>
-                        <img id="vehicleDetailImage" src="" alt="">
-                        <div id="vehicleDetailImageFallback" class="vehicle-detail-image-fallback" hidden>🏍️</div>
+
+                        <div class="vehicle-detail-image-stage">
+                            <img id="vehicleDetailImage" src="" alt="">
+                            <div id="vehicleDetailImageFallback" class="vehicle-detail-image-fallback" hidden>🏍️</div>
+                            <div id="vehicleCutoutLoader" class="vehicle-cutout-loader" aria-hidden="true">
+                                <span></span>
+                                <small>Preparing vehicle image</small>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="vehicle-detail-mini-trust">
                         <span>● Live availability</span>
-                        <span>Secure account booking</span>
+                        <span>One uploaded photo</span>
                     </div>
                 </div>
 
