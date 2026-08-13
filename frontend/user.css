@@ -10706,3 +10706,170 @@ main {
         font-size: .8rem !important;
     }
 }
+
+
+/* =========================================================
+   STEP 4 V3 — VISIBLE PER-DAY/PER-HOUR + BETTER BOOK BUTTON
+========================================================= */
+
+/* Price boxes */
+.vehicle-price-item {
+    overflow: visible !important;
+    min-height: 68px !important;
+    padding: 9px 10px !important;
+}
+
+.vehicle-price-value {
+    min-width: 0 !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    gap: 4px !important;
+}
+
+.vehicle-price-value strong {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+
+    font-size: .78rem !important;
+    line-height: 1 !important;
+    letter-spacing: -.015em !important;
+}
+
+.vehicle-price-unit {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+
+    color: #708096 !important;
+    font-size: .48rem !important;
+    line-height: 1.15 !important;
+    font-weight: 700 !important;
+    letter-spacing: .015em !important;
+    white-space: nowrap !important;
+}
+
+/* Make the primary price slightly stronger without making it too large. */
+.vehicle-price-primary .vehicle-price-value strong {
+    color: #ff7a1a !important;
+}
+
+.vehicle-card-electric .vehicle-price-primary .vehicle-price-value strong {
+    color: #45dca9 !important;
+}
+
+/* Full-width, cleaner Book Now button */
+.vehicle-card-actions-single {
+    width: 100% !important;
+    display: block !important;
+    margin-top: 2px !important;
+}
+
+.vehicle-card-actions-single .vehicle-card-book-btn {
+    width: 100% !important;
+    min-width: 100% !important;
+    min-height: 46px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 16px !important;
+    border-radius: 12px !important;
+
+    font-size: .72rem !important;
+    font-weight: 900 !important;
+    letter-spacing: .01em !important;
+
+    background:
+        linear-gradient(135deg, #ff7b1b 0%, #ff5b00 100%) !important;
+    color: #ffffff !important;
+
+    box-shadow:
+        0 10px 22px rgba(255,91,0,.18) !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        filter .2s ease !important;
+}
+
+.vehicle-card-actions-single .vehicle-card-book-btn:not(:disabled):hover {
+    transform: translateY(-2px) !important;
+    filter: brightness(1.04);
+    box-shadow:
+        0 14px 28px rgba(255,91,0,.25) !important;
+}
+
+.vehicle-card-actions-single .vehicle-card-book-btn:not(:disabled):active {
+    transform: translateY(0) scale(.99) !important;
+}
+
+/* Electric cards keep the green CTA. */
+.vehicle-card-electric .vehicle-card-actions-single .vehicle-card-book-btn:not(:disabled) {
+    background:
+        linear-gradient(135deg, #2acb93 0%, #1cae7c 100%) !important;
+    box-shadow:
+        0 10px 22px rgba(28,174,124,.17) !important;
+}
+
+.vehicle-card-electric .vehicle-card-actions-single .vehicle-card-book-btn:not(:disabled):hover {
+    box-shadow:
+        0 14px 28px rgba(28,174,124,.23) !important;
+}
+
+/* Unavailable remains intentionally subdued. */
+.vehicle-card-actions-single .vehicle-card-book-btn:disabled {
+    background: rgba(148,163,184,.07) !important;
+    color: #718096 !important;
+    border: 1px solid rgba(148,163,184,.10) !important;
+    box-shadow: none !important;
+}
+
+/* Tablet */
+@media (max-width: 1180px) and (min-width: 701px) {
+    .vehicle-price-value strong {
+        font-size: .72rem !important;
+    }
+
+    .vehicle-price-unit {
+        font-size: .45rem !important;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .vehicle-price-item {
+        min-height: 64px !important;
+        padding: 8px 9px !important;
+    }
+
+    .vehicle-price-value strong {
+        font-size: .82rem !important;
+    }
+
+    .vehicle-price-unit {
+        font-size: .46rem !important;
+    }
+
+    .vehicle-card-actions-single .vehicle-card-book-btn {
+        min-height: 45px !important;
+        font-size: .7rem !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-price-value strong {
+        font-size: .74rem !important;
+    }
+
+    .vehicle-price-unit {
+        font-size: .43rem !important;
+    }
+}

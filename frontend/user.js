@@ -792,22 +792,22 @@ function renderBikes() {
         <div class="vehicle-price-grid">
           <div class="vehicle-price-item vehicle-price-primary">
             <span class="vehicle-price-label">Hourly</span>
-            <div><strong>₹${hourlyPrice.toFixed(0)}</strong><small>/ hour</small></div>
+            <div class="vehicle-price-value"><strong>₹${hourlyPrice.toFixed(0)}</strong><span class="vehicle-price-unit">per hour</span></div>
           </div>
           <div class="vehicle-price-item">
             <span class="vehicle-price-label">Daily</span>
-            <div><strong>₹${safeDailyPrice.toFixed(0)}</strong><small>/ day</small></div>
+            <div class="vehicle-price-value"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span class="vehicle-price-unit">per day</span></div>
           </div>
         </div>`
       : `
         <div class="vehicle-price-grid">
           <div class="vehicle-price-item vehicle-price-primary">
             <span class="vehicle-price-label">Daily</span>
-            <div><strong>₹${safeDailyPrice.toFixed(0)}</strong><small>/ day</small></div>
+            <div class="vehicle-price-value"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span class="vehicle-price-unit">per day</span></div>
           </div>
           <div class="vehicle-price-item is-muted">
             <span class="vehicle-price-label">Hourly</span>
-            <div><strong>—</strong><small>Not set</small></div>
+            <div class="vehicle-price-value"><strong>—</strong><span class="vehicle-price-unit">Not set</span></div>
           </div>
         </div>`;
     const categoryLabel = category === "SCOOTY" ? "Scooty" : category === "BIKE" ? "Bike" : String(bike.type || "Vehicle");
@@ -839,7 +839,7 @@ function renderBikes() {
           <button
             class="${bike.available ? "btn-primary vehicle-card-book-btn" : "unavailable-btn vehicle-card-book-btn"}"
             ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>
-            ${bike.available ? "Book Now" : "Unavailable"}
+            ${bike.available ? "Book Now →" : "Unavailable"}
           </button>
         </div>
       </div>`;
