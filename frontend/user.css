@@ -3508,154 +3508,641 @@ button.vehicle-filter-option.is-active:hover {
 
 
 /* =========================================================
-   HOMEPAGE HERO V5
-   Desktop: one sport bike + one BMW C 400 GT scooter.
-   Mobile: keep the clean single-bike composition.
+   HOMEPAGE HERO V7
+   Design target:
+   - Desktop: BMW C 400 GT lower/front, BMW S1000RR higher/right.
+   - Tablet: same two-vehicle composition in a compact stage.
+   - Mobile: both vehicles remain visible, scaled and re-stacked.
+   - Existing hamburger navigation and all lower sections are preserved.
 ========================================================= */
-@media (min-width: 701px) {
-    .hero-v3-bike-main {
-        width: min(425px, 61%);
-        height: 325px;
-        left: 31%;
-        top: 61%;
-        transform: translate(-50%, -50%) rotate(-3deg);
-        z-index: 4;
-    }
 
-    .hero-v3-bike-secondary {
-        display: block !important;
-        width: min(370px, 52%);
-        height: 360px;
-        left: 72%;
-        top: 43%;
-        transform: translate(-50%, -50%) rotate(1deg);
-        object-fit: contain;
-        z-index: 3;
-        opacity: 1;
-    }
+.home-hero-v7 {
+    position: relative;
+    min-height: calc(100vh - 82px);
+    padding: clamp(44px, 5vw, 76px) max(18px, 4.6vw) clamp(68px, 6vw, 94px);
+    overflow: hidden;
+    background:
+        radial-gradient(circle at 76% 24%, rgba(255, 92, 0, .15), transparent 27%),
+        radial-gradient(circle at 14% 20%, rgba(255,255,255,.035), transparent 24%),
+        #080d19;
+}
 
-    .hero-v3-panel:hover .hero-v3-bike-main {
-        transform: translate(-50%, -50%) rotate(-2deg) translateY(-3px);
-    }
+.home-hero-v7::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(90deg, transparent 0%, rgba(255,255,255,.012) 50%, transparent 100%);
+}
 
-    .hero-v3-panel:hover .hero-v3-bike-secondary {
-        transform: translate(-50%, -50%) rotate(.5deg) translateY(-4px);
+.hero-v7-shell {
+    position: relative;
+    z-index: 2;
+    width: min(1440px, 100%);
+    min-height: 650px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, .86fr) minmax(560px, 1.14fr);
+    align-items: center;
+    gap: clamp(34px, 4.8vw, 82px);
+}
+
+.hero-v7-copy {
+    position: relative;
+    z-index: 8;
+    max-width: 650px;
+}
+
+.hero-v7-copy h1 {
+    max-width: 640px;
+    margin: 16px 0 22px;
+    color: #f3f6fb;
+    font-family: var(--font-display);
+    font-size: clamp(3.55rem, 5.35vw, 6rem);
+    line-height: .93;
+    letter-spacing: -.06em;
+}
+
+.hero-v7-copy h1 span {
+    color: var(--orange);
+}
+
+.hero-v7-copy > p {
+    max-width: 610px;
+    margin: 0;
+    color: #a7b4c7;
+    font-size: clamp(1rem, 1.2vw, 1.14rem);
+    line-height: 1.72;
+}
+
+.hero-v7-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.hero-v7-actions .home-primary-cta,
+.hero-v7-actions .home-secondary-cta {
+    min-height: 54px;
+    padding-inline: 24px;
+}
+
+.hero-v7-actions .home-primary-cta span {
+    margin-left: 10px;
+}
+
+.hero-v7-highlights {
+    gap: 10px;
+}
+
+.hero-v7-highlights-desktop {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-top: 32px;
+}
+
+.hero-v7-highlights-desktop > div {
+    min-width: 0;
+    min-height: 92px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 16px;
+    background: rgba(255,255,255,.027);
+}
+
+.hero-v7-highlight-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(255,107,0,.13);
+    color: var(--orange);
+    font-weight: 900;
+}
+
+.hero-v7-highlights strong,
+.hero-v7-highlights small {
+    display: block;
+}
+
+.hero-v7-highlights strong {
+    color: #f5f8fc;
+    font-family: var(--font-display);
+    font-size: .79rem;
+    line-height: 1.2;
+}
+
+.hero-v7-highlights small {
+    margin-top: 4px;
+    color: #78889f;
+    font-size: .63rem;
+    line-height: 1.35;
+}
+
+.hero-v7-highlights-mobile {
+    display: none;
+}
+
+/* Right-side vehicle stage */
+.hero-v7-visual {
+    position: relative;
+    min-width: 0;
+    min-height: 610px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 36px;
+    background:
+        radial-gradient(circle at 70% 48%, rgba(255,99,0,.11), transparent 34%),
+        linear-gradient(145deg, rgba(255,255,255,.028), rgba(255,255,255,.006)),
+        #0b1120;
+    box-shadow: 0 34px 90px rgba(0,0,0,.34);
+    isolation: isolate;
+}
+
+.hero-v7-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,.5), transparent 88%);
+}
+
+.hero-v7-orange-ring {
+    position: absolute;
+    z-index: -1;
+    width: 430px;
+    aspect-ratio: 1;
+    right: 1.5%;
+    top: 9%;
+    border-radius: 50%;
+    border: 58px solid #ff6b00;
+    box-shadow:
+        0 0 65px rgba(255,107,0,.18),
+        inset 0 0 34px rgba(0,0,0,.12);
+    opacity: .96;
+}
+
+.hero-v7-dots {
+    position: absolute;
+    top: 55px;
+    right: 43%;
+    width: 120px;
+    height: 75px;
+    opacity: .45;
+    background-image: radial-gradient(circle, #ff6b00 1.5px, transparent 1.7px);
+    background-size: 14px 14px;
+}
+
+.hero-v7-stage {
+    position: absolute;
+    z-index: 1;
+    height: 95px;
+    border: 2px solid rgba(255,107,0,.6);
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse at center, rgba(255,107,0,.19), rgba(255,107,0,.045) 46%, transparent 72%);
+    box-shadow:
+        0 14px 30px rgba(0,0,0,.35),
+        inset 0 -6px 14px rgba(255,107,0,.08);
+}
+
+.hero-v7-stage::after {
+    content: "";
+    position: absolute;
+    inset: 12px 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,171,100,.18);
+}
+
+.hero-v7-stage-scooty {
+    width: 430px;
+    left: 4%;
+    bottom: 30px;
+    transform: rotate(-3deg);
+}
+
+.hero-v7-stage-bike {
+    width: 340px;
+    right: 1%;
+    top: 46%;
+    transform: translateY(-50%) rotate(2deg);
+}
+
+.hero-v7-vehicle {
+    position: absolute;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 32px 30px rgba(0,0,0,.54));
+    transition: transform .35s ease;
+}
+
+/* Front/lower scooter */
+.hero-v7-scooty {
+    z-index: 5;
+    width: min(470px, 64%);
+    left: 29%;
+    top: 64%;
+    transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+/* Higher/right sport bike */
+.hero-v7-bike {
+    z-index: 4;
+    width: min(390px, 53%);
+    left: 73%;
+    top: 38%;
+    transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.hero-v7-visual:hover .hero-v7-scooty {
+    transform: translate(-50%, -50%) rotate(-1deg) translateY(-4px);
+}
+
+.hero-v7-visual:hover .hero-v7-bike {
+    transform: translate(-50%, -50%) rotate(-1deg) translateY(-4px);
+}
+
+.hero-v7-callout {
+    position: absolute;
+    z-index: 8;
+    min-width: 150px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 15px;
+    background: rgba(8,14,26,.9);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 18px 44px rgba(0,0,0,.32);
+}
+
+.hero-v7-callout strong,
+.hero-v7-callout small,
+.hero-v7-callout span {
+    display: block;
+}
+
+.hero-v7-callout strong {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: .78rem;
+}
+
+.hero-v7-callout small {
+    margin-top: 3px;
+    color: #8998ad;
+    font-size: .59rem;
+}
+
+.hero-v7-callout span {
+    width: fit-content;
+    margin-top: 8px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(255,107,0,.12);
+    color: #ff9a52;
+    font-size: .55rem;
+    font-weight: 900;
+}
+
+.hero-v7-callout-scooty {
+    left: 2.5%;
+    top: 46%;
+}
+
+.hero-v7-callout-bike {
+    right: 3%;
+    top: 12%;
+}
+
+.hero-v7-scroll {
+    bottom: 18px;
+}
+
+/* Large desktop */
+@media (min-width: 1181px) {
+    .hero-v7-visual {
+        min-height: 620px;
     }
 }
 
-@media (min-width: 701px) and (max-width: 1180px) {
-    .hero-v3-bike-main {
-        width: min(365px, 59%);
-        height: 290px;
+/* Compact desktop / landscape tablet */
+@media (min-width: 961px) and (max-width: 1180px) {
+    .hero-v7-shell {
+        grid-template-columns: minmax(0, .86fr) minmax(510px, 1.14fr);
+        gap: 34px;
+    }
+
+    .hero-v7-copy h1 {
+        font-size: clamp(3.2rem, 5.2vw, 5rem);
+    }
+
+    .hero-v7-visual {
+        min-height: 560px;
+    }
+
+    .hero-v7-orange-ring {
+        width: 390px;
+        border-width: 52px;
+    }
+
+    .hero-v7-scooty {
+        width: min(420px, 64%);
+        left: 29%;
+        top: 65%;
+    }
+
+    .hero-v7-bike {
+        width: min(350px, 52%);
+        left: 73%;
+        top: 38%;
+    }
+
+    .hero-v7-stage-scooty {
+        width: 380px;
+    }
+
+    .hero-v7-stage-bike {
+        width: 300px;
+    }
+}
+
+/* Portrait tablet */
+@media (min-width: 701px) and (max-width: 960px) {
+    .home-hero-v7 {
+        min-height: auto;
+        padding-top: 54px;
+    }
+
+    .hero-v7-shell {
+        grid-template-columns: 1fr;
+        min-height: 0;
+        gap: 36px;
+    }
+
+    .hero-v7-copy {
+        max-width: 760px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .hero-v7-copy > p {
+        margin-inline: auto;
+    }
+
+    .hero-v7-actions {
+        justify-content: center;
+    }
+
+    .hero-v7-highlights-desktop {
+        width: min(650px, 100%);
+        margin-inline: auto;
+    }
+
+    .hero-v7-visual {
+        width: min(760px, 100%);
+        min-height: 520px;
+        margin: 0 auto;
+    }
+
+    .hero-v7-orange-ring {
+        width: 380px;
+        right: 4%;
+        top: 7%;
+        border-width: 50px;
+    }
+
+    .hero-v7-scooty {
+        width: min(420px, 60%);
+        left: 29%;
+        top: 65%;
+    }
+
+    .hero-v7-bike {
+        width: min(340px, 47%);
+        left: 73%;
+        top: 39%;
+    }
+
+    .hero-v7-stage-scooty {
+        width: 380px;
+        left: 4%;
+    }
+
+    .hero-v7-stage-bike {
+        width: 300px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .home-hero-v7 {
+        min-height: auto;
+        padding: 34px 14px 54px;
+    }
+
+    .hero-v7-shell {
+        grid-template-columns: 1fr;
+        min-height: 0;
+        gap: 24px;
+    }
+
+    .hero-v7-copy {
+        max-width: none;
+        text-align: left;
+    }
+
+    .hero-v7-copy h1 {
+        max-width: 100%;
+        margin: 12px 0 16px;
+        font-size: clamp(2.6rem, 13.2vw, 4rem);
+        line-height: .94;
+    }
+
+    .hero-v7-copy > p {
+        font-size: .9rem;
+        line-height: 1.62;
+    }
+
+    .hero-v7-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-top: 22px;
+    }
+
+    .hero-v7-actions .home-primary-cta,
+    .hero-v7-actions .home-secondary-cta {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-v7-highlights-desktop {
+        display: none;
+    }
+
+    .hero-v7-visual {
+        width: 100%;
+        min-height: 365px;
+        border-radius: 26px;
+    }
+
+    .hero-v7-orange-ring {
+        width: 260px;
+        right: -28px;
+        top: 63px;
+        border-width: 36px;
+    }
+
+    .hero-v7-dots {
+        width: 82px;
+        height: 55px;
+        right: 31%;
+        top: 30px;
+        background-size: 11px 11px;
+    }
+
+    .hero-v7-stage-scooty {
+        width: 245px;
+        height: 66px;
+        left: -4%;
+        bottom: 22px;
+    }
+
+    .hero-v7-stage-bike {
+        width: 205px;
+        height: 58px;
+        right: -3%;
+        top: 52%;
+    }
+
+    .hero-v7-scooty {
+        display: block;
+        width: min(290px, 72%);
         left: 30%;
-        top: 62%;
+        top: 69%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-2deg);
     }
 
-    .hero-v3-bike-secondary {
-        width: min(315px, 50%);
-        height: 315px;
-        left: 72%;
-        top: 44%;
-    }
-}
-
-@media (max-width: 700px) {
-    .hero-v3-bike-secondary {
-        display: none !important;
-    }
-}
-
-
-/* =========================================================
-   HOMEPAGE HERO V6
-   Desktop / tablet: BMW sport bike higher/front + BMW C 400 GT lower/right.
-   Mobile: clean single-bike composition.
-========================================================= */
-
-@media (min-width: 941px) {
-    .hero-v3-panel {
-        min-height: 585px;
-    }
-
-    .hero-v3-bike-main {
-        display: block !important;
-        width: min(430px, 62%);
-        height: 330px;
-        left: 38%;
+    .hero-v7-bike {
+        display: block;
+        width: min(240px, 58%);
+        left: 73%;
         top: 43%;
-        z-index: 5;
-        opacity: 1;
-        transform: translate(-50%, -50%) rotate(-4deg);
-    }
-
-    .hero-v3-bike-secondary {
-        display: block !important;
-        width: min(350px, 49%);
-        height: 350px;
-        left: 70%;
-        top: 67%;
         z-index: 4;
-        opacity: 1;
-        transform: translate(-50%, -50%) rotate(2deg);
+        transform: translate(-50%, -50%) rotate(-2deg);
     }
 
-    .hero-v3-panel:hover .hero-v3-bike-main {
-        transform: translate(-50%, -50%) rotate(-3deg) translateY(-4px);
+    .hero-v7-callout {
+        min-width: 108px;
+        padding: 8px 9px;
+        border-radius: 11px;
     }
 
-    .hero-v3-panel:hover .hero-v3-bike-secondary {
-        transform: translate(-50%, -50%) rotate(1deg) translateY(-3px);
+    .hero-v7-callout strong {
+        font-size: .58rem;
+    }
+
+    .hero-v7-callout small {
+        font-size: .48rem;
+    }
+
+    .hero-v7-callout span {
+        margin-top: 5px;
+        padding: 3px 6px;
+        font-size: .45rem;
+    }
+
+    .hero-v7-callout-scooty {
+        left: 8px;
+        top: 43%;
+    }
+
+    .hero-v7-callout-bike {
+        right: 8px;
+        top: 11px;
+    }
+
+    .hero-v7-highlights-mobile {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin-top: -6px;
+    }
+
+    .hero-v7-highlights-mobile > div {
+        min-width: 0;
+        min-height: 78px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 9px 5px;
+        text-align: center;
+        border: 1px solid rgba(255,255,255,.07);
+        border-radius: 13px;
+        background: rgba(255,255,255,.025);
+    }
+
+    .hero-v7-highlights-mobile .hero-v7-highlight-icon {
+        width: 29px;
+        height: 29px;
+        flex-basis: 29px;
+        border-radius: 9px;
+    }
+
+    .hero-v7-highlights-mobile strong {
+        font-size: .62rem;
+    }
+
+    .hero-v7-scroll {
+        display: none;
     }
 }
 
-@media (min-width: 701px) and (max-width: 940px) {
-    .hero-v3-panel {
-        min-height: 500px;
-    }
-
-    .hero-v3-bike-main {
-        display: block !important;
-        width: min(370px, 59%);
-        height: 285px;
-        left: 38%;
-        top: 42%;
-        z-index: 5;
-        transform: translate(-50%, -50%) rotate(-4deg);
-    }
-
-    .hero-v3-bike-secondary {
-        display: block !important;
-        width: min(300px, 47%);
-        height: 300px;
-        left: 70%;
-        top: 68%;
-        z-index: 4;
-        opacity: 1;
-        transform: translate(-50%, -50%) rotate(2deg);
-    }
-}
-
-@media (max-width: 700px) {
-    .hero-v3-bike-secondary {
-        display: none !important;
-    }
-
-    .hero-v3-bike-main {
-        display: block !important;
-        width: 122%;
-        max-width: 440px;
-        height: 265px;
-        left: 50%;
-        top: 50%;
-        z-index: 5;
-        transform: translate(-50%, -50%) rotate(-3deg);
-    }
-}
-
+/* Small phones */
 @media (max-width: 390px) {
-    .hero-v3-bike-main {
-        width: 120%;
-        max-width: 360px;
-        height: 245px;
+    .hero-v7-visual {
+        min-height: 340px;
+    }
+
+    .hero-v7-orange-ring {
+        width: 238px;
+        right: -35px;
+        top: 58px;
+        border-width: 32px;
+    }
+
+    .hero-v7-scooty {
+        width: 74%;
+        left: 29%;
+        top: 70%;
+    }
+
+    .hero-v7-bike {
+        width: 57%;
+        left: 74%;
+        top: 43%;
+    }
+
+    .hero-v7-callout-scooty {
+        top: 45%;
+    }
+
+    .hero-v7-highlights-mobile strong {
+        font-size: .56rem;
     }
 }
