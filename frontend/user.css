@@ -2145,3 +2145,153 @@ body.mobile-menu-open {
     .hero-floating-card small { display:none; }
     .duration-options { grid-template-columns:1fr; }
 }
+
+
+/* =========================================================
+   CUSTOMER VEHICLE FILTERS — MOBILE FIRST
+   Vehicle Type: All / Bikes / Scooties
+   Fuel Type: All / Petrol / Electric
+========================================================= */
+.vehicle-filter-panel {
+    margin: 1.25rem 0 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(145deg, rgba(255, 107, 0, 0.045), rgba(17, 24, 39, 0.96));
+    box-shadow: var(--shadow-card);
+}
+
+.vehicle-filter-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.vehicle-filter-heading h2 { margin: .25rem 0 .25rem; font-size: clamp(1.2rem, 4.5vw, 1.65rem); }
+.vehicle-filter-heading p { margin: 0; max-width: 38rem; font-size: .82rem; }
+
+.filter-clear-btn {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: .65rem .85rem;
+    border: 1px solid rgba(255, 107, 0, .35);
+    border-radius: 10px;
+    background: rgba(255, 107, 0, .09);
+    color: #ffd8bc;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.vehicle-filter-groups { display: grid; gap: 1rem; }
+.vehicle-filter-group { min-width: 0; }
+.vehicle-filter-label {
+    display: block;
+    margin-bottom: .55rem;
+    color: var(--text-secondary);
+    font-size: .72rem;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.vehicle-filter-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .55rem;
+}
+.vehicle-filter-option {
+    min-width: 0;
+    min-height: 70px;
+    padding: .7rem .6rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .025);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: .55rem;
+    text-align: left;
+    cursor: pointer;
+    transition: transform var(--transition), border-color var(--transition), background var(--transition);
+}
+.vehicle-filter-option:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+.vehicle-filter-option.is-active {
+    border-color: rgba(255, 107, 0, .75);
+    background: linear-gradient(145deg, rgba(255, 107, 0, .18), rgba(255, 107, 0, .07));
+    box-shadow: inset 0 0 0 1px rgba(255, 107, 0, .12);
+}
+.filter-option-icon { flex: 0 0 auto; font-size: 1.2rem; line-height: 1; }
+.filter-option-copy { min-width: 0; display: grid; gap: .08rem; }
+.filter-option-copy strong { color: #fff; font-size: .83rem; white-space: nowrap; }
+.filter-option-copy small { color: var(--text-secondary); font-size: .65rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.compact-filter-option { min-height: 58px; }
+.fuel-dot { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; box-shadow: 0 0 0 4px rgba(255,255,255,.035); }
+.fuel-dot-all { background: #94a3b8; }
+.fuel-dot-petrol { background: #f59e0b; }
+.fuel-dot-electric { background: #22c55e; }
+
+.vehicle-filter-result-row {
+    margin-top: .9rem;
+    padding-top: .8rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+}
+.vehicle-filter-result { color: var(--text-secondary); font-size: .78rem; }
+.vehicle-filter-result strong { color: var(--orange); font-size: .95rem; }
+.vehicle-filter-hint { color: var(--text-muted); font-size: .68rem; text-align: right; }
+
+.vehicle-card-meta { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .65rem; }
+.vehicle-meta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .25rem;
+    min-height: 26px;
+    padding: .28rem .55rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255,255,255,.035);
+    color: #cbd5e1;
+    font-size: .68rem;
+    font-weight: 800;
+}
+.vehicle-meta-pill.fuel-petrol { border-color: rgba(245,158,11,.28); color: #fcd34d; background: rgba(245,158,11,.08); }
+.vehicle-meta-pill.fuel-electric { border-color: rgba(34,197,94,.28); color: #86efac; background: rgba(34,197,94,.08); }
+.vehicle-meta-pill.fuel-unset { color: var(--text-muted); }
+
+.vehicle-filter-empty { grid-column: 1 / -1; min-height: 230px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .55rem; text-align: center; }
+.filter-empty-icon { width: 50px; height: 50px; display: grid; place-items: center; border-radius: 50%; background: var(--orange-soft); color: var(--orange); font-size: 1.35rem; }
+
+@media (min-width: 680px) {
+    .vehicle-filter-panel { padding: 1.25rem; }
+    .vehicle-filter-groups { grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+    .vehicle-filter-option { padding: .78rem; }
+}
+
+@media (min-width: 1100px) {
+    .vehicle-filter-panel { padding: 1.4rem 1.5rem; }
+    .vehicle-filter-heading { align-items: center; }
+    .vehicle-filter-heading p { font-size: .86rem; }
+    .vehicle-filter-options { gap: .7rem; }
+    .vehicle-filter-option { min-height: 76px; }
+    .compact-filter-option { min-height: 62px; }
+}
+
+@media (max-width: 479px) {
+    .vehicle-filter-heading { display: grid; }
+    .filter-clear-btn { width: 100%; }
+    .vehicle-filter-options { gap: .42rem; }
+    .vehicle-filter-option { min-height: 64px; padding: .58rem .45rem; gap: .38rem; }
+    .filter-option-icon { font-size: 1rem; }
+    .filter-option-copy strong { font-size: .74rem; }
+    .filter-option-copy small { font-size: .58rem; }
+    .vehicle-filter-result-row { align-items: flex-start; flex-direction: column; }
+    .vehicle-filter-hint { text-align: left; }
+}

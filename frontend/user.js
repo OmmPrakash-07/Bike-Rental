@@ -264,168 +264,193 @@ function logoutUser() {
   showToast("You have been logged out.", "info");
 }
 
-function renderVehicleStats() {
+let vehicleCategoryFilter = "ALL";
+let vehicleFuelFilter = "ALL";
+
+function normalizedVehicleCategory(bike) {
+  const type = String(bike?.type || "").trim().toLowerCase();
+  if (type.includes("scoot") || type.includes("scooty") || type.includes("scooter")) return "SCOOTY";
+  if (type.includes("bike") || type.includes("bullet") || type.includes("motorcycle") || type.includes("motorbike")) return "BIKE";
+  return "OTHER";
+}
+
+function normalizedFuelType(bike) {
+  const fuel = String(bike?.fuelType || "").trim().toUpperCase();
+  if (fuel === "PETROL") return "PETROL";
+  if (fuel === "ELECTRIC") return "ELECTRIC";
+  return "UNSET";
+}
+
+function filteredVehicles() {
+  return bikes.filter((bike) => {
+    const categoryMatches = vehicleCategoryFilter === "ALL" || normalizedVehicleCategory(bike) === vehicleCategoryFilter;
+    const fuelMatches = vehicleFuelFilter === "ALL" || normalizedFuelType(bike) === vehicleFuelFilter;
+    return categoryMatches && fuelMatches;
+  });
+}
+
+function setCountText(id, value, singular, plural = `${singular}s`) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = `${value} ${value === 1 ? singular : plural}`;
+}
+
+function updateVehicleFilterCounts() {
+  const bikeCount = bikes.filter((bike) => normalizedVehicleCategory(bike) === "BIKE").length;
+  const scootyCount = bikes.filter((bike) => normalizedVehicleCategory(bike) === "SCOOTY").length;
+  const petrolCount = bikes.filter((bike) => normalizedFuelType(bike) === "PETROL").length;
+  const electricCount = bikes.filter((bike) => normalizedFuelType(bike) === "ELECTRIC").length;
+
+  setCountText("allVehicleCount", bikes.length, "ride");
+  setCountText("bikeVehicleCount", bikeCount, "bike");
+  setCountText("scootyVehicleCount", scootyCount, "scooty", "scooties");
+  setCountText("allFuelCount", bikes.length, "ride");
+  setCountText("petrolVehicleCount", petrolCount, "ride");
+  setCountText("electricVehicleCount", electricCount, "ride");
+}
+
+function updateVehicleFilterUi() {
+  document.querySelectorAll("[data-category-filter]").forEach((button) => {
+    const active = button.dataset.categoryFilter === vehicleCategoryFilter;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  document.querySelectorAll("[data-fuel-filter]").forEach((button) => {
+    const active = button.dataset.fuelFilter === vehicleFuelFilter;
+    button.classList.toggle("is-active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+
+  const clearButton = document.getElementById("clearVehicleFiltersButton");
+  if (clearButton) clearButton.hidden = vehicleCategoryFilter === "ALL" && vehicleFuelFilter === "ALL";
+
+  const result = document.getElementById("vehicleFilterResult");
+  if (result) {
+    const categoryLabel = vehicleCategoryFilter === "BIKE" ? "bikes" : vehicleCategoryFilter === "SCOOTY" ? "scooties" : "vehicles";
+    const fuelLabel = vehicleFuelFilter === "PETROL" ? "Petrol " : vehicleFuelFilter === "ELECTRIC" ? "Electric " : "";
+    result.innerHTML = `<strong>${filteredVehicles().length}</strong> ${fuelLabel}${categoryLabel} found`;
+  }
+}
+
+function setVehicleCategoryFilter(value) {
+  vehicleCategoryFilter = ["ALL", "BIKE", "SCOOTY"].includes(value) ? value : "ALL";
+  renderBikes();
+}
+
+function setVehicleFuelFilter(value) {
+  vehicleFuelFilter = ["ALL", "PETROL", "ELECTRIC"].includes(value) ? value : "ALL";
+  renderBikes();
+}
+
+function clearVehicleFilters() {
+  vehicleCategoryFilter = "ALL";
+  vehicleFuelFilter = "ALL";
+  renderBikes();
+}
+
+function renderVehicleStats(visibleBikes = filteredVehicles()) {
   const stats = document.getElementById("vehicleStats");
+  if (!stats) return;
+  if (!bikes.length) { stats.innerHTML = ""; return; }
+  const available = visibleBikes.filter((bike) => bike.available).length;
+  stats.innerHTML = `
+    <div class="stat-chip"><strong>${visibleBikes.length}</strong><span>Showing</span></div>
+    <div class="stat-chip available-chip"><strong>${available}</strong><span>Available</span></div>
+    <div class="stat-chip"><strong>${visibleBikes.length - available}</strong><span>Unavailable</span></div>`;
+}
+
+function renderBikes() {
+  const container = document.getElementById("bikeContainer");
+  if (!container) return;
+
+  updateVehicleFilterCounts();
+  updateVehicleFilterUi();
+  const visibleBikes = filteredVehicles();
+  renderVehicleStats(visibleBikes);
+  container.innerHTML = "";
 
   if (!bikes.length) {
-    stats.innerHTML = "";
+    container.innerHTML = `<div class="empty-state">No vehicles have been added yet.</div>`;
     return;
   }
 
-  const available = bikes.filter((bike) => bike.available).length;
+  if (!visibleBikes.length) {
+    const categoryText = vehicleCategoryFilter === "BIKE" ? "bike" : vehicleCategoryFilter === "SCOOTY" ? "scooty" : "vehicle";
+    const fuelText = vehicleFuelFilter === "PETROL" ? "petrol " : vehicleFuelFilter === "ELECTRIC" ? "electric " : "";
+    container.innerHTML = `
+      <div class="empty-state vehicle-filter-empty">
+        <div class="filter-empty-icon">⌕</div>
+        <strong>No ${escapeHtml(fuelText + categoryText)} found.</strong>
+        <small>Try another vehicle or fuel filter.</small>
+        <button class="retry-btn" type="button" onclick="clearVehicleFilters()">Show All Vehicles</button>
+      </div>`;
+    return;
+  }
 
-  stats.innerHTML = `
-        <div class="stat-chip">
-          <strong>${bikes.length}</strong>
-          <span>Total vehicles</span>
+  visibleBikes.forEach((bike, index) => {
+    const card = document.createElement("article");
+    card.className = `card reveal delay-${Math.min(index + 1, 4)}`;
+
+    const image = bike.imageUrl
+      ? `<div class="card-image-wrap"><img loading="lazy" src="${escapeHtml(imageSrc(bike.imageUrl))}" alt="${escapeHtml(bike.name)}"></div>`
+      : `<div class="image-placeholder">🏍️</div>`;
+
+    const hourlyPrice = Number(bike.pricePerHour);
+    const hourlyConfigured = Number.isFinite(hourlyPrice) && hourlyPrice > 0;
+    const dailyPrice = Number(bike.pricePerDay);
+    const safeDailyPrice = Number.isFinite(dailyPrice) && dailyPrice >= 0 ? dailyPrice : 0;
+
+    const priceHtml = hourlyConfigured
+      ? `<div class="card-price-stack"><div class="card-price"><strong>₹${hourlyPrice.toFixed(0)}</strong><span>/ hour</span></div><div class="card-price secondary-price"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span>/ day</span></div></div>`
+      : `<div class="card-price-stack"><div class="card-price"><strong>₹${safeDailyPrice.toFixed(0)}</strong><span>/ day</span></div><div class="card-price secondary-price price-muted"><strong>Hourly</strong><span>not configured</span></div></div>`;
+
+    const category = normalizedVehicleCategory(bike);
+    const fuel = normalizedFuelType(bike);
+    const categoryLabel = category === "SCOOTY" ? "Scooty" : category === "BIKE" ? "Bike" : String(bike.type || "Vehicle");
+    const fuelLabel = fuel === "PETROL" ? "Petrol" : fuel === "ELECTRIC" ? "Electric" : "Fuel not set";
+
+    card.innerHTML = `
+      <span class="badge ${bike.available ? "available" : "unavailable"}">${bike.available ? "Available" : "Unavailable"}</span>
+      ${image}
+      <div class="card-body">
+        <div class="vehicle-card-meta">
+          <span class="vehicle-meta-pill">${escapeHtml(categoryLabel)}</span>
+          <span class="vehicle-meta-pill fuel-${fuel.toLowerCase()}">${fuel === "ELECTRIC" ? "⚡" : fuel === "PETROL" ? "⛽" : "•"} ${escapeHtml(fuelLabel)}</span>
         </div>
-        <div class="stat-chip available-chip">
-          <strong>${available}</strong>
-          <span>Available</span>
-        </div>
-        <div class="stat-chip">
-          <strong>${bikes.length - available}</strong>
-          <span>Unavailable</span>
-        </div>`;
+        <div class="card-name">${escapeHtml(bike.name)}</div>
+        <p class="card-type">${escapeHtml(String(bike.type || "Vehicle"))}${fuel !== "UNSET" ? ` • ${escapeHtml(fuelLabel)}` : ""}</p>
+        ${priceHtml}
+        <button class="${bike.available ? "btn-primary" : "unavailable-btn"}" ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>${bike.available ? "Book Now" : "Currently Unavailable"}</button>
+      </div>`;
+
+    const img = card.querySelector("img");
+    if (img) {
+      img.addEventListener("error", () => {
+        const wrap = img.closest(".card-image-wrap");
+        if (wrap) wrap.innerHTML = `<div class="image-placeholder">🏍️</div>`;
+      }, { once: true });
+    }
+    container.appendChild(card);
+  });
 }
 
 async function loadBikes({ quiet = false } = {}) {
   const container = document.getElementById("bikeContainer");
-
-  if (!quiet) {
-    container.innerHTML =
-      `<div class="skeleton-card"></div>` +
-      `<div class="skeleton-card"></div>` +
-      `<div class="skeleton-card"></div>`;
-  }
+  if (!container) return;
+  if (!quiet) container.innerHTML = `<div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>`;
 
   try {
     const res = await fetch(BIKE_API, { cache: "no-store" });
-
-    if (!res.ok) {
-      throw new Error(await errorMessage(res));
-    }
-
+    if (!res.ok) throw new Error(await errorMessage(res));
     bikes = await res.json();
-
-    renderVehicleStats();
-    container.innerHTML = "";
-
-    if (!bikes.length) {
-      container.innerHTML =
-        `<div class="empty-state">No vehicles have been added yet.</div>`;
-      return;
-    }
-
-    bikes.forEach((bike, index) => {
-      const card = document.createElement("article");
-      card.className = `card reveal delay-${Math.min(index + 1, 4)}`;
-
-      const image = bike.imageUrl
-        ? `<div class="card-image-wrap">
-             <img
-               loading="lazy"
-               src="${escapeHtml(imageSrc(bike.imageUrl))}"
-               alt="${escapeHtml(bike.name)}"
-             >
-           </div>`
-        : `<div class="image-placeholder">🏍️</div>`;
-
-      const hourlyPrice = Number(bike.pricePerHour);
-      const hourlyConfigured =
-        Number.isFinite(hourlyPrice) && hourlyPrice > 0;
-
-      const priceHtml = hourlyConfigured
-        ? `
-          <div class="card-price-stack">
-            <div class="card-price">
-              <strong>₹${hourlyPrice.toFixed(0)}</strong>
-              <span>/ hour</span>
-            </div>
-            <div class="card-price secondary-price">
-              <strong>₹${Number(bike.pricePerDay).toFixed(0)}</strong>
-              <span>/ day</span>
-            </div>
-          </div>`
-        : `
-          <div class="card-price-stack">
-            <div class="card-price">
-              <strong>₹${Number(bike.pricePerDay).toFixed(0)}</strong>
-              <span>/ day</span>
-            </div>
-            <div class="card-price secondary-price price-muted">
-              <strong>Hourly</strong>
-              <span>not configured</span>
-            </div>
-          </div>`;
-
-      card.innerHTML = `
-        <span class="badge ${bike.available ? "available" : "unavailable"}">
-          ${bike.available ? "Available" : "Unavailable"}
-        </span>
-
-        ${image}
-
-        <div class="card-body">
-          <div class="card-name">${escapeHtml(bike.name)}</div>
-          <p class="card-type">
-            ${escapeHtml(bike.type)}
-            ${
-              bike.fuelType
-                ? ` • ${escapeHtml(
-                    bike.fuelType.charAt(0).toUpperCase() +
-                    bike.fuelType.slice(1).toLowerCase()
-                  )}`
-                : ""
-            }
-          </p>
-
-          ${priceHtml}
-
-          <button
-            class="${bike.available ? "btn-primary" : "unavailable-btn"}"
-            ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}
-          >
-            ${bike.available ? "Book Now" : "Currently Unavailable"}
-          </button>
-        </div>`;
-
-      const img = card.querySelector("img");
-
-      if (img) {
-        img.addEventListener(
-          "error",
-          () => {
-            const wrap = img.closest(".card-image-wrap");
-
-            if (wrap) {
-              wrap.innerHTML =
-                `<div class="image-placeholder">🏍️</div>`;
-            }
-          },
-          { once: true },
-        );
-      }
-
-      container.appendChild(card);
-    });
+    if (!Array.isArray(bikes)) bikes = [];
+    renderBikes();
   } catch (error) {
     console.error(error);
-
-    document.getElementById("vehicleStats").innerHTML = "";
-
-    container.innerHTML = `
-      <div class="empty-state error-state">
-        <strong>Could not load vehicles.</strong>
-        <small>${escapeHtml(error.message)}</small>
-        <button
-          class="retry-btn"
-          type="button"
-          onclick="refreshBikes()"
-        >
-          Try Again
-        </button>
-      </div>`;
+    const stats = document.getElementById("vehicleStats");
+    if (stats) stats.innerHTML = "";
+    container.innerHTML = `<div class="empty-state error-state"><strong>Could not load vehicles.</strong><small>${escapeHtml(error.message)}</small><button class="retry-btn" type="button" onclick="refreshBikes()">Try Again</button></div>`;
   }
 }
 
