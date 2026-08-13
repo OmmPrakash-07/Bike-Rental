@@ -266,6 +266,8 @@ function logoutUser() {
 
 let vehicleCategoryFilter = "ALL";
 let vehicleFuelFilter = "ALL";
+let vehicleSearchQuery = "";
+let vehicleSortMode = "DEFAULT";
 
 function normalizedVehicleCategory(bike) {
   const type = String(bike?.type || "").trim().toLowerCase();
@@ -281,12 +283,95 @@ function normalizedFuelType(bike) {
   return "UNSET";
 }
 
+function normalizedSearchText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function vehicleMatchesSearch(bike) {
+  const query = normalizedSearchText(vehicleSearchQuery);
+  if (!query) return true;
+
+  const category = normalizedVehicleCategory(bike);
+  const fuel = normalizedFuelType(bike);
+
+  const searchable = normalizedSearchText([
+    bike?.name,
+    bike?.type,
+    category === "BIKE" ? "bike motorcycle bullet" : "",
+    category === "SCOOTY" ? "scooty scooter" : "",
+    fuel === "PETROL" ? "petrol fuel" : "",
+    fuel === "ELECTRIC" ? "electric ev" : ""
+  ].filter(Boolean).join(" "));
+
+  return query
+    .split(" ")
+    .filter(Boolean)
+    .every((term) => searchable.includes(term));
+}
+
 function filteredVehicles() {
   return bikes.filter((bike) => {
-    const categoryMatches = vehicleCategoryFilter === "ALL" || normalizedVehicleCategory(bike) === vehicleCategoryFilter;
-    const fuelMatches = vehicleFuelFilter === "ALL" || normalizedFuelType(bike) === vehicleFuelFilter;
-    return categoryMatches && fuelMatches;
+    const categoryMatches =
+      vehicleCategoryFilter === "ALL" ||
+      normalizedVehicleCategory(bike) === vehicleCategoryFilter;
+
+    const fuelMatches =
+      vehicleFuelFilter === "ALL" ||
+      normalizedFuelType(bike) === vehicleFuelFilter;
+
+    return categoryMatches && fuelMatches && vehicleMatchesSearch(bike);
   });
+}
+
+function safeSortNumber(value, fallback = Number.POSITIVE_INFINITY) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : fallback;
+}
+
+function sortedVehicles(items = filteredVehicles()) {
+  const list = [...items];
+
+  switch (vehicleSortMode) {
+    case "PRICE_DAY_ASC":
+      return list.sort((a, b) =>
+        safeSortNumber(a.pricePerDay) - safeSortNumber(b.pricePerDay)
+      );
+
+    case "PRICE_DAY_DESC":
+      return list.sort((a, b) =>
+        safeSortNumber(b.pricePerDay, -1) - safeSortNumber(a.pricePerDay, -1)
+      );
+
+    case "PRICE_HOUR_ASC":
+      return list.sort((a, b) =>
+        safeSortNumber(a.pricePerHour) - safeSortNumber(b.pricePerHour)
+      );
+
+    case "PRICE_HOUR_DESC":
+      return list.sort((a, b) =>
+        safeSortNumber(b.pricePerHour, -1) - safeSortNumber(a.pricePerHour, -1)
+      );
+
+    case "NAME_ASC":
+      return list.sort((a, b) =>
+        String(a?.name || "").localeCompare(String(b?.name || ""), undefined, {
+          sensitivity: "base"
+        })
+      );
+
+    case "AVAILABLE_FIRST":
+      return list.sort((a, b) => {
+        const availabilityDifference = Number(Boolean(b.available)) - Number(Boolean(a.available));
+        if (availabilityDifference !== 0) return availabilityDifference;
+        return Number(a?.id || 0) - Number(b?.id || 0);
+      });
+
+    default:
+      return list;
+  }
 }
 
 function setCountText(id, value, singular, plural = `${singular}s`) {
@@ -327,10 +412,29 @@ function updateVehicleFilterUi() {
 
   const result = document.getElementById("vehicleFilterResult");
   if (result) {
-    const categoryLabel = vehicleCategoryFilter === "BIKE" ? "bikes" : vehicleCategoryFilter === "SCOOTY" ? "scooties" : "vehicles";
-    const fuelLabel = vehicleFuelFilter === "PETROL" ? "Petrol " : vehicleFuelFilter === "ELECTRIC" ? "Electric " : "";
-    result.innerHTML = `<strong>${filteredVehicles().length}</strong> ${fuelLabel}${categoryLabel} found`;
+    const categoryLabel =
+      vehicleCategoryFilter === "BIKE"
+        ? "bikes"
+        : vehicleCategoryFilter === "SCOOTY"
+          ? "scooties"
+          : "vehicles";
+
+    const fuelLabel =
+      vehicleFuelFilter === "PETROL"
+        ? "Petrol "
+        : vehicleFuelFilter === "ELECTRIC"
+          ? "Electric "
+          : "";
+
+    const searchLabel = normalizedSearchText(vehicleSearchQuery)
+      ? ` matching “${escapeHtml(vehicleSearchQuery.trim())}”`
+      : "";
+
+    result.innerHTML =
+      `<strong>${filteredVehicles().length}</strong> ${fuelLabel}${categoryLabel}${searchLabel} found`;
   }
+
+  updateVehicleDiscoveryUi();
 }
 
 function setVehicleCategoryFilter(value) {
@@ -346,6 +450,125 @@ function setVehicleFuelFilter(value) {
 function clearVehicleFilters() {
   vehicleCategoryFilter = "ALL";
   vehicleFuelFilter = "ALL";
+  renderBikes();
+}
+
+function setVehicleSearchQuery(value) {
+  vehicleSearchQuery = String(value || "");
+  renderBikes();
+}
+
+function clearVehicleSearch() {
+  vehicleSearchQuery = "";
+
+  const input = document.getElementById("vehicleSearchInput");
+  if (input) {
+    input.value = "";
+    input.focus();
+  }
+
+  renderBikes();
+}
+
+function setVehicleSortMode(value) {
+  const allowed = [
+    "DEFAULT",
+    "PRICE_DAY_ASC",
+    "PRICE_DAY_DESC",
+    "PRICE_HOUR_ASC",
+    "PRICE_HOUR_DESC",
+    "NAME_ASC",
+    "AVAILABLE_FIRST"
+  ];
+
+  vehicleSortMode = allowed.includes(value) ? value : "DEFAULT";
+  renderBikes();
+}
+
+function vehicleSortLabel() {
+  const labels = {
+    DEFAULT: "Recommended",
+    PRICE_DAY_ASC: "Daily price: Low to High",
+    PRICE_DAY_DESC: "Daily price: High to Low",
+    PRICE_HOUR_ASC: "Hourly price: Low to High",
+    PRICE_HOUR_DESC: "Hourly price: High to Low",
+    NAME_ASC: "Name: A to Z",
+    AVAILABLE_FIRST: "Available first"
+  };
+
+  return labels[vehicleSortMode] || labels.DEFAULT;
+}
+
+function updateVehicleDiscoveryUi() {
+  const input = document.getElementById("vehicleSearchInput");
+  if (input && input.value !== vehicleSearchQuery) {
+    input.value = vehicleSearchQuery;
+  }
+
+  const clearSearchButton = document.getElementById("clearVehicleSearchButton");
+  if (clearSearchButton) {
+    clearSearchButton.hidden = !normalizedSearchText(vehicleSearchQuery);
+  }
+
+  const sortSelect = document.getElementById("vehicleSortSelect");
+  if (sortSelect && sortSelect.value !== vehicleSortMode) {
+    sortSelect.value = vehicleSortMode;
+  }
+
+  const summary = document.getElementById("activeDiscoverySummary");
+  const summaryText = document.getElementById("activeDiscoveryText");
+
+  if (!summary || !summaryText) return;
+
+  const searchActive = Boolean(normalizedSearchText(vehicleSearchQuery));
+  const sortActive = vehicleSortMode !== "DEFAULT";
+
+  summary.hidden = !searchActive && !sortActive;
+
+  if (summary.hidden) {
+    summaryText.textContent = "";
+    return;
+  }
+
+  const parts = [];
+
+  if (searchActive) {
+    parts.push(`Search: “${vehicleSearchQuery.trim()}”`);
+  }
+
+  if (sortActive) {
+    parts.push(`Sort: ${vehicleSortLabel()}`);
+  }
+
+  summaryText.textContent = parts.join(" • ");
+}
+
+function resetVehicleDiscovery() {
+  vehicleSearchQuery = "";
+  vehicleSortMode = "DEFAULT";
+
+  const input = document.getElementById("vehicleSearchInput");
+  if (input) input.value = "";
+
+  const select = document.getElementById("vehicleSortSelect");
+  if (select) select.value = "DEFAULT";
+
+  renderBikes();
+}
+
+
+function resetAllVehicleDiscovery() {
+  vehicleCategoryFilter = "ALL";
+  vehicleFuelFilter = "ALL";
+  vehicleSearchQuery = "";
+  vehicleSortMode = "DEFAULT";
+
+  const input = document.getElementById("vehicleSearchInput");
+  if (input) input.value = "";
+
+  const select = document.getElementById("vehicleSortSelect");
+  if (select) select.value = "DEFAULT";
+
   renderBikes();
 }
 
@@ -366,7 +589,7 @@ function renderBikes() {
 
   updateVehicleFilterCounts();
   updateVehicleFilterUi();
-  const visibleBikes = filteredVehicles();
+  const visibleBikes = sortedVehicles(filteredVehicles());
   renderVehicleStats(visibleBikes);
   container.innerHTML = "";
 
@@ -382,8 +605,8 @@ function renderBikes() {
       <div class="empty-state vehicle-filter-empty">
         <div class="filter-empty-icon">⌕</div>
         <strong>No ${escapeHtml(fuelText + categoryText)} found.</strong>
-        <small>Try another vehicle or fuel filter.</small>
-        <button class="retry-btn" type="button" onclick="clearVehicleFilters()">Show All Vehicles</button>
+        <small>${normalizedSearchText(vehicleSearchQuery) ? "Try another search or reset your filters." : "Try another vehicle or fuel filter."}</small>
+        <button class="retry-btn" type="button" onclick="resetAllVehicleDiscovery()">Show All Vehicles</button>
       </div>`;
     return;
   }
@@ -393,7 +616,7 @@ function renderBikes() {
     card.className = `card reveal delay-${Math.min(index + 1, 4)}`;
 
     const image = bike.imageUrl
-      ? `<div class="card-image-wrap"><img loading="lazy" src="${escapeHtml(imageSrc(bike.imageUrl))}" alt="${escapeHtml(bike.name)}"></div>`
+      ? `<a class="vehicle-card-image-link" href="vehicle.html?id=${encodeURIComponent(bike.id)}" aria-label="View ${escapeHtml(bike.name)} details"><div class="card-image-wrap"><img loading="lazy" src="${escapeHtml(imageSrc(bike.imageUrl))}" alt="${escapeHtml(bike.name)}"></div></a>`
       : `<div class="image-placeholder">🏍️</div>`;
 
     const hourlyPrice = Number(bike.pricePerHour);
@@ -418,10 +641,13 @@ function renderBikes() {
           <span class="vehicle-meta-pill">${escapeHtml(categoryLabel)}</span>
           <span class="vehicle-meta-pill fuel-${fuel.toLowerCase()}">${fuel === "ELECTRIC" ? "⚡" : fuel === "PETROL" ? "⛽" : "•"} ${escapeHtml(fuelLabel)}</span>
         </div>
-        <div class="card-name">${escapeHtml(bike.name)}</div>
+        <a class="card-name vehicle-card-name-link" href="vehicle.html?id=${encodeURIComponent(bike.id)}">${escapeHtml(bike.name)}</a>
         <p class="card-type">${escapeHtml(String(bike.type || "Vehicle"))}${fuel !== "UNSET" ? ` • ${escapeHtml(fuelLabel)}` : ""}</p>
         ${priceHtml}
-        <button class="${bike.available ? "btn-primary" : "unavailable-btn"}" ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>${bike.available ? "Book Now" : "Currently Unavailable"}</button>
+        <div class="vehicle-card-actions">
+          <a class="vehicle-details-btn" href="vehicle.html?id=${encodeURIComponent(bike.id)}">View Details</a>
+          <button class="${bike.available ? "btn-primary" : "unavailable-btn"}" ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>${bike.available ? "Book Now" : "Currently Unavailable"}</button>
+        </div>
       </div>`;
 
     const img = card.querySelector("img");
@@ -435,6 +661,37 @@ function renderBikes() {
   });
 }
 
+
+let bookingQueryHandled = false;
+
+function maybeOpenBookingFromQuery() {
+  if (bookingQueryHandled) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const rawBookId = params.get("book");
+
+  if (!rawBookId) return;
+
+  const bikeId = Number(rawBookId);
+  if (!Number.isInteger(bikeId) || bikeId <= 0) return;
+
+  const bike = bikes.find((item) => Number(item.id) === bikeId);
+  if (!bike) return;
+
+  bookingQueryHandled = true;
+
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete("book");
+  window.history.replaceState({}, "", `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash || "#vehicles"}`);
+
+  if (!bike.available) {
+    showToast(`${bike.name} is currently unavailable.`, "info");
+    return;
+  }
+
+  setTimeout(() => openBookingModal(bikeId), 120);
+}
+
 async function loadBikes({ quiet = false } = {}) {
   const container = document.getElementById("bikeContainer");
   if (!container) return;
@@ -446,6 +703,7 @@ async function loadBikes({ quiet = false } = {}) {
     bikes = await res.json();
     if (!Array.isArray(bikes)) bikes = [];
     renderBikes();
+    maybeOpenBookingFromQuery();
   } catch (error) {
     console.error(error);
     const stats = document.getElementById("vehicleStats");

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0a0f1e">
-    <title>Bike Rental</title>
+    <title>Browse Vehicles | BikeRental</title>
     <link rel="stylesheet" href="user.css">
 </head>
 
@@ -232,10 +232,55 @@
                 </div>
             </div>
 
+            <div class="fleet-discovery-toolbar" aria-label="Search and sort vehicles">
+                <div class="vehicle-search-wrap">
+                    <span class="vehicle-search-icon" aria-hidden="true">⌕</span>
+                    <label class="sr-only" for="vehicleSearchInput">Search vehicles</label>
+                    <input
+                        id="vehicleSearchInput"
+                        class="vehicle-search-input"
+                        type="search"
+                        placeholder="Search by vehicle name, type or fuel..."
+                        autocomplete="off"
+                        spellcheck="false"
+                        oninput="setVehicleSearchQuery(this.value)"
+                    >
+                    <button
+                        id="clearVehicleSearchButton"
+                        class="vehicle-search-clear"
+                        type="button"
+                        aria-label="Clear vehicle search"
+                        onclick="clearVehicleSearch()"
+                        hidden
+                    >×</button>
+                </div>
+
+                <div class="vehicle-sort-wrap">
+                    <label for="vehicleSortSelect">
+                        <span>Sort by</span>
+                    </label>
+                    <select id="vehicleSortSelect" class="vehicle-sort-select" onchange="setVehicleSortMode(this.value)">
+                        <option value="DEFAULT">Recommended</option>
+                        <option value="PRICE_DAY_ASC">Daily price: Low to High</option>
+                        <option value="PRICE_DAY_DESC">Daily price: High to Low</option>
+                        <option value="PRICE_HOUR_ASC">Hourly price: Low to High</option>
+                        <option value="PRICE_HOUR_DESC">Hourly price: High to Low</option>
+                        <option value="NAME_ASC">Name: A to Z</option>
+                        <option value="AVAILABLE_FIRST">Available first</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="activeDiscoverySummary" class="active-discovery-summary" hidden aria-live="polite">
+                <div id="activeDiscoveryText"></div>
+                <button type="button" onclick="resetVehicleDiscovery()">Reset search & sort</button>
+            </div>
+
             <div class="fleet-toolbar">
                 <div id="vehicleStats" class="vehicle-stats" aria-live="polite"></div>
                 <button id="refreshBikesButton" class="refresh-btn" type="button" onclick="refreshBikes()" aria-label="Refresh vehicle availability">↻ Refresh</button>
             </div>
+
             <div id="bikeContainer" class="grid" aria-live="polite"></div>
         </section>
 

@@ -7324,3 +7324,1668 @@ button.vehicle-filter-option.is-active:hover {
         bottom: 22px;
     }
 }
+
+
+/* =========================================================
+   V18 — CLEAN SCOOTER IMAGES + SYNCHRONIZED HOMEPAGE SECTIONS
+   Goals:
+   1) Keep every scooter in its ORIGINAL colour on a clean white image stage.
+   2) Make all long-ride cards line up evenly.
+   3) Make the lower homepage feel like one continuous design instead of
+      separate pasted/patch sections.
+========================================================= */
+
+/* ---------- LONG-RIDE IMAGE STAGE: WHITE + ORIGINAL COLOURS ---------- */
+
+.long-ride-image-wrap {
+    height: 220px !important;
+    padding: 12px !important;
+    display: grid !important;
+    place-items: center !important;
+    overflow: hidden !important;
+    border: 1px solid #e8e8e8 !important;
+    border-radius: 22px !important;
+    background: #ffffff !important;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.015);
+}
+
+.long-ride-image-wrap::after {
+    display: none !important;
+}
+
+.long-ride-image-wrap::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 18%;
+    right: 18%;
+    bottom: 12px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.08) !important;
+    filter: blur(10px);
+}
+
+.long-ride-image-wrap img.long-ride-scooter-image,
+.long-ride-scooter-image--honda-activa,
+.long-ride-scooter-image--suzuki-access-125,
+.long-ride-scooter-image--yamaha-rayzr-125,
+.long-ride-scooter-image--bajaj-chetak {
+    position: relative !important;
+    z-index: 2 !important;
+    inset: auto !important;
+    width: 90% !important;
+    max-width: 90% !important;
+    height: 190px !important;
+    max-height: 190px !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    transform: none !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    mix-blend-mode: normal !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    filter: drop-shadow(0 12px 14px rgba(0,0,0,.14)) !important;
+    opacity: 1 !important;
+}
+
+/* Keep Yamaha as the visual reference, but all four now follow same box. */
+.long-ride-scooter-image--yamaha-rayzr-125 {
+    width: 88% !important;
+    max-width: 88% !important;
+}
+
+/* Equal card alignment — remove the staggered/patched look. */
+.long-ride-grid {
+    align-items: stretch !important;
+}
+
+.long-ride-card,
+.long-ride-card:nth-child(2),
+.long-ride-card:nth-child(4) {
+    min-height: 470px !important;
+    transform: none !important;
+}
+
+.long-ride-card:hover,
+.long-ride-card:nth-child(2):hover,
+.long-ride-card:nth-child(4):hover {
+    transform: translateY(-7px) !important;
+}
+
+.long-ride-card h3 {
+    min-height: 1.45em;
+}
+
+/* ---------- ONE CONTINUOUS HOMEPAGE CANVAS ---------- */
+
+main {
+    background:
+        radial-gradient(circle at 12% 22%, rgba(255,107,0,.035), transparent 22%),
+        radial-gradient(circle at 88% 70%, rgba(255,107,0,.025), transparent 24%),
+        #080d19;
+}
+
+/* Shared content width and vertical rhythm */
+.home-section,
+.long-ride-shell,
+.ride-match-shell {
+    width: min(1380px, calc(100% - 40px)) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.home-section {
+    padding-top: 82px !important;
+    padding-bottom: 82px !important;
+}
+
+.long-ride-savings,
+.ride-match-section {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+.long-ride-savings {
+    padding: 88px 0 84px !important;
+}
+
+.ride-match-section {
+    padding: 82px 0 !important;
+}
+
+.ride-match-section::before,
+.long-ride-savings::before {
+    opacity: .08 !important;
+}
+
+/* Soft divider between major blocks instead of hard "patch" changes. */
+.long-ride-shell,
+.ride-match-shell,
+.duration-banner,
+.experience-grid,
+.rider-story-card {
+    position: relative;
+}
+
+.long-ride-shell::after,
+.ride-match-shell::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -42px;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.07) 18%,
+        rgba(255,107,0,.10) 50%,
+        rgba(255,255,255,.07) 82%,
+        transparent
+    );
+}
+
+/* SAVE BIG heading/card spacing becomes more compact and consistent. */
+.long-ride-heading {
+    margin-bottom: 34px !important;
+}
+
+.long-ride-discount-note {
+    border-color: rgba(255,107,0,.18) !important;
+    background: rgba(255,107,0,.055) !important;
+    box-shadow: none !important;
+}
+
+.long-ride-footer {
+    margin-top: 34px !important;
+}
+
+/* ---------- RIDE MATCH — integrated with same canvas ---------- */
+
+.ride-match-heading {
+    margin-bottom: 28px !important;
+}
+
+.ride-match-card {
+    min-height: 300px !important;
+    border-radius: 22px !important;
+    background:
+        radial-gradient(circle at 92% 10%, rgba(255,107,0,.055), transparent 30%),
+        linear-gradient(145deg, #111a2a, #0b1320) !important;
+    box-shadow: none !important;
+}
+
+.ride-match-card:hover {
+    box-shadow: 0 18px 42px rgba(0,0,0,.22) !important;
+}
+
+/* ---------- DURATION SECTION — remove hard orange/black patch split ---------- */
+
+.duration-section {
+    padding-top: 82px !important;
+}
+
+.duration-banner {
+    min-height: 390px !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(255,255,255,.075) !important;
+    background:
+        radial-gradient(circle at 8% 50%, rgba(255,107,0,.18), transparent 32%),
+        radial-gradient(circle at 96% 22%, rgba(255,107,0,.055), transparent 28%),
+        linear-gradient(145deg, #111a2a, #0b1320) !important;
+    box-shadow: none !important;
+}
+
+.duration-intro {
+    color: var(--text-primary) !important;
+}
+
+.duration-intro > span {
+    color: var(--orange) !important;
+}
+
+.duration-intro h2 {
+    color: var(--text-primary) !important;
+}
+
+.duration-intro p {
+    color: #94a3b8 !important;
+}
+
+.duration-intro a {
+    background: var(--orange) !important;
+    color: #fff !important;
+    box-shadow: 0 12px 28px rgba(255,107,0,.18);
+}
+
+.duration-options article {
+    background: rgba(255,255,255,.03) !important;
+    border-color: rgba(255,255,255,.07) !important;
+}
+
+/* ---------- EXPERIENCE + STORY — same radius and spacing language ---------- */
+
+.experience-section,
+.rider-story-section {
+    padding-top: 82px !important;
+    padding-bottom: 82px !important;
+}
+
+.experience-grid {
+    gap: 18px !important;
+}
+
+.experience-grid article {
+    min-height: 235px !important;
+    border-radius: 22px !important;
+    background:
+        linear-gradient(145deg, #101827, #0b1320) !important;
+    box-shadow: none !important;
+}
+
+.rider-story-card {
+    border-radius: 24px !important;
+    background:
+        radial-gradient(circle at 88% 50%, rgba(255,107,0,.10), transparent 32%),
+        linear-gradient(145deg, #101827, #0b1320) !important;
+    box-shadow: none !important;
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1050px) {
+    .home-section,
+    .long-ride-shell,
+    .ride-match-shell {
+        width: min(100% - 28px, 1380px) !important;
+    }
+
+    .long-ride-card,
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        min-height: 450px !important;
+    }
+
+    .long-ride-image-wrap {
+        height: 215px !important;
+    }
+
+    .long-ride-image-wrap img.long-ride-scooter-image,
+    .long-ride-scooter-image--honda-activa,
+    .long-ride-scooter-image--suzuki-access-125,
+    .long-ride-scooter-image--yamaha-rayzr-125,
+    .long-ride-scooter-image--bajaj-chetak {
+        height: 184px !important;
+        max-height: 184px !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .home-section,
+    .long-ride-shell,
+    .ride-match-shell {
+        width: calc(100% - 24px) !important;
+    }
+
+    .home-section,
+    .long-ride-savings,
+    .ride-match-section,
+    .duration-section,
+    .experience-section,
+    .rider-story-section {
+        padding-top: 58px !important;
+        padding-bottom: 58px !important;
+    }
+
+    .long-ride-card,
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        min-height: 0 !important;
+    }
+
+    .long-ride-image-wrap {
+        height: 210px !important;
+        min-height: 210px !important;
+        margin: 12px !important;
+    }
+
+    .long-ride-image-wrap img.long-ride-scooter-image,
+    .long-ride-scooter-image--honda-activa,
+    .long-ride-scooter-image--suzuki-access-125,
+    .long-ride-scooter-image--yamaha-rayzr-125,
+    .long-ride-scooter-image--bajaj-chetak {
+        width: 86% !important;
+        max-width: 86% !important;
+        height: 180px !important;
+        max-height: 180px !important;
+    }
+
+    .duration-banner {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+
+/* =========================================================
+   V21 — LONG-RIDE LAYOUT REFINEMENT
+   Desktop:
+   1st + 3rd cards slightly higher
+   2nd + 4th cards slightly lower
+
+   Mobile:
+   Royal-Brothers-inspired 2 x 2 composition,
+   but kept in BikeRental dark/orange theme.
+========================================================= */
+
+/* ---------- DESKTOP STAGGER ---------- */
+@media (min-width: 1051px) {
+    .long-ride-grid {
+        align-items: start !important;
+        padding-top: 24px;
+        padding-bottom: 34px;
+    }
+
+    .long-ride-card,
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        min-height: 470px !important;
+    }
+
+    .long-ride-card:nth-child(1),
+    .long-ride-card:nth-child(3) {
+        transform: translateY(-16px) !important;
+    }
+
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        transform: translateY(26px) !important;
+    }
+
+    .long-ride-card:nth-child(1):hover,
+    .long-ride-card:nth-child(3):hover {
+        transform: translateY(-23px) !important;
+    }
+
+    .long-ride-card:nth-child(2):hover,
+    .long-ride-card:nth-child(4):hover {
+        transform: translateY(19px) !important;
+    }
+}
+
+/* ---------- TABLET: gentle 2 x 2 stagger ---------- */
+@media (min-width: 701px) and (max-width: 1050px) {
+    .long-ride-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 24px !important;
+        padding-top: 14px;
+        padding-bottom: 22px;
+    }
+
+    .long-ride-card:nth-child(1),
+    .long-ride-card:nth-child(3) {
+        transform: translateY(-8px) !important;
+    }
+
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        transform: translateY(12px) !important;
+    }
+}
+
+/* ---------- MOBILE: 2 x 2, compact reference-style layout ---------- */
+@media (max-width: 700px) {
+    .long-ride-savings {
+        padding: 50px 0 54px !important;
+        background:
+            radial-gradient(circle at 18% 12%, rgba(255,107,0,.10), transparent 24%),
+            radial-gradient(circle at 86% 82%, rgba(255,107,0,.06), transparent 28%),
+            #080d19 !important;
+    }
+
+    .long-ride-shell {
+        width: calc(100% - 22px) !important;
+    }
+
+    .long-ride-heading {
+        margin-bottom: 22px !important;
+    }
+
+    .long-ride-kicker {
+        font-size: .56rem !important;
+        letter-spacing: .14em !important;
+    }
+
+    .long-ride-heading h2 {
+        color: #f5f7fb !important;
+        font-size: clamp(2.45rem, 14vw, 3.4rem) !important;
+        line-height: .92 !important;
+    }
+
+    .long-ride-heading p {
+        color: #9ba9bd !important;
+        font-size: .88rem !important;
+    }
+
+    .long-ride-heading p strong {
+        color: #ffffff !important;
+    }
+
+    .long-ride-discount-note {
+        width: 100% !important;
+        padding: 11px 13px !important;
+        border-radius: 14px !important;
+        background: rgba(255,107,0,.07) !important;
+        border: 1px solid rgba(255,107,0,.16) !important;
+    }
+
+    .long-ride-discount-note strong {
+        color: #ff984f !important;
+        font-size: .68rem !important;
+    }
+
+    .long-ride-discount-note span {
+        color: #8e9cb0 !important;
+        font-size: .57rem !important;
+    }
+
+    .long-ride-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+        padding: 8px 0 12px !important;
+        align-items: start !important;
+    }
+
+    .long-ride-card,
+    .long-ride-card:nth-child(1),
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(3),
+    .long-ride-card:nth-child(4) {
+        min-width: 0 !important;
+        min-height: 0 !important;
+        transform: none !important;
+        border-radius: 18px !important;
+        background:
+            linear-gradient(145deg, #111a2a, #0c1422) !important;
+        border: 1px solid rgba(255,255,255,.07) !important;
+        box-shadow: 0 12px 26px rgba(0,0,0,.22) !important;
+        overflow: hidden !important;
+    }
+
+    /* small alternating vertical rhythm like the mobile reference */
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        margin-top: 26px !important;
+    }
+
+    .long-ride-image-wrap {
+        width: calc(100% - 14px) !important;
+        height: 128px !important;
+        min-height: 128px !important;
+        margin: 7px !important;
+        padding: 6px !important;
+        border-radius: 14px !important;
+        background: #ffffff !important;
+        border: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .long-ride-image-wrap img.long-ride-scooter-image,
+    .long-ride-scooter-image--honda-activa,
+    .long-ride-scooter-image--suzuki-access-125,
+    .long-ride-scooter-image--yamaha-rayzr-125,
+    .long-ride-scooter-image--bajaj-chetak {
+        width: 92% !important;
+        max-width: 92% !important;
+        height: 116px !important;
+        max-height: 116px !important;
+        object-fit: contain !important;
+        object-position: center !important;
+        transform: none !important;
+        filter: drop-shadow(0 7px 8px rgba(0,0,0,.12)) !important;
+    }
+
+    .long-ride-card-body {
+        padding: 8px 10px 12px !important;
+    }
+
+    .long-ride-meta {
+        margin-bottom: 5px !important;
+        gap: 5px !important;
+    }
+
+    .long-ride-fuel {
+        min-height: 21px !important;
+        padding: 0 6px !important;
+        font-size: .43rem !important;
+    }
+
+    .long-ride-daily {
+        font-size: .43rem !important;
+    }
+
+    .long-ride-card h3 {
+        min-height: auto !important;
+        margin: 0 0 7px !important;
+        color: #f5f8fc !important;
+        font-size: .82rem !important;
+        line-height: 1.15 !important;
+    }
+
+    .long-ride-prices {
+        gap: 5px !important;
+    }
+
+    .long-ride-price-row {
+        min-height: 29px !important;
+        padding: 0 6px !important;
+        border-radius: 8px !important;
+        background: rgba(255,255,255,.04) !important;
+    }
+
+    .long-ride-price-row strong {
+        font-size: .58rem !important;
+    }
+
+    .long-ride-price-row b {
+        font-size: .63rem !important;
+    }
+
+    .long-ride-price-row span {
+        display: none !important;
+    }
+
+    .long-ride-card-link {
+        margin-top: 8px !important;
+        font-size: .52rem !important;
+        color: #ff8b39 !important;
+    }
+
+    .long-ride-footer {
+        margin-top: 24px !important;
+        padding-top: 12px !important;
+        border-top: 1px solid rgba(255,255,255,.05) !important;
+    }
+
+    .long-ride-footer a {
+        color: #ff7a1a !important;
+        font-size: .62rem !important;
+    }
+}
+
+/* Extra-small phones */
+@media (max-width: 390px) {
+    .long-ride-grid {
+        gap: 9px !important;
+    }
+
+    .long-ride-card:nth-child(2),
+    .long-ride-card:nth-child(4) {
+        margin-top: 20px !important;
+    }
+
+    .long-ride-image-wrap {
+        height: 116px !important;
+        min-height: 116px !important;
+    }
+
+    .long-ride-image-wrap img.long-ride-scooter-image,
+    .long-ride-scooter-image--honda-activa,
+    .long-ride-scooter-image--suzuki-access-125,
+    .long-ride-scooter-image--yamaha-rayzr-125,
+    .long-ride-scooter-image--bajaj-chetak {
+        height: 104px !important;
+        max-height: 104px !important;
+    }
+
+    .long-ride-card h3 {
+        font-size: .74rem !important;
+    }
+
+    .long-ride-price-row strong,
+    .long-ride-price-row b {
+        font-size: .54rem !important;
+    }
+}
+
+
+/* =========================================================
+   V22 — CLEAN LONG-RIDE PRICE ROWS
+   Removes the heavy boxed look from 7 / 15 / 30 day prices.
+   Keeps the current staggered desktop layout and mobile 2x2 layout.
+========================================================= */
+
+.long-ride-prices {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 7px !important;
+    margin-top: 10px !important;
+}
+
+.long-ride-price-row {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: minmax(64px, 1fr) auto auto !important;
+    align-items: center !important;
+    gap: 9px !important;
+    min-height: 38px !important;
+    padding: 8px 10px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,.025),
+            rgba(255,255,255,.045)
+        ) !important;
+    box-shadow: none !important;
+    transition:
+        background .25s ease,
+        transform .25s ease !important;
+}
+
+.long-ride-price-row::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    border-radius: 999px;
+    background: rgba(255,107,0,.38);
+    opacity: 0;
+    transition: opacity .25s ease;
+}
+
+.long-ride-price-row:hover {
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,107,0,.055),
+            rgba(255,255,255,.04)
+        ) !important;
+    transform: translateX(3px) !important;
+}
+
+.long-ride-price-row:hover::before {
+    opacity: 1;
+}
+
+.long-ride-price-row strong,
+.long-ride-price-row .days {
+    color: #aab6c8 !important;
+    font-size: .78rem !important;
+    font-weight: 650 !important;
+    letter-spacing: .01em;
+}
+
+.long-ride-price-row b {
+    color: #ffffff !important;
+    font-size: .86rem !important;
+    font-weight: 800 !important;
+    text-align: right;
+}
+
+.long-ride-price-row span:last-child {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 22px;
+    padding: 3px 7px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: rgba(255,107,0,.095) !important;
+    color: #ff9850 !important;
+    font-size: .49rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap;
+}
+
+/* Desktop/tablet refinement */
+@media (min-width: 701px) {
+    .long-ride-price-row {
+        min-height: 40px !important;
+        padding: 9px 11px !important;
+    }
+
+    .long-ride-price-row strong,
+    .long-ride-price-row .days {
+        font-size: .8rem !important;
+    }
+
+    .long-ride-price-row b {
+        font-size: .9rem !important;
+    }
+}
+
+/* Mobile keeps the same design but more compact */
+@media (max-width: 700px) {
+    .long-ride-prices {
+        gap: 5px !important;
+        margin-top: 7px !important;
+    }
+
+    .long-ride-price-row {
+        grid-template-columns: minmax(48px, 1fr) auto !important;
+        gap: 6px !important;
+        min-height: 30px !important;
+        padding: 6px 7px !important;
+        border-radius: 8px !important;
+    }
+
+    .long-ride-price-row strong,
+    .long-ride-price-row .days {
+        font-size: .55rem !important;
+    }
+
+    .long-ride-price-row b {
+        font-size: .6rem !important;
+    }
+
+    .long-ride-price-row span:last-child {
+        display: none !important;
+    }
+
+    .long-ride-price-row:hover {
+        transform: none !important;
+    }
+}
+
+
+/* =========================================================
+   STEP 1 — VEHICLE DETAILS PAGE
+   Mobile-first responsive, reuses BikeRental dark/orange design.
+========================================================= */
+
+.vehicle-card-actions {
+    display: grid;
+    grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.vehicle-card-actions .btn-primary,
+.vehicle-card-actions .unavailable-btn {
+    width: 100%;
+    margin: 0;
+}
+
+.vehicle-details-btn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 10px;
+    background: rgba(255,255,255,.03);
+    color: #edf3fb;
+    text-decoration: none;
+    font-size: .72rem;
+    font-weight: 800;
+    transition:
+        border-color .22s ease,
+        background .22s ease,
+        transform .22s ease;
+}
+
+.vehicle-details-btn:hover {
+    border-color: rgba(255,107,0,.34);
+    background: rgba(255,107,0,.07);
+    transform: translateY(-1px);
+}
+
+.vehicle-card-image-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.vehicle-card-name-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.vehicle-card-name-link:hover {
+    color: #ff7a1a;
+}
+
+.vehicle-details-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 82% 18%, rgba(255,107,0,.08), transparent 24%),
+        #080d19;
+}
+
+.vehicle-details-main {
+    min-height: calc(100vh - 82px);
+    padding: clamp(28px, 4vw, 54px) max(16px, 4vw) clamp(66px, 7vw, 96px);
+}
+
+.vehicle-details-shell {
+    width: min(1320px, 100%);
+    margin: 0 auto;
+}
+
+.vehicle-back-link {
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 26px;
+    color: #8998ac;
+    text-decoration: none;
+    font-size: .76rem;
+    font-weight: 750;
+    transition: color .2s ease, transform .2s ease;
+}
+
+.vehicle-back-link:hover {
+    color: #ff7a1a;
+    transform: translateX(-3px);
+}
+
+.vehicle-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr);
+    gap: clamp(34px, 5vw, 76px);
+    align-items: center;
+}
+
+.vehicle-detail-visual {
+    position: relative;
+    min-height: 570px;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+}
+
+.vehicle-detail-orbit {
+    position: absolute;
+    z-index: -1;
+    width: min(470px, 78%);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: clamp(38px, 5vw, 60px) solid #ff6b00;
+    background: #08101f;
+    box-shadow:
+        0 0 52px rgba(255,107,0,.17),
+        0 0 0 16px rgba(255,107,0,.025);
+}
+
+.vehicle-detail-orbit::after {
+    content: "";
+    position: absolute;
+    width: 125%;
+    height: 28%;
+    left: -12%;
+    bottom: -14%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,107,0,.28);
+    transform: rotate(-8deg);
+}
+
+.vehicle-detail-image-frame {
+    width: min(610px, 100%);
+    min-height: 430px;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+}
+
+.vehicle-detail-image-frame img {
+    width: 100%;
+    max-width: 590px;
+    height: 420px;
+    object-fit: contain;
+    filter: drop-shadow(0 34px 32px rgba(0,0,0,.54));
+    transition: transform .4s cubic-bezier(.16,1,.3,1);
+}
+
+.vehicle-detail-visual:hover .vehicle-detail-image-frame img {
+    transform: translateY(-5px) scale(1.015);
+}
+
+.vehicle-detail-image-fallback {
+    font-size: 7rem;
+}
+
+.vehicle-detail-availability {
+    position: absolute;
+    z-index: 5;
+    top: 28px;
+    right: 3%;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: .62rem;
+    font-weight: 900;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    backdrop-filter: blur(12px);
+}
+
+.vehicle-detail-availability.is-available {
+    color: #5ee4a7;
+    border: 1px solid rgba(53,212,167,.24);
+    background: rgba(53,212,167,.09);
+}
+
+.vehicle-detail-availability.is-unavailable {
+    color: #ff8c8c;
+    border: 1px solid rgba(255,86,86,.22);
+    background: rgba(255,86,86,.08);
+}
+
+.vehicle-detail-mini-trust {
+    position: absolute;
+    left: 3%;
+    bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.vehicle-detail-mini-trust span {
+    min-height: 31px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 999px;
+    background: rgba(8,14,26,.72);
+    color: #98a7ba;
+    font-size: .58rem;
+    backdrop-filter: blur(10px);
+}
+
+.vehicle-detail-mini-trust span:first-child {
+    color: #55ddb0;
+}
+
+.vehicle-detail-copy {
+    max-width: 620px;
+}
+
+.vehicle-detail-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.vehicle-detail-copy h1 {
+    margin: 18px 0 13px;
+    color: #f4f7fb;
+    font-family: var(--font-display);
+    font-size: clamp(2.8rem, 5vw, 5.4rem);
+    line-height: .96;
+    letter-spacing: -.055em;
+}
+
+.vehicle-detail-subtitle {
+    max-width: 570px;
+    margin: 0;
+    color: #94a3b8;
+    font-size: .94rem;
+    line-height: 1.68;
+}
+
+.vehicle-detail-price-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 12px;
+    margin-top: 27px;
+}
+
+.vehicle-detail-price-card {
+    min-height: 126px;
+    padding: 17px;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 17px;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
+}
+
+.vehicle-detail-price-card span,
+.vehicle-detail-price-card strong,
+.vehicle-detail-price-card small {
+    display: block;
+}
+
+.vehicle-detail-price-card span {
+    color: #8291a6;
+    font-size: .65rem;
+    font-weight: 750;
+}
+
+.vehicle-detail-price-card strong {
+    margin-top: 8px;
+    color: #ff7a1a;
+    font-family: var(--font-display);
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+.vehicle-detail-price-card small {
+    margin-top: 7px;
+    color: #64748b;
+    font-size: .58rem;
+}
+
+.vehicle-detail-price-card.is-muted strong {
+    color: #8492a6;
+    font-size: 1rem;
+}
+
+.vehicle-detail-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.vehicle-detail-facts > div {
+    min-height: 75px;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 13px;
+    background: rgba(255,255,255,.02);
+}
+
+.vehicle-detail-facts span,
+.vehicle-detail-facts strong {
+    display: block;
+}
+
+.vehicle-detail-facts span {
+    color: #69798f;
+    font-size: .55rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.vehicle-detail-facts strong {
+    margin-top: 5px;
+    color: #edf3fb;
+    font-size: .72rem;
+}
+
+.vehicle-detail-how {
+    margin-top: 24px;
+}
+
+.vehicle-detail-how-label {
+    color: #ff7a1a;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .14em;
+}
+
+.vehicle-detail-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 7px;
+    margin-top: 10px;
+}
+
+.vehicle-detail-steps > div {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+}
+
+.vehicle-detail-steps b {
+    flex: 0 0 25px;
+    width: 25px;
+    height: 25px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(255,107,0,.11);
+    color: #ff8c3a;
+    font-size: .58rem;
+}
+
+.vehicle-detail-steps span {
+    color: #96a4b8;
+    font-size: .59rem;
+    line-height: 1.2;
+}
+
+.vehicle-detail-actions {
+    display: grid;
+    grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr);
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.vehicle-detail-book-btn,
+.vehicle-detail-secondary-btn {
+    min-height: 52px;
+}
+
+.vehicle-detail-secondary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 11px;
+    background: rgba(255,255,255,.025);
+    color: #eaf1fb;
+    text-decoration: none;
+    font-size: .74rem;
+    font-weight: 800;
+}
+
+.vehicle-detail-secondary-btn:hover {
+    border-color: rgba(255,107,0,.28);
+    background: rgba(255,107,0,.055);
+}
+
+.vehicle-detail-unavailable-note {
+    margin-top: 12px;
+    color: #ff9b9b;
+    font-size: .66rem;
+}
+
+.vehicle-detail-benefits {
+    width: min(1320px, 100%);
+    margin: clamp(54px, 7vw, 90px) auto 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    border-top: 1px solid rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.vehicle-detail-benefits > div {
+    min-height: 150px;
+    padding: 24px 20px;
+    border-right: 1px solid rgba(255,255,255,.06);
+}
+
+.vehicle-detail-benefits > div:last-child {
+    border-right: 0;
+}
+
+.vehicle-detail-benefits span,
+.vehicle-detail-benefits strong,
+.vehicle-detail-benefits small {
+    display: block;
+}
+
+.vehicle-detail-benefits span {
+    color: #ff7a1a;
+    font-family: var(--font-display);
+    font-size: .68rem;
+}
+
+.vehicle-detail-benefits strong {
+    margin-top: 12px;
+    color: #edf3fb;
+    font-family: var(--font-display);
+    font-size: .88rem;
+}
+
+.vehicle-detail-benefits small {
+    margin-top: 7px;
+    color: #728198;
+    font-size: .61rem;
+    line-height: 1.5;
+}
+
+.vehicle-detail-loading {
+    min-height: 570px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+}
+
+.vehicle-detail-skeleton {
+    border-radius: 18px;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,.03), rgba(255,255,255,.07), rgba(255,255,255,.03));
+    background-size: 200% 100%;
+    animation: vehicleDetailSkeleton 1.2s linear infinite;
+}
+
+.vehicle-detail-skeleton-image {
+    height: 440px;
+}
+
+.vehicle-detail-skeleton-copy {
+    display: grid;
+    gap: 16px;
+}
+
+.vehicle-detail-skeleton-copy .line-lg {
+    width: 90%;
+    height: 72px;
+}
+
+.vehicle-detail-skeleton-copy .line-md {
+    width: 72%;
+    height: 22px;
+}
+
+.vehicle-detail-skeleton-copy .line-sm {
+    width: 56%;
+    height: 18px;
+}
+
+@keyframes vehicleDetailSkeleton {
+    to { background-position: -200% 0; }
+}
+
+.vehicle-detail-error {
+    min-height: 520px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    text-align: center;
+}
+
+.vehicle-detail-error-icon {
+    width: 62px;
+    height: 62px;
+    display: grid;
+    place-items: center;
+    border-radius: 20px;
+    background: rgba(255,107,0,.10);
+    color: #ff7a1a;
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+}
+
+.vehicle-detail-error h1 {
+    margin-top: 18px;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+.vehicle-detail-error p {
+    max-width: 500px;
+    margin: 9px auto 20px;
+    color: #8c9aae;
+}
+
+/* Tablet */
+@media (max-width: 960px) {
+    .vehicle-detail-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .vehicle-detail-visual {
+        min-height: 480px;
+    }
+
+    .vehicle-detail-copy {
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .vehicle-detail-benefits {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+
+    .vehicle-detail-benefits > div:nth-child(2) {
+        border-right: 0;
+    }
+
+    .vehicle-detail-benefits > div:nth-child(-n+2) {
+        border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .vehicle-detail-loading {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .vehicle-card-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-details-main {
+        padding: 22px 12px 54px;
+    }
+
+    .vehicle-back-link {
+        margin-bottom: 16px;
+    }
+
+    .vehicle-detail-visual {
+        min-height: 330px;
+    }
+
+    .vehicle-detail-orbit {
+        width: 260px;
+        border-width: 34px;
+    }
+
+    .vehicle-detail-image-frame {
+        min-height: 280px;
+        padding: 8px;
+    }
+
+    .vehicle-detail-image-frame img {
+        height: 270px;
+    }
+
+    .vehicle-detail-availability {
+        top: 7px;
+        right: 4px;
+    }
+
+    .vehicle-detail-mini-trust {
+        left: 4px;
+        right: 4px;
+        bottom: 5px;
+        justify-content: center;
+    }
+
+    .vehicle-detail-copy h1 {
+        margin-top: 13px;
+        font-size: clamp(2.45rem, 13vw, 3.7rem);
+    }
+
+    .vehicle-detail-subtitle {
+        font-size: .86rem;
+    }
+
+    .vehicle-detail-price-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 20px;
+    }
+
+    .vehicle-detail-price-card {
+        min-height: 111px;
+        padding: 13px;
+    }
+
+    .vehicle-detail-facts {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .vehicle-detail-facts > div {
+        min-height: 58px;
+    }
+
+    .vehicle-detail-steps {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 10px;
+    }
+
+    .vehicle-detail-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-detail-benefits {
+        grid-template-columns: 1fr 1fr;
+        margin-top: 48px;
+    }
+
+    .vehicle-detail-benefits > div {
+        min-height: 135px;
+        padding: 18px 14px;
+    }
+
+    .vehicle-detail-skeleton-image {
+        height: 300px;
+    }
+
+    .vehicle-detail-loading {
+        min-height: 450px;
+        gap: 24px;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-detail-price-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-detail-benefits {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-detail-benefits > div,
+    .vehicle-detail-benefits > div:nth-child(2) {
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .vehicle-detail-benefits > div:last-child {
+        border-bottom: 0;
+    }
+}
+
+
+/* =========================================================
+   STEP 2 — VEHICLE SEARCH + SORT
+========================================================= */
+
+.fleet-discovery-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 290px);
+    gap: 12px;
+    margin: 18px 0 12px;
+}
+
+.vehicle-search-wrap {
+    position: relative;
+    min-width: 0;
+}
+
+.vehicle-search-icon {
+    position: absolute;
+    z-index: 2;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ff7a1a;
+    font-size: 1.05rem;
+    pointer-events: none;
+}
+
+.vehicle-search-input {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 46px 0 44px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    outline: none;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
+    color: #f3f7fc;
+    font: inherit;
+    font-size: .79rem;
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+}
+
+.vehicle-search-input::placeholder {
+    color: #67778d;
+}
+
+.vehicle-search-input:focus {
+    border-color: rgba(255,107,0,.42);
+    background: rgba(255,255,255,.04);
+    box-shadow: 0 0 0 4px rgba(255,107,0,.07);
+}
+
+.vehicle-search-clear {
+    position: absolute;
+    z-index: 2;
+    right: 10px;
+    top: 50%;
+    width: 31px;
+    height: 31px;
+    display: grid;
+    place-items: center;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 9px;
+    background: rgba(255,255,255,.055);
+    color: #aeb9c8;
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.vehicle-search-clear:hover {
+    background: rgba(255,107,0,.10);
+    color: #ff8d3b;
+}
+
+.vehicle-sort-wrap {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr);
+    align-items: center;
+    gap: 9px;
+    padding: 0 10px 0 14px;
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 14px;
+    background:
+        linear-gradient(145deg, rgba(255,255,255,.035), rgba(255,255,255,.018));
+}
+
+.vehicle-sort-wrap label span {
+    color: #748399;
+    font-size: .61rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.vehicle-sort-select {
+    min-width: 0;
+    width: 100%;
+    min-height: 50px;
+    padding: 0 31px 0 8px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #edf3fb;
+    font: inherit;
+    font-size: .71rem;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.vehicle-sort-select option {
+    background: #101827;
+    color: #f2f6fc;
+}
+
+.active-discovery-summary {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 7px 8px 7px 13px;
+    border: 1px solid rgba(255,107,0,.13);
+    border-radius: 11px;
+    background: rgba(255,107,0,.045);
+}
+
+.active-discovery-summary > div {
+    min-width: 0;
+    color: #9cabbf;
+    font-size: .62rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.active-discovery-summary button {
+    flex: 0 0 auto;
+    min-height: 28px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(255,107,0,.10);
+    color: #ff9450;
+    font-size: .55rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.active-discovery-summary button:hover {
+    background: rgba(255,107,0,.16);
+}
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .fleet-discovery-toolbar {
+        grid-template-columns: minmax(0,1fr) minmax(205px, 250px);
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .fleet-discovery-toolbar {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        margin-top: 14px;
+    }
+
+    .vehicle-search-input {
+        min-height: 49px;
+        border-radius: 12px;
+        font-size: .72rem;
+    }
+
+    .vehicle-sort-wrap {
+        min-height: 48px;
+        grid-template-columns: 58px minmax(0,1fr);
+        border-radius: 12px;
+    }
+
+    .vehicle-sort-select {
+        min-height: 46px;
+        font-size: .68rem;
+    }
+
+    .active-discovery-summary {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 7px;
+        padding: 9px 10px;
+    }
+
+    .active-discovery-summary > div {
+        width: 100%;
+        white-space: normal;
+        line-height: 1.45;
+    }
+
+    .active-discovery-summary button {
+        min-height: 30px;
+    }
+}
