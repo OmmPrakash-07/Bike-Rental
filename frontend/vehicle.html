@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0f1e">
+    <title>Vehicle Details | BikeRental</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+
+<body class="vehicle-details-page">
+    <nav class="navbar">
+        <a class="logo logo-link" href="index.html" aria-label="BikeRental home">
+            Bike<span>Rental</span>
+        </a>
+
+        <div class="nav-actions">
+            <a class="nav-services-link" href="vehicles.html">Browse Vehicles</a>
+            <a id="accountLink" class="login-nav-btn" href="account.html">Login / Sign Up</a>
+
+            <div id="userMenu" class="user-menu" hidden>
+                <button id="userMenuButton" class="user-menu-button" type="button" aria-expanded="false">
+                    <span id="userAvatar" class="user-avatar">U</span>
+                    <span id="userMenuName" class="user-menu-name">User</span>
+                    <span class="user-menu-arrow">⌄</span>
+                </button>
+
+                <div id="userMenuDropdown" class="user-menu-dropdown" hidden>
+                    <a href="account.html">Profile</a>
+                    <button id="logoutButton" type="button">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <button id="mobileMenuButton" class="mobile-menu-button" type="button"
+            aria-label="Open navigation menu" aria-controls="mobileMenu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+
+    <aside id="mobileMenu" class="mobile-menu-drawer" aria-hidden="true" aria-label="Site navigation">
+        <div class="mobile-menu-header">
+            <a class="logo mobile-menu-logo" href="index.html">Bike<span>Rental</span></a>
+            <button id="mobileMenuClose" class="mobile-menu-close" type="button" aria-label="Close menu">×</button>
+        </div>
+
+        <div id="mobileUserSummary" class="mobile-user-summary" hidden>
+            <span id="mobileUserAvatar" class="mobile-user-avatar">U</span>
+            <div>
+                <strong id="mobileUserName">User</strong>
+                <small>Signed in</small>
+            </div>
+        </div>
+
+        <nav class="mobile-menu-links">
+            <a href="index.html"><span>⌂</span> Home</a>
+            <a href="vehicles.html"><span>🏍</span> Browse Vehicles</a>
+            <a href="services.html"><span>◇</span> Services</a>
+            <a href="vehicles.html#my-bookings"><span>▣</span> My Bookings</a>
+            <a href="vehicles.html#help"><span>☎</span> Need Help?</a>
+        </nav>
+
+        <div class="mobile-menu-account">
+            <a id="mobileAccountLink" class="mobile-menu-primary" href="account.html?mode=login">Login / Sign Up</a>
+            <a id="mobileProfileLink" href="account.html" hidden>Profile</a>
+            <button id="mobileLogoutButton" type="button" hidden>Logout</button>
+        </div>
+    </aside>
+
+    <main class="vehicle-details-main">
+        <section class="vehicle-details-shell">
+            <a class="vehicle-back-link" href="vehicles.html">← Back to Browse Vehicles</a>
+
+            <div id="vehicleDetailLoading" class="vehicle-detail-loading">
+                <div class="vehicle-detail-skeleton vehicle-detail-skeleton-image"></div>
+                <div class="vehicle-detail-skeleton-copy">
+                    <div class="vehicle-detail-skeleton line-lg"></div>
+                    <div class="vehicle-detail-skeleton line-md"></div>
+                    <div class="vehicle-detail-skeleton line-sm"></div>
+                </div>
+            </div>
+
+            <div id="vehicleDetailError" class="vehicle-detail-error" hidden>
+                <div class="vehicle-detail-error-icon">!</div>
+                <h1>Vehicle could not be opened</h1>
+                <p id="vehicleDetailErrorText">Please go back and try another vehicle.</p>
+                <a href="vehicles.html" class="btn-primary">Browse Vehicles</a>
+            </div>
+
+            <article id="vehicleDetailContent" class="vehicle-detail-layout" hidden>
+                <div class="vehicle-detail-visual">
+                    <div class="vehicle-detail-orbit" aria-hidden="true"></div>
+
+                    <span id="vehicleAvailabilityBadge" class="vehicle-detail-availability">Available</span>
+
+                    <div class="vehicle-detail-image-frame">
+                        <img id="vehicleDetailImage" src="" alt="">
+                        <div id="vehicleDetailImageFallback" class="vehicle-detail-image-fallback" hidden>🏍️</div>
+                    </div>
+
+                    <div class="vehicle-detail-mini-trust">
+                        <span>● Live availability</span>
+                        <span>Secure account booking</span>
+                    </div>
+                </div>
+
+                <div class="vehicle-detail-copy">
+                    <span class="section-label">VEHICLE DETAILS</span>
+
+                    <div class="vehicle-detail-pills">
+                        <span id="vehicleTypePill" class="vehicle-meta-pill">Vehicle</span>
+                        <span id="vehicleFuelPill" class="vehicle-meta-pill">Fuel</span>
+                    </div>
+
+                    <h1 id="vehicleDetailName">Vehicle</h1>
+                    <p id="vehicleDetailSubtitle" class="vehicle-detail-subtitle">
+                        Choose your rental duration and book securely from your BikeRental account.
+                    </p>
+
+                    <div class="vehicle-detail-price-grid">
+                        <div id="hourlyPriceCard" class="vehicle-detail-price-card">
+                            <span>Hourly rental</span>
+                            <strong id="vehicleHourlyPrice">—</strong>
+                            <small>Best for short city rides</small>
+                        </div>
+
+                        <div class="vehicle-detail-price-card">
+                            <span>Daily rental</span>
+                            <strong id="vehicleDailyPrice">—</strong>
+                            <small>Flexible 1–30 day rental</small>
+                        </div>
+                    </div>
+
+                    <div class="vehicle-detail-facts">
+                        <div>
+                            <span>Availability</span>
+                            <strong id="vehicleAvailabilityText">Checking…</strong>
+                        </div>
+                        <div>
+                            <span>Vehicle type</span>
+                            <strong id="vehicleTypeText">—</strong>
+                        </div>
+                        <div>
+                            <span>Fuel type</span>
+                            <strong id="vehicleFuelText">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="vehicle-detail-how">
+                        <span class="vehicle-detail-how-label">HOW BOOKING WORKS</span>
+                        <div class="vehicle-detail-steps">
+                            <div><b>1</b><span>Choose date</span></div>
+                            <div><b>2</b><span>Hours or days</span></div>
+                            <div><b>3</b><span>Review amount</span></div>
+                            <div><b>4</b><span>Send request</span></div>
+                        </div>
+                    </div>
+
+                    <div class="vehicle-detail-actions">
+                        <button id="vehicleBookButton" class="btn-primary vehicle-detail-book-btn" type="button">
+                            Book This Vehicle
+                        </button>
+                        <a class="vehicle-detail-secondary-btn" href="vehicles.html">Compare Other Vehicles</a>
+                    </div>
+
+                    <p id="vehicleDetailUnavailableNote" class="vehicle-detail-unavailable-note" hidden>
+                        This vehicle is currently unavailable. You can still compare other available vehicles.
+                    </p>
+                </div>
+            </article>
+        </section>
+
+        <section class="vehicle-detail-benefits">
+            <div>
+                <span>01</span>
+                <strong>Live fleet</strong>
+                <small>Availability comes from the current vehicle record.</small>
+            </div>
+            <div>
+                <span>02</span>
+                <strong>Hourly or daily</strong>
+                <small>Choose the rental duration that fits your ride.</small>
+            </div>
+            <div>
+                <span>03</span>
+                <strong>Backend pricing</strong>
+                <small>The booking amount is calculated by the backend.</small>
+            </div>
+            <div>
+                <span>04</span>
+                <strong>Private booking</strong>
+                <small>Your booking is linked to your signed-in account.</small>
+            </div>
+        </section>
+    </main>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <footer>
+        <div class="logo">Bike<span>Rental</span></div>
+        <div>Simple bike rental management project.</div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="vehicle-details.js"></script>
+</body>
+
+</html>
