@@ -123,53 +123,112 @@
 
             <div class="vehicle-filter-panel" aria-label="Vehicle filters">
                 <div class="vehicle-filter-heading">
-                    <div>
-                        <span class="section-label">FILTER YOUR RIDE</span>
-                        <h2>Find the right vehicle</h2>
-                        <p>Choose Bike or Scooty, then narrow the list by Petrol or Electric.</p>
+                    <div class="vehicle-filter-intro">
+                        <span class="vehicle-filter-eyebrow">
+                            <span class="vehicle-filter-eyebrow-icon">⌁</span>
+                            FILTER YOUR RIDE
+                        </span>
+                        <h2>Find your <span>perfect ride</span></h2>
+                        <p>Choose what you want to ride, then select Petrol or Electric.</p>
                     </div>
 
                     <button id="clearVehicleFiltersButton" class="filter-clear-btn" type="button"
                         onclick="clearVehicleFilters()" hidden>
+                        <span aria-hidden="true">×</span>
                         Clear filters
                     </button>
                 </div>
 
                 <div class="vehicle-filter-groups">
-                    <div class="vehicle-filter-group">
-                        <span class="vehicle-filter-label">Vehicle Type</span>
-                        <div class="vehicle-filter-options vehicle-type-options" role="group" aria-label="Filter by vehicle type">
-                            <button class="vehicle-filter-option is-active" type="button" data-category-filter="ALL" onclick="setVehicleCategoryFilter('ALL')">
-                                <span class="filter-option-icon">✦</span><span class="filter-option-copy"><strong>All</strong><small id="allVehicleCount">0 rides</small></span>
-                            </button>
-                            <button class="vehicle-filter-option" type="button" data-category-filter="BIKE" onclick="setVehicleCategoryFilter('BIKE')">
-                                <span class="filter-option-icon">🏍</span><span class="filter-option-copy"><strong>Bikes</strong><small id="bikeVehicleCount">0 bikes</small></span>
-                            </button>
-                            <button class="vehicle-filter-option" type="button" data-category-filter="SCOOTY" onclick="setVehicleCategoryFilter('SCOOTY')">
-                                <span class="filter-option-icon">🛵</span><span class="filter-option-copy"><strong>Scooties</strong><small id="scootyVehicleCount">0 scooties</small></span>
-                            </button>
+                    <section class="vehicle-filter-group" aria-labelledby="vehicleTypeFilterTitle">
+                        <div class="vehicle-filter-group-head">
+                            <span class="vehicle-filter-step">01</span>
+                            <div>
+                                <h3 id="vehicleTypeFilterTitle">Vehicle Type</h3>
+                                <p>Choose Bike or Scooty</p>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="vehicle-filter-group">
-                        <span class="vehicle-filter-label">Fuel Type</span>
-                        <div class="vehicle-filter-options fuel-filter-options" role="group" aria-label="Filter by fuel type">
-                            <button class="vehicle-filter-option compact-filter-option is-active" type="button" data-fuel-filter="ALL" onclick="setVehicleFuelFilter('ALL')">
-                                <span class="fuel-dot fuel-dot-all"></span><span class="filter-option-copy"><strong>All</strong><small id="allFuelCount">0 rides</small></span>
+                        <div class="vehicle-filter-options vehicle-type-options" role="group"
+                            aria-label="Filter by vehicle type">
+                            <button class="vehicle-filter-option is-active" type="button"
+                                data-category-filter="ALL" onclick="setVehicleCategoryFilter('ALL')">
+                                <span class="filter-option-icon filter-icon-all">✦</span>
+                                <span class="filter-option-copy">
+                                    <strong>All</strong>
+                                    <small id="allVehicleCount">0 rides</small>
+                                </span>
                             </button>
-                            <button class="vehicle-filter-option compact-filter-option" type="button" data-fuel-filter="PETROL" onclick="setVehicleFuelFilter('PETROL')">
-                                <span class="fuel-dot fuel-dot-petrol"></span><span class="filter-option-copy"><strong>Petrol</strong><small id="petrolVehicleCount">0 rides</small></span>
+
+                            <button class="vehicle-filter-option" type="button"
+                                data-category-filter="BIKE" onclick="setVehicleCategoryFilter('BIKE')">
+                                <span class="filter-option-icon">🏍</span>
+                                <span class="filter-option-copy">
+                                    <strong>Bike</strong>
+                                    <small id="bikeVehicleCount">0 bikes</small>
+                                </span>
                             </button>
-                            <button class="vehicle-filter-option compact-filter-option" type="button" data-fuel-filter="ELECTRIC" onclick="setVehicleFuelFilter('ELECTRIC')">
-                                <span class="fuel-dot fuel-dot-electric"></span><span class="filter-option-copy"><strong>Electric</strong><small id="electricVehicleCount">0 rides</small></span>
+
+                            <button class="vehicle-filter-option" type="button"
+                                data-category-filter="SCOOTY" onclick="setVehicleCategoryFilter('SCOOTY')">
+                                <span class="filter-option-icon">🛵</span>
+                                <span class="filter-option-copy">
+                                    <strong>Scooty</strong>
+                                    <small id="scootyVehicleCount">0 scooties</small>
+                                </span>
                             </button>
                         </div>
-                    </div>
+                    </section>
+
+                    <section class="vehicle-filter-group" aria-labelledby="fuelTypeFilterTitle">
+                        <div class="vehicle-filter-group-head">
+                            <span class="vehicle-filter-step">02</span>
+                            <div>
+                                <h3 id="fuelTypeFilterTitle">Fuel Type</h3>
+                                <p>Choose Petrol or Electric</p>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-filter-options fuel-filter-options" role="group"
+                            aria-label="Filter by fuel type">
+                            <button class="vehicle-filter-option compact-filter-option is-active" type="button"
+                                data-fuel-filter="ALL" onclick="setVehicleFuelFilter('ALL')">
+                                <span class="fuel-dot fuel-dot-all"></span>
+                                <span class="filter-option-copy">
+                                    <strong>All</strong>
+                                    <small id="allFuelCount">0 rides</small>
+                                </span>
+                            </button>
+
+                            <button class="vehicle-filter-option compact-filter-option" type="button"
+                                data-fuel-filter="PETROL" onclick="setVehicleFuelFilter('PETROL')">
+                                <span class="fuel-dot fuel-dot-petrol"></span>
+                                <span class="filter-option-copy">
+                                    <strong>Petrol</strong>
+                                    <small id="petrolVehicleCount">0 rides</small>
+                                </span>
+                            </button>
+
+                            <button class="vehicle-filter-option compact-filter-option" type="button"
+                                data-fuel-filter="ELECTRIC" onclick="setVehicleFuelFilter('ELECTRIC')">
+                                <span class="fuel-dot fuel-dot-electric"></span>
+                                <span class="filter-option-copy">
+                                    <strong>Electric</strong>
+                                    <small id="electricVehicleCount">0 rides</small>
+                                </span>
+                            </button>
+                        </div>
+                    </section>
                 </div>
 
                 <div class="vehicle-filter-result-row">
-                    <div id="vehicleFilterResult" class="vehicle-filter-result" aria-live="polite">Showing all vehicles</div>
-                    <div class="vehicle-filter-hint">Bike includes motorcycle / Bullet type vehicles.</div>
+                    <div class="vehicle-filter-result-wrap">
+                        <span class="vehicle-filter-result-dot"></span>
+                        <div id="vehicleFilterResult" class="vehicle-filter-result" aria-live="polite">
+                            Showing all vehicles
+                        </div>
+                    </div>
+                    <div class="vehicle-filter-hint">Motorcycle / Bullet vehicles are included under Bike.</div>
                 </div>
             </div>
 
