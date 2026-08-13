@@ -6210,3 +6210,98 @@ button.vehicle-filter-option.is-active:hover {
         font-size: .44rem;
     }
 }
+
+
+/* ===== V14: fix clipped images in lower services cards on index page ===== */
+.home-service-card {
+    overflow: hidden;
+}
+
+.home-service-art {
+    position: relative;
+    min-height: 360px;
+    padding: 24px 28px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.home-service-card-live .home-service-art,
+.home-service-card-coming .home-service-art {
+    overflow: visible;
+}
+
+.home-service-card-live .service-art-circle,
+.home-service-card-coming .service-art-circle {
+    width: 290px;
+    height: 290px;
+    opacity: .42;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.home-service-art img {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 340px;
+    height: 255px;
+    object-fit: contain;
+    object-position: center;
+    filter: drop-shadow(0 24px 28px rgba(0,0,0,.45));
+}
+
+.home-service-card-live .home-service-art img {
+    max-width: 332px;
+    height: 248px;
+    transform: translateX(-10px);
+}
+
+.home-service-card-coming .home-service-art img {
+    max-width: 332px;
+    height: 248px;
+    transform: translateX(-18px);
+}
+
+@media (max-width: 1100px) {
+    .home-service-art {
+        padding: 20px 22px 24px;
+        min-height: 300px;
+    }
+
+    .home-service-card-live .service-art-circle,
+    .home-service-card-coming .service-art-circle {
+        width: 245px;
+        height: 245px;
+    }
+
+    .home-service-art img,
+    .home-service-card-live .home-service-art img,
+    .home-service-card-coming .home-service-art img {
+        max-width: 290px;
+        height: 214px;
+        transform: translateX(0);
+    }
+}
+
+@media (max-width: 700px) {
+    .home-service-art {
+        min-height: 230px;
+        padding: 18px 18px 20px;
+    }
+
+    .home-service-card-live .service-art-circle,
+    .home-service-card-coming .service-art-circle {
+        width: 210px;
+        height: 210px;
+    }
+
+    .home-service-art img,
+    .home-service-card-live .home-service-art img,
+    .home-service-card-coming .home-service-art img {
+        max-width: 250px;
+        height: 188px;
+        transform: translateX(0);
+    }
+}
