@@ -27,19 +27,23 @@ BikeRental currently supports secure customer authentication, email OTP verifica
 
 The homepage includes a dark/orange BikeRental theme, live vehicle navigation, promotional rental sections, and a 7/15/30-day long-ride savings area.
 
-![BikeRental homepage long ride section](docs/screenshots/homepage-long-ride.png)
+<img width="2534" height="1462" alt="image" src="https://github.com/user-attachments/assets/338bcd78-c36b-47d9-a2f3-bd99f7cc048f" />
+
 
 ## Browse Vehicles
 
 The fleet page includes vehicle/fuel filters, search, sorting, availability, responsive vehicle cards, hourly/daily pricing, and booking actions.
 
-![BikeRental browse vehicles](docs/screenshots/browse-vehicles.png)
+<img width="2530" height="1462" alt="image" src="https://github.com/user-attachments/assets/a50cfed4-b083-4bfc-8ee5-e5d0cb206888" />
+
+
 
 ## Vehicle Details
 
 Each vehicle can be opened from its image/name to a dedicated details screen with pricing, availability, vehicle/fuel information, booking steps, and a Book This Vehicle action.
 
-![BikeRental vehicle details](docs/screenshots/vehicle-details.png)
+<img width="2536" height="1464" alt="image" src="https://github.com/user-attachments/assets/c0078008-3942-43fd-a13f-64b96cab6cc6" />
+
 
 > Screenshots are development checkpoints from the current UI work. Small visual refinements may continue without changing the underlying feature set.
 
