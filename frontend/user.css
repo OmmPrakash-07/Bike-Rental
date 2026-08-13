@@ -10607,3 +10607,102 @@ main {
         grid-template-columns: .7fr 1.3fr !important;
     }
 }
+
+
+/* =========================================================
+   STEP 4 V2 — PRICE VISIBILITY + SINGLE BOOK BUTTON
+   Fixes clipped "/ day" text and removes redundant Details button.
+========================================================= */
+
+.vehicle-price-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+}
+
+.vehicle-price-item {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    padding: 9px 8px !important;
+}
+
+.vehicle-price-item > div {
+    min-width: 0 !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: start !important;
+    gap: 1px !important;
+}
+
+.vehicle-price-item strong {
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+    white-space: nowrap !important;
+    text-overflow: clip !important;
+
+    font-size: clamp(.78rem, 1.15vw, .96rem) !important;
+    line-height: 1.05 !important;
+}
+
+.vehicle-price-item small {
+    display: block !important;
+    min-width: 0 !important;
+    margin-top: 2px !important;
+
+    color: #68788d !important;
+    font-size: .47rem !important;
+    line-height: 1.15 !important;
+    white-space: nowrap !important;
+}
+
+/* One clear primary action is enough because image/name already open Details. */
+.vehicle-card-actions-single {
+    display: block !important;
+    margin-top: 0 !important;
+}
+
+.vehicle-card-actions-single .vehicle-card-book-btn {
+    width: 100% !important;
+    min-height: 43px !important;
+}
+
+/* Remove any old two-button layout influence. */
+.vehicle-card-actions.vehicle-card-actions-single {
+    grid-template-columns: 1fr !important;
+}
+
+/* Slightly smaller price text on narrower vehicle cards. */
+@media (max-width: 1180px) and (min-width: 701px) {
+    .vehicle-price-item strong {
+        font-size: .82rem !important;
+    }
+
+    .vehicle-price-item small {
+        font-size: .44rem !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .vehicle-price-item {
+        padding: 8px !important;
+    }
+
+    .vehicle-price-item strong {
+        font-size: .88rem !important;
+    }
+
+    .vehicle-price-item small {
+        font-size: .45rem !important;
+    }
+
+    .vehicle-card-actions-single .vehicle-card-book-btn {
+        min-height: 44px !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-price-item strong {
+        font-size: .8rem !important;
+    }
+}

@@ -835,12 +835,7 @@ function renderBikes() {
 
         ${priceHtml}
 
-        <div class="vehicle-card-actions">
-          <a class="vehicle-details-btn"
-             href="vehicle.html?id=${encodeURIComponent(bike.id)}">
-            Details
-          </a>
-
+        <div class="vehicle-card-actions vehicle-card-actions-single">
           <button
             class="${bike.available ? "btn-primary vehicle-card-book-btn" : "unavailable-btn vehicle-card-book-btn"}"
             ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>
