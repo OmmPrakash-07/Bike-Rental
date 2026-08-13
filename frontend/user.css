@@ -3505,3 +3505,157 @@ button.vehicle-filter-option.is-active:hover {
         height: 245px;
     }
 }
+
+
+/* =========================================================
+   HOMEPAGE HERO V5
+   Desktop: one sport bike + one BMW C 400 GT scooter.
+   Mobile: keep the clean single-bike composition.
+========================================================= */
+@media (min-width: 701px) {
+    .hero-v3-bike-main {
+        width: min(425px, 61%);
+        height: 325px;
+        left: 31%;
+        top: 61%;
+        transform: translate(-50%, -50%) rotate(-3deg);
+        z-index: 4;
+    }
+
+    .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(370px, 52%);
+        height: 360px;
+        left: 72%;
+        top: 43%;
+        transform: translate(-50%, -50%) rotate(1deg);
+        object-fit: contain;
+        z-index: 3;
+        opacity: 1;
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-main {
+        transform: translate(-50%, -50%) rotate(-2deg) translateY(-3px);
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-secondary {
+        transform: translate(-50%, -50%) rotate(.5deg) translateY(-4px);
+    }
+}
+
+@media (min-width: 701px) and (max-width: 1180px) {
+    .hero-v3-bike-main {
+        width: min(365px, 59%);
+        height: 290px;
+        left: 30%;
+        top: 62%;
+    }
+
+    .hero-v3-bike-secondary {
+        width: min(315px, 50%);
+        height: 315px;
+        left: 72%;
+        top: 44%;
+    }
+}
+
+@media (max-width: 700px) {
+    .hero-v3-bike-secondary {
+        display: none !important;
+    }
+}
+
+
+/* =========================================================
+   HOMEPAGE HERO V6
+   Desktop / tablet: BMW sport bike higher/front + BMW C 400 GT lower/right.
+   Mobile: clean single-bike composition.
+========================================================= */
+
+@media (min-width: 941px) {
+    .hero-v3-panel {
+        min-height: 585px;
+    }
+
+    .hero-v3-bike-main {
+        display: block !important;
+        width: min(430px, 62%);
+        height: 330px;
+        left: 38%;
+        top: 43%;
+        z-index: 5;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(350px, 49%);
+        height: 350px;
+        left: 70%;
+        top: 67%;
+        z-index: 4;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(2deg);
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-main {
+        transform: translate(-50%, -50%) rotate(-3deg) translateY(-4px);
+    }
+
+    .hero-v3-panel:hover .hero-v3-bike-secondary {
+        transform: translate(-50%, -50%) rotate(1deg) translateY(-3px);
+    }
+}
+
+@media (min-width: 701px) and (max-width: 940px) {
+    .hero-v3-panel {
+        min-height: 500px;
+    }
+
+    .hero-v3-bike-main {
+        display: block !important;
+        width: min(370px, 59%);
+        height: 285px;
+        left: 38%;
+        top: 42%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-4deg);
+    }
+
+    .hero-v3-bike-secondary {
+        display: block !important;
+        width: min(300px, 47%);
+        height: 300px;
+        left: 70%;
+        top: 68%;
+        z-index: 4;
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(2deg);
+    }
+}
+
+@media (max-width: 700px) {
+    .hero-v3-bike-secondary {
+        display: none !important;
+    }
+
+    .hero-v3-bike-main {
+        display: block !important;
+        width: 122%;
+        max-width: 440px;
+        height: 265px;
+        left: 50%;
+        top: 50%;
+        z-index: 5;
+        transform: translate(-50%, -50%) rotate(-3deg);
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-v3-bike-main {
+        width: 120%;
+        max-width: 360px;
+        height: 245px;
+    }
+}
