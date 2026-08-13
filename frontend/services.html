@@ -1092,9 +1092,35 @@
             border-radius: 12px;
             background: rgba(255,255,255,.035);
             color: var(--text);
-            font-size: 1.8rem;
-            line-height: 1;
             cursor: pointer;
+            position: relative;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            font-size: 0;
+            line-height: 0;
+            overflow: hidden;
+        }
+
+        .mobile-menu-close::before,
+        .mobile-menu-close::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 17px;
+            height: 2px;
+            border-radius: 999px;
+            background: currentColor;
+            transform-origin: center;
+        }
+
+        .mobile-menu-close::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .mobile-menu-close::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
         }
 
         .mobile-user-summary {

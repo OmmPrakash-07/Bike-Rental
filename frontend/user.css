@@ -2637,3 +2637,209 @@ button.vehicle-filter-option.is-active:hover {
     }
 }
 
+
+/* =========================================================
+   NAV CLOSE BUTTON + MOBILE HERO POLISH
+   - Perfectly centered close icon on every shared drawer
+   - Cleaner mobile hero composition
+========================================================= */
+
+.mobile-menu-close {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    overflow: hidden;
+}
+
+.mobile-menu-close::before,
+.mobile-menu-close::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 17px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transform-origin: center;
+}
+
+.mobile-menu-close::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.mobile-menu-close::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@media (max-width: 700px) {
+    .home-hero {
+        padding: 44px 16px 52px;
+    }
+
+    .home-hero-content {
+        gap: 18px;
+    }
+
+    .home-hero-copy h1 {
+        margin-top: 14px;
+        font-size: clamp(2.45rem, 12.5vw, 3.6rem);
+        line-height: .96;
+    }
+
+    .home-hero-copy > p {
+        font-size: .94rem;
+        line-height: 1.65;
+    }
+
+    .home-hero-actions {
+        margin-top: 22px;
+        gap: 9px;
+    }
+
+    .home-trust-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 7px;
+        margin-top: 22px;
+        width: 100%;
+    }
+
+    .home-trust-row div {
+        min-width: 0;
+        padding: 10px 5px;
+        text-align: center;
+        border-radius: 12px;
+    }
+
+    .home-trust-row strong {
+        font-size: .76rem;
+        white-space: nowrap;
+    }
+
+    .home-trust-row span {
+        margin-top: 3px;
+        font-size: .58rem;
+        line-height: 1.25;
+    }
+
+    .home-hero-visual {
+        width: min(100%, 390px);
+        min-height: 350px;
+        margin: 20px auto 0;
+        overflow: visible;
+    }
+
+    .hero-orbit {
+        width: 292px;
+        top: 51%;
+        left: 50%;
+    }
+
+    .hero-orbit::after {
+        inset: 46px;
+    }
+
+    .hero-bike-main {
+        width: 326px;
+        max-width: 92vw;
+        left: 50%;
+        top: 53%;
+        transform: translate(-50%, -50%) rotate(-2deg);
+        z-index: 3;
+    }
+
+    .hero-bike-second {
+        display: none;
+    }
+
+    .hero-road-line-one {
+        width: 260px;
+        height: 88px;
+        left: 50%;
+        right: auto;
+        bottom: 7%;
+        transform: translateX(-50%) rotate(-10deg);
+        opacity: .75;
+    }
+
+    .hero-card-live {
+        left: 4px;
+        bottom: 14px;
+        max-width: 180px;
+    }
+
+    .hero-card-flex {
+        right: 4px;
+        top: 18px;
+        max-width: 155px;
+    }
+
+    .hero-floating-card {
+        padding: 11px 12px;
+        border-radius: 13px;
+    }
+
+    .hero-floating-card strong {
+        font-size: .78rem;
+    }
+
+    .hero-floating-card small {
+        font-size: .62rem;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 420px) {
+    .home-hero {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .home-trust-row {
+        gap: 5px;
+    }
+
+    .home-trust-row div {
+        padding: 9px 3px;
+    }
+
+    .home-trust-row strong {
+        font-size: .7rem;
+    }
+
+    .home-trust-row span {
+        font-size: .53rem;
+    }
+
+    .home-hero-visual {
+        width: 100%;
+        min-height: 320px;
+    }
+
+    .hero-orbit {
+        width: 250px;
+    }
+
+    .hero-orbit::after {
+        inset: 39px;
+    }
+
+    .hero-bike-main {
+        width: 285px;
+    }
+
+    .hero-card-live {
+        bottom: 8px;
+    }
+
+    .hero-card-flex {
+        top: 12px;
+    }
+
+    .hero-floating-card small {
+        display: block;
+    }
+}
