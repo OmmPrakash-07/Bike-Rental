@@ -4146,3 +4146,589 @@ button.vehicle-filter-option.is-active:hover {
         font-size: .56rem;
     }
 }
+
+
+/* =========================================================
+   HOMEPAGE HERO V8 — PREMIUM TWO-VEHICLE COMPOSITION
+   Desktop/tablet: scooter large lower-left, sportbike elevated upper-right.
+   Mobile: both vehicles remain visible in a compact, balanced composition.
+========================================================= */
+
+.home-hero-v8 {
+    position: relative;
+    min-height: calc(100vh - 82px);
+    overflow: hidden;
+    padding: clamp(42px, 4.8vw, 72px) max(18px, 4.6vw) clamp(68px, 6vw, 92px);
+    background:
+        radial-gradient(circle at 77% 30%, rgba(255, 92, 0, .13), transparent 30%),
+        radial-gradient(circle at 58% 72%, rgba(255, 107, 0, .07), transparent 26%),
+        #080d19;
+}
+
+.hero-v8-shell {
+    position: relative;
+    z-index: 2;
+    width: min(1440px, 100%);
+    min-height: 650px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, .83fr) minmax(600px, 1.17fr);
+    align-items: center;
+    gap: clamp(34px, 5vw, 86px);
+}
+
+.hero-v8-copy {
+    position: relative;
+    z-index: 9;
+    max-width: 620px;
+}
+
+.hero-v8-copy h1 {
+    max-width: 610px;
+    margin: 15px 0 22px;
+    color: #f2f5fa;
+    font-family: var(--font-display);
+    font-size: clamp(3.45rem, 5vw, 5.75rem);
+    line-height: .94;
+    letter-spacing: -.06em;
+}
+
+.hero-v8-copy h1 span {
+    color: var(--orange);
+}
+
+.hero-v8-copy > p {
+    max-width: 590px;
+    margin: 0;
+    color: #a7b4c7;
+    font-size: clamp(.98rem, 1.17vw, 1.12rem);
+    line-height: 1.72;
+}
+
+.hero-v8-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.hero-v8-actions .home-primary-cta,
+.hero-v8-actions .home-secondary-cta {
+    min-height: 54px;
+    padding-inline: 24px;
+}
+
+.hero-v8-highlights {
+    max-width: 620px;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.hero-v8-highlights > div {
+    min-width: 0;
+    min-height: 88px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid rgba(255,255,255,.075);
+    border-radius: 15px;
+    background: rgba(255,255,255,.026);
+}
+
+.hero-v8-highlight-icon {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(255,107,0,.13);
+    color: var(--orange);
+    font-weight: 900;
+}
+
+.hero-v8-highlights strong,
+.hero-v8-highlights small {
+    display: block;
+}
+
+.hero-v8-highlights strong {
+    color: #f4f7fb;
+    font-family: var(--font-display);
+    font-size: .78rem;
+    line-height: 1.2;
+}
+
+.hero-v8-highlights small {
+    margin-top: 4px;
+    color: #7d8ca1;
+    font-size: .62rem;
+    line-height: 1.32;
+}
+
+/* Showcase deliberately blends into the hero instead of looking like a box. */
+.hero-v8-showcase {
+    position: relative;
+    min-width: 0;
+    min-height: 610px;
+    overflow: visible;
+    isolation: isolate;
+}
+
+.hero-v8-glow {
+    position: absolute;
+    z-index: -3;
+    width: 84%;
+    height: 78%;
+    right: -2%;
+    top: 10%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,99,0,.18), rgba(255,99,0,.055) 38%, transparent 72%);
+    filter: blur(8px);
+}
+
+.hero-v8-arc {
+    position: absolute;
+    z-index: -1;
+    width: 440px;
+    aspect-ratio: 1;
+    right: 1%;
+    top: 8%;
+    border-radius: 50%;
+    border: 52px solid #ff6b00;
+    box-shadow: 0 0 70px rgba(255,107,0,.22);
+    opacity: .94;
+}
+
+.hero-v8-dots {
+    position: absolute;
+    z-index: 1;
+    width: 118px;
+    height: 76px;
+    top: 56px;
+    right: 43%;
+    opacity: .52;
+    background-image: radial-gradient(circle, #ff6b00 1.4px, transparent 1.6px);
+    background-size: 14px 14px;
+}
+
+.hero-v8-platform {
+    position: absolute;
+    z-index: 1;
+    border-radius: 50%;
+    border: 2px solid rgba(255,107,0,.78);
+    background:
+        radial-gradient(ellipse at center, rgba(255,120,30,.20), rgba(255,107,0,.055) 45%, transparent 72%);
+    box-shadow:
+        0 0 22px rgba(255,107,0,.16),
+        inset 0 -8px 18px rgba(255,107,0,.08);
+}
+
+.hero-v8-platform::after {
+    content: "";
+    position: absolute;
+    inset: 10px 18px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,190,135,.18);
+}
+
+.hero-v8-platform-bike {
+    width: 355px;
+    height: 90px;
+    right: -1%;
+    top: 51%;
+    transform: translateY(-50%) rotate(1deg);
+}
+
+.hero-v8-platform-scooty {
+    width: 440px;
+    height: 108px;
+    left: 0;
+    bottom: 17px;
+    transform: rotate(-2deg);
+}
+
+.hero-v8-vehicle {
+    position: absolute;
+    z-index: 4;
+    display: block;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    pointer-events: none;
+    filter: drop-shadow(0 30px 28px rgba(0,0,0,.58));
+    transition: transform .35s ease;
+}
+
+/* Sportbike elevated / right */
+.hero-v8-bike {
+    width: min(410px, 52%);
+    left: 75%;
+    top: 38%;
+    transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+/* Scooter larger / lower / left */
+.hero-v8-scooty {
+    width: min(500px, 64%);
+    left: 31%;
+    top: 67%;
+    transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.hero-v8-showcase:hover .hero-v8-bike {
+    transform: translate(-50%, -50%) rotate(-1deg) translateY(-4px);
+}
+
+.hero-v8-showcase:hover .hero-v8-scooty {
+    transform: translate(-50%, -50%) rotate(-1deg) translateY(-4px);
+}
+
+.hero-v8-callout {
+    position: absolute;
+    z-index: 8;
+    min-width: 148px;
+    padding: 11px 13px;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 14px;
+    background: rgba(8,14,26,.91);
+    backdrop-filter: blur(14px);
+    box-shadow: 0 18px 44px rgba(0,0,0,.32);
+}
+
+.hero-v8-callout strong,
+.hero-v8-callout small,
+.hero-v8-callout span {
+    display: block;
+}
+
+.hero-v8-callout strong {
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: .76rem;
+}
+
+.hero-v8-callout small {
+    margin-top: 3px;
+    color: #8796aa;
+    font-size: .58rem;
+}
+
+.hero-v8-callout span {
+    width: fit-content;
+    margin-top: 8px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(255,107,0,.13);
+    color: #ff9d58;
+    font-size: .53rem;
+    font-weight: 900;
+}
+
+.hero-v8-callout-bike {
+    top: 10%;
+    right: 0;
+}
+
+.hero-v8-callout-scooty {
+    top: 48%;
+    left: 0;
+}
+
+.hero-v8-scroll {
+    bottom: 18px;
+}
+
+/* Compact desktop */
+@media (min-width: 961px) and (max-width: 1180px) {
+    .hero-v8-shell {
+        grid-template-columns: minmax(0, .84fr) minmax(520px, 1.16fr);
+        gap: 34px;
+    }
+
+    .hero-v8-copy h1 {
+        font-size: clamp(3.1rem, 5.05vw, 4.8rem);
+    }
+
+    .hero-v8-showcase {
+        min-height: 560px;
+    }
+
+    .hero-v8-arc {
+        width: 390px;
+        border-width: 47px;
+    }
+
+    .hero-v8-bike {
+        width: min(360px, 52%);
+        left: 74%;
+        top: 38%;
+    }
+
+    .hero-v8-scooty {
+        width: min(440px, 64%);
+        left: 31%;
+        top: 67%;
+    }
+
+    .hero-v8-platform-bike {
+        width: 300px;
+    }
+
+    .hero-v8-platform-scooty {
+        width: 390px;
+    }
+}
+
+/* Tablet */
+@media (min-width: 701px) and (max-width: 960px) {
+    .home-hero-v8 {
+        min-height: auto;
+        padding-top: 52px;
+    }
+
+    .hero-v8-shell {
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 34px;
+    }
+
+    .hero-v8-copy {
+        max-width: 740px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .hero-v8-copy > p {
+        margin-inline: auto;
+    }
+
+    .hero-v8-actions {
+        justify-content: center;
+    }
+
+    .hero-v8-highlights {
+        margin-inline: auto;
+    }
+
+    .hero-v8-showcase {
+        width: min(760px, 100%);
+        min-height: 525px;
+        margin: 0 auto;
+    }
+
+    .hero-v8-arc {
+        width: 385px;
+        right: 5%;
+        border-width: 47px;
+    }
+
+    .hero-v8-bike {
+        width: min(345px, 48%);
+        left: 74%;
+        top: 39%;
+    }
+
+    .hero-v8-scooty {
+        width: min(430px, 60%);
+        left: 31%;
+        top: 66%;
+    }
+
+    .hero-v8-platform-bike {
+        width: 300px;
+        right: 2%;
+    }
+
+    .hero-v8-platform-scooty {
+        width: 380px;
+        left: 2%;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .home-hero-v8 {
+        min-height: auto;
+        padding: 32px 14px 54px;
+    }
+
+    .hero-v8-shell {
+        min-height: 0;
+        grid-template-columns: 1fr;
+        gap: 22px;
+    }
+
+    .hero-v8-copy {
+        max-width: none;
+        text-align: left;
+    }
+
+    .hero-v8-copy h1 {
+        max-width: 100%;
+        margin: 12px 0 15px;
+        font-size: clamp(2.55rem, 13vw, 3.85rem);
+        line-height: .94;
+    }
+
+    .hero-v8-copy > p {
+        font-size: .9rem;
+        line-height: 1.62;
+    }
+
+    .hero-v8-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 9px;
+        margin-top: 21px;
+    }
+
+    .hero-v8-actions .home-primary-cta,
+    .hero-v8-actions .home-secondary-cta {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-v8-highlights {
+        order: 3;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin-top: 0;
+    }
+
+    .hero-v8-highlights > div {
+        min-height: 78px;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        gap: 6px;
+        padding: 8px 4px;
+    }
+
+    .hero-v8-highlight-icon {
+        width: 29px;
+        height: 29px;
+        flex-basis: 29px;
+        border-radius: 9px;
+    }
+
+    .hero-v8-highlights strong {
+        font-size: .58rem;
+    }
+
+    .hero-v8-highlights small {
+        display: none;
+    }
+
+    .hero-v8-showcase {
+        order: 2;
+        width: 100%;
+        min-height: 365px;
+        margin-top: 2px;
+    }
+
+    .hero-v8-arc {
+        width: 255px;
+        right: -28px;
+        top: 51px;
+        border-width: 34px;
+    }
+
+    .hero-v8-dots {
+        width: 78px;
+        height: 50px;
+        top: 24px;
+        right: 28%;
+        background-size: 10px 10px;
+    }
+
+    .hero-v8-bike {
+        width: min(235px, 58%);
+        left: 73%;
+        top: 41%;
+        z-index: 4;
+    }
+
+    .hero-v8-scooty {
+        width: min(285px, 71%);
+        left: 30%;
+        top: 69%;
+        z-index: 5;
+    }
+
+    .hero-v8-platform-bike {
+        width: 200px;
+        height: 58px;
+        right: -3%;
+        top: 50%;
+    }
+
+    .hero-v8-platform-scooty {
+        width: 240px;
+        height: 66px;
+        left: -3%;
+        bottom: 20px;
+    }
+
+    .hero-v8-callout {
+        min-width: 105px;
+        padding: 8px 9px;
+        border-radius: 11px;
+    }
+
+    .hero-v8-callout strong {
+        font-size: .55rem;
+    }
+
+    .hero-v8-callout small {
+        font-size: .46rem;
+    }
+
+    .hero-v8-callout span {
+        margin-top: 5px;
+        padding: 3px 6px;
+        font-size: .43rem;
+    }
+
+    .hero-v8-callout-bike {
+        top: 7px;
+        right: 4px;
+    }
+
+    .hero-v8-callout-scooty {
+        top: 47%;
+        left: 4px;
+    }
+
+    .hero-v8-scroll {
+        display: none;
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-v8-showcase {
+        min-height: 340px;
+    }
+
+    .hero-v8-arc {
+        width: 232px;
+        right: -35px;
+        top: 48px;
+        border-width: 31px;
+    }
+
+    .hero-v8-bike {
+        width: 57%;
+        left: 74%;
+        top: 41%;
+    }
+
+    .hero-v8-scooty {
+        width: 73%;
+        left: 29%;
+        top: 70%;
+    }
+}
