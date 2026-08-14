@@ -62,7 +62,9 @@ public class UserAccountService {
     @Transactional
     public OtpChallengeResponse signup(UserSignupRequest request) {
         if (request == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Signup data is required");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Signup data is required");
         }
 
         String fullName = normalizeName(request.fullName());
@@ -70,33 +72,181 @@ public class UserAccountService {
         String phone = normalizePhone(request.phone());
         validatePassword(request.password());
 
-        UserAccount user = repository.findByEmailIgnoreCase(email).orElse(null);
+        UserAccount emailOwner =
+                repository.findByEmailIgnoreCase(email)
+                        .orElse(null);
 
-        if (user != null && user.isEmailVerified()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this email already exists");
+        UserAccount phoneOwner =
+                repository.findByPhone(phone)
+                        .orElse(null);
+
+        /*
+         * A verified account owns its email permanently.
+         */
+        if (emailOwner != null
+                && emailOwner.isEmailVerified()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "An account with this email already exists");
         }
 
-        UserAccount phoneOwner = repository.findByPhone(phone).orElse(null);
-        if (phoneOwner != null && (user == null || !phoneOwner.getId().equals(user.getId()))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "An account with this phone number already exists");
+        /*
+         * Normal case:
+         *
+         * The requested email already belongs to the same
+         * pending account as the phone number.
+         */
+        if (emailOwner != null
+                && phoneOwner != null
+                && emailOwner.getId().equals(
+                        phoneOwner.getId())) {
+
+            enforceResendCooldown(
+                    emailOwner);
+
+            updatePendingSignup(
+                    emailOwner,
+                    fullName,
+                    email,
+                    phone,
+                    request.password());
+
+            return issueEmailOtp(
+                    emailOwner,
+                    false);
         }
 
-        if (user == null) {
-            user = new UserAccount();
-            user.setCreatedAt(LocalDateTime.now());
-        } else {
-            enforceResendCooldown(user);
+        /*
+         * EMAIL-CORRECTION RECOVERY
+         * -------------------------
+         *
+         * Example:
+         *
+         * 1. Customer signs up with:
+         *      wrong@email.com + 9876543210
+         *
+         * 2. OTP is sent, but the customer notices that the
+         *    email was typed incorrectly.
+         *
+         * 3. Customer signs up again with:
+         *      correct@email.com + 9876543210
+         *
+         * The phone is already attached to the first pending
+         * account. Previously this produced HTTP 409 forever.
+         *
+         * We now allow the SAME pending customer to correct
+         * the email only when:
+         *
+         * - the phone-owned account is still UNVERIFIED;
+         * - the requested new email is not owned by another
+         *   account; and
+         * - the supplied password matches the password used
+         *   for the pending account.
+         *
+         * The password check prevents somebody who merely
+         * knows another person's phone number from stealing
+         * that pending signup.
+         *
+         * The same database row is reused, so the wrong email
+         * does not remain as a duplicate customer record.
+         */
+        if (phoneOwner != null
+                && !phoneOwner.isEmailVerified()
+                && emailOwner == null) {
+
+            if (!passwordEncoder.matches(
+                    request.password(),
+                    phoneOwner.getPasswordHash())) {
+
+                throw new ResponseStatusException(
+                        HttpStatus.CONFLICT,
+                        "This phone number is linked to a pending signup. Use the same password to correct the email");
+            }
+
+            /*
+             * Email correction is allowed immediately.
+             * The old OTP becomes invalid as soon as the new
+             * OTP/hash below replaces it.
+             */
+            updatePendingSignup(
+                    phoneOwner,
+                    fullName,
+                    email,
+                    phone,
+                    request.password());
+
+            return issueEmailOtp(
+                    phoneOwner,
+                    false);
         }
 
-        user.setFullName(fullName);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
-        user.setActive(true);
-        user.setEmailVerified(false);
-        repository.save(user);
+        /*
+         * If the new email is already attached to a different
+         * unverified signup, do not merge two accounts.
+         */
+        if (emailOwner != null
+                && phoneOwner != null
+                && !emailOwner.getId().equals(
+                        phoneOwner.getId())) {
 
-        return issueEmailOtp(user, false);
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "This email and phone number belong to different pending signups");
+        }
+
+        /*
+         * A verified phone owner cannot be replaced by a new
+         * signup.
+         */
+        if (phoneOwner != null
+                && phoneOwner.isEmailVerified()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "An account with this phone number already exists");
+        }
+
+        /*
+         * Existing pending email with a changed/free phone.
+         * Keep the same account and OTP resend cooldown.
+         */
+        if (emailOwner != null) {
+
+            enforceResendCooldown(
+                    emailOwner);
+
+            updatePendingSignup(
+                    emailOwner,
+                    fullName,
+                    email,
+                    phone,
+                    request.password());
+
+            return issueEmailOtp(
+                    emailOwner,
+                    false);
+        }
+
+        /*
+         * Brand-new signup.
+         */
+        UserAccount user =
+                new UserAccount();
+
+        user.setCreatedAt(
+                LocalDateTime.now());
+
+        updatePendingSignup(
+                user,
+                fullName,
+                email,
+                phone,
+                request.password());
+
+        return issueEmailOtp(
+                user,
+                false);
     }
 
     @Transactional(noRollbackFor = ResponseStatusException.class)
@@ -208,6 +358,44 @@ public class UserAccountService {
 
     public UserProfile toProfile(UserAccount user) {
         return new UserProfile(user.getId(), user.getFullName(), user.getEmail(), user.getPhone());
+    }
+
+    private void updatePendingSignup(
+            UserAccount user,
+            String fullName,
+            String email,
+            String phone,
+            String rawPassword) {
+
+        user.setFullName(
+                fullName);
+
+        user.setEmail(
+                email);
+
+        user.setPhone(
+                phone);
+
+        user.setPasswordHash(
+                passwordEncoder.encode(
+                        rawPassword));
+
+        user.setActive(
+                true);
+
+        user.setEmailVerified(
+                false);
+
+        /*
+         * Any OTP that was sent to an older/wrong email
+         * must stop being valid before a replacement OTP is
+         * issued.
+         */
+        clearOtp(
+                user);
+
+        repository.save(
+                user);
     }
 
     private OtpChallengeResponse issueEmailOtp(UserAccount user, boolean enforceCooldown) {
