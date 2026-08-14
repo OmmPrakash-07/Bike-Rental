@@ -9,6 +9,213 @@
     <title>Bike Rental Admin</title>
 
     <link rel="stylesheet" href="style.css">
+
+<style>
+/* Registered Users — added without changing your existing style.css */
+.user-directory-btn {
+    position: relative;
+}
+
+.user-count-text {
+    color: #60a5fa;
+}
+
+.user-directory-panel {
+    width: min(1180px, 96vw);
+}
+
+.user-directory-subtitle {
+    max-width: 680px;
+    margin: 7px 0 0;
+    color: #7f8da3;
+    font-size: .72rem;
+    line-height: 1.5;
+}
+
+.user-directory-toolbar {
+    grid-template-columns: minmax(220px, 1fr) 180px 155px auto;
+}
+
+.user-directory-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 150px));
+    gap: 10px;
+    padding: 0 22px 16px;
+}
+
+.user-directory-summary > div {
+    min-height: 58px;
+    display: grid;
+    align-content: center;
+    gap: 4px;
+    padding: 10px 13px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    background: rgba(255,255,255,.025);
+}
+
+.user-directory-summary span {
+    color: #718096;
+    font-size: .58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.user-directory-summary strong {
+    color: #edf4ff;
+    font-size: 1rem;
+}
+
+.user-table-wrap table {
+    min-width: 1000px;
+}
+
+.admin-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.admin-user-avatar {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: linear-gradient(145deg, rgba(255,107,0,.14), rgba(255,107,0,.05));
+    border: 1px solid rgba(255,107,0,.16);
+    color: #ff8a35;
+    font-weight: 900;
+    font-size: .7rem;
+}
+
+.admin-user-cell strong,
+.admin-user-cell small {
+    display: block;
+}
+
+.admin-user-cell strong {
+    color: #edf3fb;
+    font-size: .72rem;
+}
+
+.admin-user-cell small {
+    margin-top: 2px;
+    color: #637287;
+    font-size: .55rem;
+}
+
+.user-email {
+    color: #bec9d8;
+    font-size: .68rem;
+    word-break: break-word;
+}
+
+.user-phone {
+    color: #d7dfeb;
+    font-size: .68rem;
+    white-space: nowrap;
+}
+
+.user-status-pill {
+    min-height: 26px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: .55rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.user-status-pill.verified,
+.user-status-pill.active {
+    border: 1px solid rgba(52,211,153,.18);
+    background: rgba(52,211,153,.07);
+    color: #55dcae;
+}
+
+.user-status-pill.unverified {
+    border: 1px solid rgba(251,191,36,.18);
+    background: rgba(251,191,36,.07);
+    color: #f4c653;
+}
+
+.user-status-pill.inactive {
+    border: 1px solid rgba(248,113,113,.18);
+    background: rgba(248,113,113,.07);
+    color: #fb8d8d;
+}
+
+.user-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.user-booking-count {
+    color: #ff8a35;
+    font-weight: 900;
+}
+
+.user-joined-date {
+    color: #8897ab;
+    font-size: .62rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+    .user-directory-toolbar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .user-directory-toolbar input {
+        grid-column: 1 / -1;
+    }
+
+    .user-directory-summary {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 620px) {
+    .user-directory-panel {
+        width: 100vw;
+    }
+
+    .user-directory-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .user-directory-toolbar input {
+        grid-column: auto;
+    }
+
+    .user-directory-summary {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .user-directory-summary > div {
+        min-width: 0;
+        padding: 9px;
+    }
+
+    .user-directory-summary span {
+        font-size: .48rem;
+    }
+
+    .user-directory-summary strong {
+        font-size: .86rem;
+    }
+}
+</style>
 </head>
 
 <body>
@@ -34,8 +241,8 @@
             </a>
 
             <p>
-                Manage vehicles, pricing,
-                availability and customer bookings.
+                Manage vehicles, pricing, availability,
+                customer bookings and registered users.
             </p>
 
         </div>
@@ -50,6 +257,22 @@
             >
                 View Customer Site ↗
             </a>
+
+            <button
+                type="button"
+                onclick="toggleUserPanel()"
+                class="booking-btn user-directory-btn"
+            >
+                Users
+
+                <span
+                    id="totalUserBadge"
+                    class="count-badge"
+                    hidden
+                >
+                    0
+                </span>
+            </button>
 
             <button
                 type="button"
@@ -118,6 +341,16 @@
             <strong
                 id="pendingBookingCount"
                 class="amber-text"
+            >
+                —
+            </strong>
+        </article>
+
+        <article class="stat-card user-stat-card">
+            <span>Registered Users</span>
+            <strong
+                id="registeredUserCount"
+                class="user-count-text"
             >
                 —
             </strong>
@@ -495,6 +728,136 @@
     </section>
 
 </div>
+
+
+<!-- REGISTERED USERS PANEL -->
+
+<div
+    id="userPanelBackdrop"
+    class="panel-backdrop"
+    onclick="toggleUserPanel(false)"
+></div>
+
+<aside
+    id="userPanel"
+    class="booking-panel user-directory-panel"
+    aria-hidden="true"
+    aria-labelledby="userPanelTitle"
+>
+    <div class="booking-panel-head">
+        <div>
+            <p class="eyebrow">
+                CUSTOMER DIRECTORY
+            </p>
+
+            <h2 id="userPanelTitle">
+                Registered Users
+            </h2>
+
+            <p class="user-directory-subtitle">
+                Signup information stored in the users table.
+                Passwords, OTP codes and JWT tokens are never shown here.
+            </p>
+        </div>
+
+        <button
+            type="button"
+            onclick="toggleUserPanel(false)"
+            class="close-btn"
+            aria-label="Close users panel"
+        >
+            ×
+        </button>
+    </div>
+
+    <div class="booking-toolbar user-directory-toolbar">
+        <input
+            id="userSearch"
+            type="search"
+            placeholder="Search name, email, phone or ID…"
+            aria-label="Search registered users"
+        >
+
+        <select
+            id="userVerificationFilter"
+            aria-label="Filter by email verification"
+        >
+            <option value="ALL">
+                All Verification
+            </option>
+
+            <option value="VERIFIED">
+                Email Verified
+            </option>
+
+            <option value="UNVERIFIED">
+                Not Verified
+            </option>
+        </select>
+
+        <select
+            id="userAccountFilter"
+            aria-label="Filter by account status"
+        >
+            <option value="ALL">
+                All Accounts
+            </option>
+
+            <option value="ACTIVE">
+                Active
+            </option>
+
+            <option value="INACTIVE">
+                Inactive
+            </option>
+        </select>
+
+        <button
+            id="refreshUsersButton"
+            type="button"
+            onclick="loadUsers()"
+            class="secondary-btn compact-btn"
+        >
+            ↻ Refresh
+        </button>
+    </div>
+
+    <div class="user-directory-summary">
+        <div>
+            <span>Showing</span>
+            <strong id="visibleUserCount">0</strong>
+        </div>
+
+        <div>
+            <span>Verified</span>
+            <strong id="verifiedUserCount">0</strong>
+        </div>
+
+        <div>
+            <span>Unverified</span>
+            <strong id="unverifiedUserCount">0</strong>
+        </div>
+    </div>
+
+    <div class="booking-table-wrap user-table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Verification</th>
+                    <th>Account</th>
+                    <th>Bookings</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+</aside>
 
 <!-- BOOKING PANEL BACKDROP -->
 

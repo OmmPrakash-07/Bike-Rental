@@ -107,6 +107,14 @@ public class SecurityConfig {
                                 "/api/bikes/**")
                         .permitAll()
 
+                        // Admin-only customer/user directory.
+                        // Returns a safe DTO only; password hashes, OTP values
+                        // and authentication secrets are never exposed.
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/admin/users")
+                        .hasAuthority("SCOPE_admin")
+
                         // User protected routes
                         .requestMatchers(
                                 HttpMethod.GET,

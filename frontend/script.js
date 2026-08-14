@@ -8,6 +8,9 @@ const BIKE_API =
 const BOOKING_API =
     `${API_BASE}/api/bookings`;
 
+const ADMIN_USER_API =
+    `${API_BASE}/api/admin/users`;
+
 const MAX_IMAGE_BYTES =
     5 * 1024 * 1024;
 
@@ -29,6 +32,8 @@ let editImageUrl = "";
 let bikesCache = [];
 
 let bookingsCache = [];
+
+let usersCache = [];
 
 let previewObjectUrl = null;
 
@@ -700,6 +705,31 @@ function updateStats() {
 
     badge.hidden =
         pending === 0;
+
+
+    const registeredUserCount =
+        document.getElementById(
+            "registeredUserCount"
+        );
+
+    if (registeredUserCount) {
+        registeredUserCount.textContent =
+            usersCache.length;
+    }
+
+
+    const totalUserBadge =
+        document.getElementById(
+            "totalUserBadge"
+        );
+
+    if (totalUserBadge) {
+        totalUserBadge.textContent =
+            usersCache.length;
+
+        totalUserBadge.hidden =
+            usersCache.length === 0;
+    }
 }
 
 
@@ -2259,6 +2289,635 @@ function renderBookings() {
 
 
 // ---------------------------------------------------------
+// REGISTERED USERS
+// ---------------------------------------------------------
+
+function userInitials(
+    fullName
+) {
+
+    const parts =
+        String(
+            fullName || "User"
+        )
+            .trim()
+            .split(
+                /\s+/
+            )
+            .filter(
+                Boolean
+            );
+
+
+    if (
+        parts.length === 0
+    ) {
+        return "U";
+    }
+
+
+    if (
+        parts.length === 1
+    ) {
+        return parts[0]
+            .slice(0, 1)
+            .toUpperCase();
+    }
+
+
+    return (
+        parts[0]
+            .slice(0, 1)
+        +
+        parts[
+            parts.length - 1
+        ]
+            .slice(0, 1)
+    )
+        .toUpperCase();
+}
+
+
+function formatUserJoinedDate(
+    value
+) {
+
+    if (!value) {
+        return "—";
+    }
+
+
+    const date =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+        return String(
+            value
+        );
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    )
+        .format(
+            date
+        );
+}
+
+
+function renderUsers() {
+
+    const table =
+        document.getElementById(
+            "userTable"
+        );
+
+    if (!table) {
+        return;
+    }
+
+
+    const query =
+        document
+            .getElementById(
+                "userSearch"
+            )
+            ?.value
+            .trim()
+            .toLowerCase()
+        || "";
+
+
+    const verificationFilter =
+        document
+            .getElementById(
+                "userVerificationFilter"
+            )
+            ?.value
+        || "ALL";
+
+
+    const accountFilter =
+        document
+            .getElementById(
+                "userAccountFilter"
+            )
+            ?.value
+        || "ALL";
+
+
+    const filtered =
+        usersCache.filter(
+            user => {
+
+                const matchesSearch =
+                    !query
+                    ||
+                    [
+                        user.id,
+                        user.fullName,
+                        user.email,
+                        user.phone
+                    ]
+                        .some(
+                            value =>
+                                String(
+                                    value ?? ""
+                                )
+                                    .toLowerCase()
+                                    .includes(
+                                        query
+                                    )
+                        );
+
+
+                const matchesVerification =
+                    verificationFilter === "ALL"
+                    ||
+                    (
+                        verificationFilter === "VERIFIED"
+                        &&
+                        user.emailVerified
+                    )
+                    ||
+                    (
+                        verificationFilter === "UNVERIFIED"
+                        &&
+                        !user.emailVerified
+                    );
+
+
+                const matchesAccount =
+                    accountFilter === "ALL"
+                    ||
+                    (
+                        accountFilter === "ACTIVE"
+                        &&
+                        user.active
+                    )
+                    ||
+                    (
+                        accountFilter === "INACTIVE"
+                        &&
+                        !user.active
+                    );
+
+
+                return (
+                    matchesSearch
+                    &&
+                    matchesVerification
+                    &&
+                    matchesAccount
+                );
+            }
+        );
+
+
+    const verified =
+        usersCache.filter(
+            user =>
+                user.emailVerified
+        ).length;
+
+
+    const visibleUserCount =
+        document.getElementById(
+            "visibleUserCount"
+        );
+
+    const verifiedUserCount =
+        document.getElementById(
+            "verifiedUserCount"
+        );
+
+    const unverifiedUserCount =
+        document.getElementById(
+            "unverifiedUserCount"
+        );
+
+
+    if (visibleUserCount) {
+        visibleUserCount.textContent =
+            filtered.length;
+    }
+
+    if (verifiedUserCount) {
+        verifiedUserCount.textContent =
+            verified;
+    }
+
+    if (unverifiedUserCount) {
+        unverifiedUserCount.textContent =
+            usersCache.length -
+            verified;
+    }
+
+
+    if (
+        filtered.length === 0
+    ) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td
+                    class="empty-row"
+                    colspan="8"
+                >
+                    No registered users match
+                    the current search/filter.
+                </td>
+            </tr>
+            `;
+
+        return;
+    }
+
+
+    table.innerHTML = "";
+
+
+    filtered.forEach(
+        user => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const name =
+                String(
+                    user.fullName ||
+                    "Unnamed User"
+                );
+
+
+            const initials =
+                userInitials(
+                    name
+                );
+
+
+            const verificationClass =
+                user.emailVerified
+                    ? "verified"
+                    : "unverified";
+
+
+            const verificationLabel =
+                user.emailVerified
+                    ? "Verified"
+                    : "Not verified";
+
+
+            const accountClass =
+                user.active
+                    ? "active"
+                    : "inactive";
+
+
+            const accountLabel =
+                user.active
+                    ? "Active"
+                    : "Inactive";
+
+
+            row.innerHTML =
+                `
+                <td>
+                    #${escapeHtml(
+                        user.id ?? "—"
+                    )}
+                </td>
+
+                <td>
+                    <div class="admin-user-cell">
+                        <span class="admin-user-avatar">
+                            ${escapeHtml(
+                                initials
+                            )}
+                        </span>
+
+                        <div>
+                            <strong>
+                                ${escapeHtml(
+                                    name
+                                )}
+                            </strong>
+
+                            <small>
+                                Customer account
+                            </small>
+                        </div>
+                    </div>
+                </td>
+
+                <td>
+                    <span class="user-email">
+                        ${escapeHtml(
+                            user.email ||
+                            "—"
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="user-phone">
+                        ${escapeHtml(
+                            user.phone ||
+                            "—"
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    <span
+                        class="
+                            user-status-pill
+                            ${verificationClass}
+                        "
+                    >
+                        <span
+                            class="user-status-dot"
+                        ></span>
+
+                        ${verificationLabel}
+                    </span>
+                </td>
+
+                <td>
+                    <span
+                        class="
+                            user-status-pill
+                            ${accountClass}
+                        "
+                    >
+                        <span
+                            class="user-status-dot"
+                        ></span>
+
+                        ${accountLabel}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="user-booking-count">
+                        ${escapeHtml(
+                            user.totalBookings ??
+                            0
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    <span class="user-joined-date">
+                        ${escapeHtml(
+                            formatUserJoinedDate(
+                                user.createdAt
+                            )
+                        )}
+                    </span>
+                </td>
+                `;
+
+
+            table.appendChild(
+                row
+            );
+        }
+    );
+}
+
+
+async function loadUsers() {
+
+    const table =
+        document.getElementById(
+            "userTable"
+        );
+
+
+    if (table) {
+
+        table.innerHTML =
+            `
+            <tr>
+                <td
+                    class="empty-row"
+                    colspan="8"
+                >
+                    Loading registered users…
+                </td>
+            </tr>
+            `;
+    }
+
+
+    try {
+
+        const res =
+            await adminFetch(
+                ADMIN_USER_API,
+                {
+                    cache:
+                        "no-store"
+                }
+            );
+
+
+        if (!res.ok) {
+
+            throw new Error(
+                await errorMessage(
+                    res
+                )
+            );
+        }
+
+
+        const data =
+            await res.json();
+
+
+        usersCache =
+            Array.isArray(
+                data
+            )
+                ? data
+                : [];
+
+
+        renderUsers();
+
+        updateStats();
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        if (table) {
+
+            table.innerHTML =
+                `
+                <tr>
+                    <td
+                        class="
+                            empty-row
+                            error-text
+                        "
+                        colspan="8"
+                    >
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </td>
+                </tr>
+                `;
+        }
+
+
+        showToast(
+            `Users: ${error.message}`,
+            "error"
+        );
+    }
+}
+
+
+function syncAdminPanelBodyLock() {
+
+    const bookingOpen =
+        document
+            .getElementById(
+                "bookingPanel"
+            )
+            ?.classList
+            .contains(
+                "active"
+            )
+        || false;
+
+
+    const userOpen =
+        document
+            .getElementById(
+                "userPanel"
+            )
+            ?.classList
+            .contains(
+                "active"
+            )
+        || false;
+
+
+    document.body.classList.toggle(
+        "panel-open",
+        bookingOpen ||
+        userOpen
+    );
+}
+
+
+function toggleUserPanel(
+    forceOpen
+) {
+
+    const panel =
+        document.getElementById(
+            "userPanel"
+        );
+
+    const backdrop =
+        document.getElementById(
+            "userPanelBackdrop"
+        );
+
+
+    if (
+        !panel ||
+        !backdrop
+    ) {
+        return;
+    }
+
+
+    const shouldOpen =
+        typeof forceOpen ===
+            "boolean"
+            ? forceOpen
+            : !panel.classList.contains(
+                "active"
+            );
+
+
+    if (shouldOpen) {
+
+        toggleBookingPanel(
+            false
+        );
+    }
+
+
+    panel.classList.toggle(
+        "active",
+        shouldOpen
+    );
+
+
+    backdrop.classList.toggle(
+        "active",
+        shouldOpen
+    );
+
+
+    panel.setAttribute(
+        "aria-hidden",
+        String(
+            !shouldOpen
+        )
+    );
+
+
+    syncAdminPanelBodyLock();
+
+
+    if (shouldOpen) {
+
+        loadUsers();
+
+        setTimeout(
+            () =>
+                document
+                    .getElementById(
+                        "userSearch"
+                    )
+                    ?.focus(),
+            150
+        );
+    }
+}
+
+
+// ---------------------------------------------------------
 // LOAD BOOKINGS
 // ---------------------------------------------------------
 
@@ -2378,6 +3037,39 @@ function toggleBookingPanel(
             );
 
 
+    if (shouldOpen) {
+
+        const userPanel =
+            document.getElementById(
+                "userPanel"
+            );
+
+        const userBackdrop =
+            document.getElementById(
+                "userPanelBackdrop"
+            );
+
+
+        userPanel
+            ?.classList
+            .remove(
+                "active"
+            );
+
+        userBackdrop
+            ?.classList
+            .remove(
+                "active"
+            );
+
+        userPanel
+            ?.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+    }
+
+
     panel.classList.toggle(
         "active",
         shouldOpen
@@ -2398,10 +3090,7 @@ function toggleBookingPanel(
     );
 
 
-    document.body.classList.toggle(
-        "panel-open",
-        shouldOpen
-    );
+    syncAdminPanelBodyLock();
 
 
     if (shouldOpen) {
@@ -2616,7 +3305,8 @@ async function refreshAdminData() {
 
     await Promise.all([
         loadBikes(),
-        loadBookings()
+        loadBookings(),
+        loadUsers()
     ]);
 
 
@@ -2708,6 +3398,36 @@ document
     );
 
 
+document
+    .getElementById(
+        "userSearch"
+    )
+    ?.addEventListener(
+        "input",
+        renderUsers
+    );
+
+
+document
+    .getElementById(
+        "userVerificationFilter"
+    )
+    ?.addEventListener(
+        "change",
+        renderUsers
+    );
+
+
+document
+    .getElementById(
+        "userAccountFilter"
+    )
+    ?.addEventListener(
+        "change",
+        renderUsers
+    );
+
+
 [
     "name",
     "type",
@@ -2736,22 +3456,42 @@ document.addEventListener(
     event => {
 
         if (
-            event.key ===
+            event.key !==
             "Escape"
+        ) {
+            return;
+        }
 
-            &&
 
+        if (
             document
                 .getElementById(
                     "bookingPanel"
                 )
-                .classList
+                ?.classList
                 .contains(
                     "active"
                 )
         ) {
 
             toggleBookingPanel(
+                false
+            );
+        }
+
+
+        if (
+            document
+                .getElementById(
+                    "userPanel"
+                )
+                ?.classList
+                .contains(
+                    "active"
+                )
+        ) {
+
+            toggleUserPanel(
                 false
             );
         }
@@ -2765,5 +3505,6 @@ document.addEventListener(
 
 Promise.all([
     loadBikes(),
-    loadBookings()
+    loadBookings(),
+    loadUsers()
 ]);

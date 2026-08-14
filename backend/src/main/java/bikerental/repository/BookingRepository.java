@@ -33,4 +33,6 @@ public interface BookingRepository
 
     List<Booking> findByUserIdOrderByIdDesc(
             Long userId);
+
+    long countByUserId(Long userId);
 }

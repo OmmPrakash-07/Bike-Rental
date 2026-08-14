@@ -3,6 +3,7 @@ package bikerental.service;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import bikerental.dto.AdminUserSummary;
 import bikerental.dto.EmailOtpResendRequest;
 import bikerental.dto.EmailOtpVerifyRequest;
 import bikerental.dto.OtpChallengeResponse;
@@ -20,6 +22,7 @@ import bikerental.dto.UserLoginRequest;
 import bikerental.dto.UserProfile;
 import bikerental.dto.UserSignupRequest;
 import bikerental.model.UserAccount;
+import bikerental.repository.BookingRepository;
 import bikerental.repository.UserAccountRepository;
 
 @Service
@@ -32,6 +35,7 @@ public class UserAccountService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final UserAccountRepository repository;
+    private final BookingRepository bookingRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailOtpService emailOtpService;
     private final long otpExpiryMinutes;
@@ -40,12 +44,14 @@ public class UserAccountService {
 
     public UserAccountService(
             UserAccountRepository repository,
+            BookingRepository bookingRepository,
             PasswordEncoder passwordEncoder,
             EmailOtpService emailOtpService,
             @Value("${app.otp.email.expiry-minutes:5}") long otpExpiryMinutes,
             @Value("${app.otp.email.resend-seconds:60}") long otpResendSeconds,
             @Value("${app.otp.email.max-attempts:5}") int otpMaxAttempts) {
         this.repository = repository;
+        this.bookingRepository = bookingRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailOtpService = emailOtpService;
         this.otpExpiryMinutes = Math.max(1, otpExpiryMinutes);
@@ -182,6 +188,22 @@ public class UserAccountService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Email verification required");
         }
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminUserSummary> listUsersForAdmin() {
+        return repository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(user -> new AdminUserSummary(
+                        user.getId(),
+                        user.getFullName(),
+                        user.getEmail(),
+                        user.getPhone(),
+                        user.isEmailVerified(),
+                        user.isActive(),
+                        user.getCreatedAt(),
+                        bookingRepository.countByUserId(user.getId())))
+                .toList();
     }
 
     public UserProfile toProfile(UserAccount user) {
