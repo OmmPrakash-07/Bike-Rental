@@ -621,7 +621,7 @@ GET /api/health
 ```http
 POST /api/user-auth/signup
 POST /api/user-auth/verify-email
-POST /api/user-auth/resend-otp
+POST /api/user-auth/resend-email-otp
 POST /api/user-auth/login
 ```
 

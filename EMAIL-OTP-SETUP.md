@@ -8,7 +8,7 @@ This patch changes customer signup from immediate JWT login to email verificatio
 2. Backend creates/updates an unverified customer record.
 3. A 6-digit OTP is generated with `SecureRandom`.
 4. Only a BCrypt hash of the OTP is stored in MySQL.
-5. OTP is emailed through SMTP.
+5. OTP is emailed through the Brevo Transactional Email API over HTTPS.
 6. Customer enters the OTP on `account.html`.
 7. Correct, non-expired OTP marks the email verified and returns the normal user JWT.
 8. Login and protected booking APIs reject unverified customer accounts.
@@ -68,18 +68,14 @@ Successful response no longer contains a JWT:
 
 A successful verification returns the normal JWT response and the frontend signs the user in.
 
-## SMTP environment variables
+## Brevo environment variables
 
 Configure these locally and in Railway. Never commit real credentials.
 
 ```text
-MAIL_HOST=<smtp host>
-MAIL_PORT=587
-MAIL_USERNAME=<smtp username/email>
-MAIL_PASSWORD=<smtp password or app password>
-MAIL_FROM=<verified sender email>
-MAIL_SMTP_AUTH=true
-MAIL_STARTTLS=true
+BREVO_API_KEY=<Brevo API key>
+BREVO_SENDER_EMAIL=<verified sender email>
+BREVO_SENDER_NAME=BikeRental
 ```
 
 Optional OTP tuning:
@@ -90,23 +86,11 @@ EMAIL_OTP_RESEND_SECONDS=60
 EMAIL_OTP_MAX_ATTEMPTS=5
 ```
 
-### Gmail SMTP example
-
-```text
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=<Google app password, not your normal account password>
-MAIL_FROM=your-email@gmail.com
-MAIL_SMTP_AUTH=true
-MAIL_STARTTLS=true
-```
-
-Do not put the real mail password in `application.properties`, GitHub, README screenshots, or chat.
+Do not put the real Brevo API key in `application.properties`, GitHub, README screenshots, or chat.
 
 ## Local test sequence
 
-Set MySQL, JWT, admin and SMTP environment variables in the same PowerShell terminal, then run:
+Set MySQL, JWT, admin and Brevo environment variables in the same PowerShell terminal, then run:
 
 ```powershell
 cd "E:\Project\Major Project\Bike Rental\backend"
@@ -138,4 +122,4 @@ Use a real inbox you can access. Confirm:
 
 ## Railway deployment order
 
-Add the SMTP variables to Railway **before** pushing this patch to production. Otherwise signup will correctly fail with a 503 because email delivery is not configured.
+Add the Brevo variables to Railway **before** pushing this patch to production. Otherwise signup will correctly fail with a 503 because email delivery is not configured.
