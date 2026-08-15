@@ -1014,7 +1014,7 @@ function renderAiSpecifications(
         `
             <div>
                 <span>AI Result</span>
-                <strong>Verified details found</strong>
+                <strong>AI details generated</strong>
             </div>
         `;
 
@@ -1258,7 +1258,7 @@ async function generateAiSpecifications() {
         "ai-spec-status";
 
     status.textContent =
-        "Gemini is checking public web sources and preparing the specification preview…";
+        "Gemini is generating a structured specification preview…";
 
     try {
 
