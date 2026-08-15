@@ -43,6 +43,11 @@ public class BikeController {
         return service.getAllBikes();
     }
 
+    @GetMapping("/{id}")
+    public Bike getBike(@PathVariable Long id) {
+        return service.getBikeById(id);
+    }
+
     @PostMapping
     public Bike addBike(@RequestBody Bike bike) {
         return service.addBike(bike);

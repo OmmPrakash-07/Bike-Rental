@@ -11,6 +11,9 @@ const BOOKING_API =
 const ADMIN_USER_API =
     `${API_BASE}/api/admin/users`;
 
+const AI_SPEC_API =
+    `${API_BASE}/api/admin/bikes/specifications/generate`;
+
 const MAX_IMAGE_BYTES =
     5 * 1024 * 1024;
 
@@ -36,6 +39,14 @@ let bookingsCache = [];
 let usersCache = [];
 
 let previewObjectUrl = null;
+
+let generatedSpecsDraft = null;
+
+let generatedSpecsSources = [];
+
+let generatedSpecsModel = "";
+
+let generatedSpecsIdentity = "";
 
 
 // ---------------------------------------------------------
@@ -356,6 +367,7 @@ function validateBikeForm() {
         "name",
         "type",
         "fuelType",
+        "modelYear",
         "price",
         "hourlyPrice",
         "image"
@@ -395,6 +407,16 @@ function validateBikeForm() {
             .value
             .trim()
             .toUpperCase();
+
+
+    const modelYear =
+        Number(
+            document
+                .getElementById(
+                    "modelYear"
+                )
+                .value
+        );
 
 
     const price =
@@ -498,6 +520,26 @@ function validateBikeForm() {
 
         firstInvalid ??=
             "fuelType";
+    }
+
+
+    // MODEL YEAR
+
+    if (
+        !Number.isInteger(
+            modelYear
+        ) ||
+        modelYear < 1950 ||
+        modelYear > 2100
+    ) {
+
+        setFieldError(
+            "modelYear",
+            "Enter a valid model year between 1950 and 2100."
+        );
+
+        firstInvalid ??=
+            "modelYear";
     }
 
 
@@ -637,12 +679,746 @@ function validateBikeForm() {
 
         fuelType,
 
+        modelYear,
+
         price,
 
         hourlyPrice,
 
         file
     };
+}
+
+
+
+// ---------------------------------------------------------
+// AI VEHICLE SPECIFICATIONS
+// ---------------------------------------------------------
+
+const AI_SPEC_FIELDS = [
+    ["displacementCc", "Displacement", value => `${value} cc`],
+    ["engineType", "Engine Type", value => value],
+    ["maxPower", "Max Power", value => value],
+    ["maxTorque", "Max Torque", value => value],
+    ["transmission", "Transmission", value => value],
+    ["topSpeedKmph", "Top Speed", value => `${value} km/h`],
+    ["mileageKmpl", "Mileage", value => `${value} km/l`],
+    ["fuelTankLitres", "Fuel Tank", value => `${value} L`],
+    ["batteryCapacityKwh", "Battery", value => `${value} kWh`],
+    ["claimedRangeKm", "Claimed Range", value => `${value} km`],
+    ["chargingTime", "Charging Time", value => value],
+    ["motorPower", "Motor Power", value => value],
+    ["frontBrake", "Front Brake", value => value],
+    ["rearBrake", "Rear Brake", value => value],
+    ["absType", "ABS", value => value],
+    ["frontTyre", "Front Tyre", value => value],
+    ["rearTyre", "Rear Tyre", value => value],
+    ["wheelType", "Wheels", value => value],
+    ["frontSuspension", "Front Suspension", value => value],
+    ["rearSuspension", "Rear Suspension", value => value],
+    ["kerbWeightKg", "Kerb Weight", value => `${value} kg`],
+    ["seatHeightMm", "Seat Height", value => `${value} mm`],
+    ["groundClearanceMm", "Ground Clearance", value => `${value} mm`],
+    ["cylinders", "Cylinders", value => String(value)],
+    ["coolingSystem", "Cooling", value => value],
+    ["clutchType", "Clutch", value => value],
+    ["startingType", "Starting", value => value]
+];
+
+function currentAiSpecIdentity() {
+
+    const name =
+        document
+            .getElementById(
+                "name"
+            )
+            ?.value
+            .trim()
+            .replace(
+                /\s+/g,
+                " "
+            ) || "";
+
+    const modelYear =
+        document
+            .getElementById(
+                "modelYear"
+            )
+            ?.value || "";
+
+    const type =
+        document
+            .getElementById(
+                "type"
+            )
+            ?.value
+            .trim()
+            .replace(
+                /\s+/g,
+                " "
+            ) || "";
+
+    const fuelType =
+        document
+            .getElementById(
+                "fuelType"
+            )
+            ?.value
+            .trim()
+            .toUpperCase() || "";
+
+    return [
+        name.toLowerCase(),
+        modelYear,
+        type.toLowerCase(),
+        fuelType
+    ].join("|");
+}
+
+function hasSpecificationValue(
+    value
+) {
+
+    return (
+        value !== null &&
+        value !== undefined &&
+        value !== ""
+    );
+}
+
+function hasAnyAiSpecification(
+    specs
+) {
+
+    return !!specs &&
+        AI_SPEC_FIELDS.some(
+            ([key]) =>
+                hasSpecificationValue(
+                    specs[key]
+                )
+        );
+}
+
+function bikeSpecifications(
+    bike
+) {
+
+    const specs = {};
+
+    AI_SPEC_FIELDS.forEach(
+        ([key]) => {
+
+            if (
+                hasSpecificationValue(
+                    bike?.[key]
+                )
+            ) {
+
+                specs[key] =
+                    bike[key];
+            }
+        }
+    );
+
+    return specs;
+}
+
+function clearAiSpecificationPreview(
+    {
+        stale = false
+    } = {}
+) {
+
+    generatedSpecsDraft =
+        null;
+
+    generatedSpecsSources =
+        [];
+
+    generatedSpecsModel =
+        "";
+
+    generatedSpecsIdentity =
+        "";
+
+    const preview =
+        document.getElementById(
+            "aiSpecPreview"
+        );
+
+    if (preview) {
+        preview.hidden =
+            true;
+    }
+
+    const status =
+        document.getElementById(
+            "aiSpecStatus"
+        );
+
+    if (status) {
+
+        status.className =
+            stale
+                ? "ai-spec-status ai-spec-stale"
+                : "ai-spec-status";
+
+        status.textContent =
+            stale
+                ? "Vehicle identity changed. Generate AI specifications again."
+                : "Ready when vehicle identity is filled.";
+    }
+}
+
+function markAiSpecificationsStale() {
+
+    if (
+        generatedSpecsDraft
+    ) {
+
+        clearAiSpecificationPreview(
+            {
+                stale: true
+            }
+        );
+    }
+}
+
+function formatAiSpecValue(
+    key,
+    value
+) {
+
+    const field =
+        AI_SPEC_FIELDS.find(
+            ([candidate]) =>
+                candidate === key
+        );
+
+    if (!field) {
+        return String(
+            value
+        );
+    }
+
+    return field[2](
+        value
+    );
+}
+
+function renderAiSpecifications(
+    specs,
+    {
+        sources = [],
+        model = "",
+        notice = "",
+        statusText = "Specifications ready. Review them, then save the vehicle."
+    } = {}
+) {
+
+    generatedSpecsDraft =
+        specs || {};
+
+    generatedSpecsSources =
+        Array.isArray(
+            sources
+        )
+            ? sources
+            : [];
+
+    generatedSpecsModel =
+        model || "";
+
+    generatedSpecsIdentity =
+        currentAiSpecIdentity();
+
+    const preview =
+        document.getElementById(
+            "aiSpecPreview"
+        );
+
+    const summary =
+        document.getElementById(
+            "aiSpecSummary"
+        );
+
+    const list =
+        document.getElementById(
+            "aiSpecList"
+        );
+
+    const status =
+        document.getElementById(
+            "aiSpecStatus"
+        );
+
+    const noticeNode =
+        document.getElementById(
+            "aiSpecNotice"
+        );
+
+    const summaryKeys =
+        [
+            "displacementCc",
+            "maxPower",
+            "topSpeedKmph",
+            document
+                .getElementById(
+                    "fuelType"
+                )
+                ?.value === "ELECTRIC"
+                ? "claimedRangeKm"
+                : "mileageKmpl"
+        ];
+
+    const summaryHtml =
+        summaryKeys
+            .filter(
+                key =>
+                    hasSpecificationValue(
+                        generatedSpecsDraft[
+                            key
+                        ]
+                    )
+            )
+            .map(
+                key => {
+
+                    const field =
+                        AI_SPEC_FIELDS.find(
+                            ([candidate]) =>
+                                candidate === key
+                        );
+
+                    return `
+                        <div>
+                            <span>${escapeHtml(
+                                field?.[1] || key
+                            )}</span>
+                            <strong>${escapeHtml(
+                                formatAiSpecValue(
+                                    key,
+                                    generatedSpecsDraft[
+                                        key
+                                    ]
+                                )
+                            )}</strong>
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+
+    summary.innerHTML =
+        summaryHtml ||
+        `
+            <div>
+                <span>AI Result</span>
+                <strong>Verified details found</strong>
+            </div>
+        `;
+
+    list.innerHTML =
+        AI_SPEC_FIELDS
+            .filter(
+                ([key]) =>
+                    hasSpecificationValue(
+                        generatedSpecsDraft[
+                            key
+                        ]
+                    )
+            )
+            .map(
+                ([
+                    key,
+                    label
+                ]) =>
+                    `
+                        <div>
+                            <span>${escapeHtml(
+                                label
+                            )}</span>
+                            <strong>${escapeHtml(
+                                formatAiSpecValue(
+                                    key,
+                                    generatedSpecsDraft[
+                                        key
+                                    ]
+                                )
+                            )}</strong>
+                        </div>
+                    `
+            )
+            .join("");
+
+    const sourceBlock =
+        document.getElementById(
+            "aiSpecSources"
+        );
+
+    const sourceLinks =
+        document.getElementById(
+            "aiSpecSourceLinks"
+        );
+
+    const safeSources =
+        generatedSpecsSources.filter(
+            source =>
+                /^https?:\/\//i.test(
+                    String(
+                        source?.url || ""
+                    )
+                )
+        );
+
+    sourceBlock.hidden =
+        safeSources.length === 0;
+
+    sourceLinks.innerHTML =
+        safeSources
+            .map(
+                source =>
+                    `
+                        <a
+                            href="${escapeHtml(
+                                source.url
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="${escapeHtml(
+                                source.title ||
+                                "Specification source"
+                            )}"
+                        >
+                            ${escapeHtml(
+                                source.title ||
+                                "Source"
+                            )}
+                        </a>
+                    `
+            )
+            .join("");
+
+    noticeNode.textContent =
+        notice ||
+        "Unknown or unsupported values are intentionally left blank.";
+
+    status.className =
+        "ai-spec-status is-success";
+
+    status.textContent =
+        statusText;
+
+    preview.hidden =
+        false;
+}
+
+async function generateAiSpecifications() {
+
+    [
+        "name",
+        "type",
+        "fuelType",
+        "modelYear"
+    ].forEach(
+        clearFieldError
+    );
+
+    const name =
+        document
+            .getElementById(
+                "name"
+            )
+            .value
+            .trim()
+            .replace(
+                /\s+/g,
+                " "
+            );
+
+    const type =
+        document
+            .getElementById(
+                "type"
+            )
+            .value
+            .trim()
+            .replace(
+                /\s+/g,
+                " "
+            );
+
+    const fuelType =
+        document
+            .getElementById(
+                "fuelType"
+            )
+            .value
+            .trim()
+            .toUpperCase();
+
+    const modelYear =
+        Number(
+            document
+                .getElementById(
+                    "modelYear"
+                )
+                .value
+        );
+
+    let firstInvalid =
+        null;
+
+    if (
+        name.length < 2
+    ) {
+
+        setFieldError(
+            "name",
+            "Enter the exact vehicle/model name."
+        );
+
+        firstInvalid ??=
+            "name";
+    }
+
+    if (!type) {
+
+        setFieldError(
+            "type",
+            "Vehicle type is required."
+        );
+
+        firstInvalid ??=
+            "type";
+    }
+
+    if (
+        !["PETROL", "ELECTRIC"]
+            .includes(
+                fuelType
+            )
+    ) {
+
+        setFieldError(
+            "fuelType",
+            "Choose Petrol or Electric."
+        );
+
+        firstInvalid ??=
+            "fuelType";
+    }
+
+    if (
+        !Number.isInteger(
+            modelYear
+        ) ||
+        modelYear < 1950 ||
+        modelYear > 2100
+    ) {
+
+        setFieldError(
+            "modelYear",
+            "Enter the vehicle model year."
+        );
+
+        firstInvalid ??=
+            "modelYear";
+    }
+
+    if (firstInvalid) {
+
+        document
+            .getElementById(
+                firstInvalid
+            )
+            .focus();
+
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            "generateAiSpecsButton"
+        );
+
+    const status =
+        document.getElementById(
+            "aiSpecStatus"
+        );
+
+    setButtonLoading(
+        button,
+        true,
+        "✨ Researching…",
+        "✨ Generate AI Specs"
+    );
+
+    status.className =
+        "ai-spec-status";
+
+    status.textContent =
+        "Gemini is checking public web sources and preparing the specification preview…";
+
+    try {
+
+        const response =
+            await adminFetch(
+                AI_SPEC_API,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                name,
+                                modelYear,
+                                type,
+                                fuelType
+                            }
+                        )
+                }
+            );
+
+        if (!response.ok) {
+
+            throw new Error(
+                await errorMessage(
+                    response
+                )
+            );
+        }
+
+        const result =
+            await response.json();
+
+        const specs =
+            result?.specifications ||
+            {};
+
+        if (
+            !hasAnyAiSpecification(
+                specs
+            )
+        ) {
+
+            throw new Error(
+                "AI could not verify enough technical specifications for this exact vehicle."
+            );
+        }
+
+        renderAiSpecifications(
+            specs,
+            {
+                sources:
+                    result.sources ||
+                    [],
+
+                model:
+                    result.modelUsed ||
+                    "",
+
+                notice:
+                    result.notice ||
+                    ""
+            }
+        );
+
+        showToast(
+            "AI specifications generated. Review and save the vehicle."
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        generatedSpecsDraft =
+            null;
+
+        generatedSpecsIdentity =
+            "";
+
+        status.className =
+            "ai-spec-status is-error";
+
+        status.textContent =
+            error.message;
+
+        document
+            .getElementById(
+                "aiSpecPreview"
+            )
+            .hidden =
+                true;
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+    finally {
+
+        setButtonLoading(
+            button,
+            false,
+            "✨ Researching…",
+            "✨ Generate AI Specs"
+        );
+    }
+}
+
+function currentSpecificationPayload() {
+
+    if (
+        !generatedSpecsDraft ||
+        generatedSpecsIdentity !==
+            currentAiSpecIdentity()
+    ) {
+
+        return {};
+    }
+
+    const payload = {};
+
+    AI_SPEC_FIELDS.forEach(
+        ([key]) => {
+
+            if (
+                hasSpecificationValue(
+                    generatedSpecsDraft[
+                        key
+                    ]
+                )
+            ) {
+
+                payload[key] =
+                    generatedSpecsDraft[
+                        key
+                    ];
+            }
+            else {
+
+                payload[key] =
+                    null;
+            }
+        }
+    );
+
+    payload.specificationsModel =
+        generatedSpecsModel ||
+        null;
+
+    return payload;
 }
 
 
@@ -1231,13 +2007,18 @@ async function saveBike(
             fuelType:
                 values.fuelType,
 
+            modelYear:
+                values.modelYear,
+
             pricePerDay:
                 values.price,
 
             pricePerHour:
                 values.hourlyPrice,
 
-            imageUrl
+            imageUrl,
+
+            ...currentSpecificationPayload()
         };
 
 
@@ -1349,6 +2130,7 @@ function editBike(
         "name",
         "type",
         "fuelType",
+        "modelYear",
         "price",
         "hourlyPrice",
         "image"
@@ -1383,6 +2165,14 @@ function editBike(
                       bike.fuelType
                   ).toUpperCase()
                 : "";
+
+
+    document
+        .getElementById(
+            "modelYear"
+        )
+        .value =
+            bike.modelYear ?? "";
 
 
     document
@@ -1454,6 +2244,39 @@ function editBike(
     else {
 
         hideImagePreview();
+    }
+
+
+    const savedSpecs =
+        bikeSpecifications(
+            bike
+        );
+
+    if (
+        hasAnyAiSpecification(
+            savedSpecs
+        )
+    ) {
+
+        renderAiSpecifications(
+            savedSpecs,
+            {
+                model:
+                    bike.specificationsModel ||
+                    "",
+
+                notice:
+                    "These specifications are already saved for this vehicle. Regenerate them if the model identity changed.",
+
+                statusText:
+                    "Saved technical specifications loaded."
+            }
+        );
+
+    }
+    else {
+
+        clearAiSpecificationPreview();
     }
 
 
@@ -1529,6 +2352,7 @@ function resetBikeForm() {
         "name",
         "type",
         "fuelType",
+        "modelYear",
         "price",
         "hourlyPrice",
         "image"
@@ -1538,6 +2362,8 @@ function resetBikeForm() {
 
 
     hideImagePreview();
+
+    clearAiSpecificationPreview();
 }
 
 
@@ -3431,6 +4257,7 @@ document
 [
     "name",
     "type",
+    "modelYear",
     "price",
     "hourlyPrice"
 ].forEach(
@@ -3449,6 +4276,53 @@ document
             );
     }
 );
+
+
+
+document
+    .getElementById(
+        "generateAiSpecsButton"
+    )
+    ?.addEventListener(
+        "click",
+        generateAiSpecifications
+    );
+
+
+[
+    "name",
+    "type",
+    "modelYear"
+].forEach(
+    id => {
+
+        document
+            .getElementById(
+                id
+            )
+            ?.addEventListener(
+                "input",
+                markAiSpecificationsStale
+            );
+    }
+);
+
+
+document
+    .getElementById(
+        "fuelType"
+    )
+    ?.addEventListener(
+        "change",
+        () => {
+
+            clearFieldError(
+                "fuelType"
+            );
+
+            markAiSpecificationsStale();
+        }
+    );
 
 
 document.addEventListener(

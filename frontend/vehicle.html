@@ -123,6 +123,7 @@
                     <div class="vehicle-detail-pills">
                         <span id="vehicleTypePill" class="vehicle-meta-pill">Vehicle</span>
                         <span id="vehicleFuelPill" class="vehicle-meta-pill">Fuel</span>
+                        <span id="vehicleYearPill" class="vehicle-meta-pill" hidden>Year</span>
                     </div>
 
                     <h1 id="vehicleDetailName">Vehicle</h1>
@@ -181,6 +182,38 @@
                     </p>
                 </div>
             </article>
+        </section>
+
+
+        <section
+            id="vehicleSpecificationSection"
+            class="vehicle-spec-section"
+            hidden
+        >
+            <div class="vehicle-spec-heading">
+                <div>
+                    <span class="section-label">TECHNICAL SPECIFICATIONS</span>
+                    <h2>Know your ride.</h2>
+                    <p>
+                        Technical details saved by the admin for this exact vehicle.
+                        Only available specifications are shown.
+                    </p>
+                </div>
+
+                <span class="vehicle-spec-ai-badge">
+                    ✨ AI-assisted
+                </span>
+            </div>
+
+            <div
+                id="vehicleSpecHighlights"
+                class="vehicle-spec-highlights"
+            ></div>
+
+            <div
+                id="vehicleSpecGroups"
+                class="vehicle-spec-groups"
+            ></div>
         </section>
 
         <section class="vehicle-detail-benefits">

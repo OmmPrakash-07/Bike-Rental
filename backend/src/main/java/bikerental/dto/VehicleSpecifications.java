@@ -1,0 +1,31 @@
+package bikerental.dto;
+
+public record VehicleSpecifications(
+        Integer displacementCc,
+        String engineType,
+        String maxPower,
+        String maxTorque,
+        String transmission,
+        Integer topSpeedKmph,
+        Double mileageKmpl,
+        Double fuelTankLitres,
+        Double batteryCapacityKwh,
+        Integer claimedRangeKm,
+        String chargingTime,
+        String motorPower,
+        String frontBrake,
+        String rearBrake,
+        String absType,
+        String frontTyre,
+        String rearTyre,
+        String wheelType,
+        String frontSuspension,
+        String rearSuspension,
+        Double kerbWeightKg,
+        Integer seatHeightMm,
+        Integer groundClearanceMm,
+        Integer cylinders,
+        String coolingSystem,
+        String clutchType,
+        String startingType) {
+}

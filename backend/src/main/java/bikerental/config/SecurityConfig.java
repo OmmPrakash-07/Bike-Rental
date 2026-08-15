@@ -156,6 +156,14 @@ public class SecurityConfig {
                                 "/api/bookings/*")
                         .authenticated()
 
+                        // Admin AI specification generation.
+                        // The Gemini API key remains server-side and is never
+                        // returned to the browser.
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/admin/bikes/specifications/generate")
+                        .hasAuthority("SCOPE_admin")
+
                         // Admin bike management
                         .requestMatchers(
                                 HttpMethod.POST,

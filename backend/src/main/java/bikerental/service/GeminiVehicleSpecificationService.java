@@ -1,0 +1,1008 @@
+package bikerental.service;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import bikerental.dto.AiSpecificationRequest;
+import bikerental.dto.AiSpecificationResponse;
+import bikerental.dto.SpecificationSource;
+import bikerental.dto.VehicleSpecifications;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+
+@Service
+public class GeminiVehicleSpecificationService {
+
+    private static final String GEMINI_BASE_URL =
+            "https://generativelanguage.googleapis.com/v1beta/models/";
+
+    private static final Set<String> ALLOWED_FUEL_TYPES =
+            Set.of("PETROL", "ELECTRIC");
+
+    private final String apiKey;
+    private final String model;
+    private final ObjectMapper objectMapper;
+    private final HttpClient httpClient;
+
+    public GeminiVehicleSpecificationService(
+            @Value("${app.gemini.api-key:}") String apiKey,
+            @Value("${app.gemini.model:gemini-2.5-flash}") String model,
+            ObjectMapper objectMapper) {
+
+        this.apiKey =
+                apiKey == null ? "" : apiKey.trim();
+
+        this.model =
+                model == null || model.isBlank()
+                        ? "gemini-2.5-flash"
+                        : model.trim();
+
+        this.objectMapper =
+                objectMapper;
+
+        this.httpClient =
+                HttpClient.newBuilder()
+                        .connectTimeout(
+                                Duration.ofSeconds(10))
+                        .build();
+    }
+
+    public AiSpecificationResponse generate(
+            AiSpecificationRequest request) {
+
+        validateConfiguration();
+
+        NormalizedVehicle vehicle =
+                validateAndNormalize(
+                        request);
+
+        /*
+         * Gemini 2.5 Flash supports Google Search grounding and structured
+         * output, but combining structured output with built-in tools is a
+         * Gemini 3 feature. To keep this integration on the requested free
+         * Gemini 2.5 Flash tier, we use two calls:
+         *
+         * 1) grounded research with Google Search;
+         * 2) structured extraction of only the grounded research.
+         *
+         * The second pass is explicitly forbidden from adding facts that
+         * were not present in the grounded research.
+         */
+        GeminiCallResult research =
+                callGroundedResearch(
+                        vehicle);
+
+        List<SpecificationSource> sources =
+                extractSources(
+                        research.root());
+
+        if (sources.isEmpty()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Gemini could not verify this vehicle with web sources. "
+                            + "Use the exact model/variant and model year, then try again");
+        }
+
+        String groundedText =
+                extractText(
+                        research.root());
+
+        if (groundedText.isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Gemini returned no specification research");
+        }
+
+        VehicleSpecifications specifications =
+                callStructuredExtraction(
+                        vehicle,
+                        groundedText);
+
+        specifications =
+                sanitizeSpecifications(
+                        specifications,
+                        vehicle.fuelType());
+
+        if (!hasAnyUsefulSpecification(
+                specifications)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    "Gemini found sources but could not verify enough technical specifications. "
+                            + "Try a more exact vehicle name or model year");
+        }
+
+        return new AiSpecificationResponse(
+                vehicle.name(),
+                vehicle.modelYear(),
+                model,
+                true,
+                specifications,
+                sources,
+                "AI-assisted specifications are grounded with Google Search. "
+                        + "Review the preview before saving the vehicle.");
+    }
+
+    private GeminiCallResult callGroundedResearch(
+            NormalizedVehicle vehicle) {
+
+        String prompt =
+                """
+                You are researching a vehicle for a bike-rental catalog.
+
+                Vehicle name / exact variant: %s
+                Model year: %d
+                Vehicle type: %s
+                Fuel type: %s
+
+                REQUIRED BEHAVIOR:
+                - Use Google Search before answering.
+                - Prefer the official manufacturer/model page and official manuals.
+                - When an official source is unavailable, use reputable automotive publications.
+                - Keep the exact model year and variant separate from similarly named variants.
+                - Do not guess, estimate, interpolate, or combine specifications from different years.
+                - For a value that cannot be supported by the search results, write UNKNOWN.
+                - If two reliable sources disagree, state the disagreement instead of choosing silently.
+                - For electric vehicles, research battery, motor power, claimed range and charging time.
+                - For petrol vehicles, research displacement, engine, power, torque, mileage and fuel tank.
+                - Also research transmission, top speed where reliably published, brakes, ABS,
+                  tyres, wheels, suspension, kerb weight, seat height, ground clearance,
+                  cylinder count, cooling system, clutch and starting type when available.
+
+                Return a concise factual research brief. Do not invent missing values.
+                """.formatted(
+                        vehicle.name(),
+                        vehicle.modelYear(),
+                        vehicle.type(),
+                        vehicle.fuelType());
+
+        Map<String, Object> payload =
+                new LinkedHashMap<>();
+
+        payload.put(
+                "contents",
+                List.of(
+                        Map.of(
+                                "parts",
+                                List.of(
+                                        Map.of(
+                                                "text",
+                                                prompt)))));
+
+        payload.put(
+                "tools",
+                List.of(
+                        Map.of(
+                                "google_search",
+                                Map.of())));
+
+        return callGemini(
+                payload);
+    }
+
+    private VehicleSpecifications callStructuredExtraction(
+            NormalizedVehicle vehicle,
+            String groundedResearch) {
+
+        String prompt =
+                """
+                Convert the GROUNDED RESEARCH below into the requested vehicle
+                specification JSON.
+
+                Vehicle: %s
+                Model year: %d
+                Type: %s
+                Fuel: %s
+
+                IMPORTANT:
+                - Use ONLY facts explicitly supported in GROUNDED RESEARCH.
+                - Do not use your memory and do not add new facts.
+                - Omit a property when its value is UNKNOWN, disputed, or not clearly supported.
+                - Numeric fields must contain only the number in the requested unit.
+                - maxPower, maxTorque, motorPower, transmission, brake, tyre, suspension,
+                  cooling, clutch and starting fields should retain useful units/details as strings.
+                - For PETROL, omit batteryCapacityKwh, claimedRangeKm, chargingTime and motorPower
+                  unless the vehicle genuinely uses those systems.
+                - For ELECTRIC, omit displacementCc, mileageKmpl, fuelTankLitres, cylinders,
+                  coolingSystem and clutchType unless genuinely applicable.
+
+                GROUNDED RESEARCH:
+                --------------------
+                %s
+                """.formatted(
+                        vehicle.name(),
+                        vehicle.modelYear(),
+                        vehicle.type(),
+                        vehicle.fuelType(),
+                        groundedResearch);
+
+        Map<String, Object> generationConfig =
+                new LinkedHashMap<>();
+
+        generationConfig.put(
+                "responseMimeType",
+                "application/json");
+
+        generationConfig.put(
+                "responseSchema",
+                specificationSchema());
+
+        Map<String, Object> payload =
+                new LinkedHashMap<>();
+
+        payload.put(
+                "contents",
+                List.of(
+                        Map.of(
+                                "parts",
+                                List.of(
+                                        Map.of(
+                                                "text",
+                                                prompt)))));
+
+        payload.put(
+                "generationConfig",
+                generationConfig);
+
+        GeminiCallResult result =
+                callGemini(
+                        payload);
+
+        String json =
+                extractText(
+                        result.root());
+
+        if (json.isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Gemini returned an empty specification result");
+        }
+
+        try {
+
+            return objectMapper.readValue(
+                    json,
+                    VehicleSpecifications.class);
+
+        } catch (JacksonException ex) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Gemini returned specifications in an unexpected format",
+                    ex);
+        }
+    }
+
+    private Map<String, Object> specificationSchema() {
+
+        Map<String, Object> properties =
+                new LinkedHashMap<>();
+
+        addInteger(
+                properties,
+                "displacementCc",
+                "Engine displacement in cubic centimetres (cc).");
+
+        addString(
+                properties,
+                "engineType",
+                "Engine layout/type and important configuration.");
+
+        addString(
+                properties,
+                "maxPower",
+                "Maximum power with unit, for example 217 hp or 160 kW.");
+
+        addString(
+                properties,
+                "maxTorque",
+                "Maximum torque with unit, for example 125 Nm.");
+
+        addString(
+                properties,
+                "transmission",
+                "Transmission, for example 6-speed manual or automatic.");
+
+        addInteger(
+                properties,
+                "topSpeedKmph",
+                "Reliably published top speed in km/h.");
+
+        addNumber(
+                properties,
+                "mileageKmpl",
+                "Mileage/fuel economy in km/l.");
+
+        addNumber(
+                properties,
+                "fuelTankLitres",
+                "Fuel tank capacity in litres.");
+
+        addNumber(
+                properties,
+                "batteryCapacityKwh",
+                "Battery capacity in kWh.");
+
+        addInteger(
+                properties,
+                "claimedRangeKm",
+                "Claimed electric riding range in km.");
+
+        addString(
+                properties,
+                "chargingTime",
+                "Charging time and charger context when available.");
+
+        addString(
+                properties,
+                "motorPower",
+                "Electric motor power with unit.");
+
+        addString(
+                properties,
+                "frontBrake",
+                "Front brake specification.");
+
+        addString(
+                properties,
+                "rearBrake",
+                "Rear brake specification.");
+
+        addString(
+                properties,
+                "absType",
+                "ABS/safety braking specification.");
+
+        addString(
+                properties,
+                "frontTyre",
+                "Front tyre size/type.");
+
+        addString(
+                properties,
+                "rearTyre",
+                "Rear tyre size/type.");
+
+        addString(
+                properties,
+                "wheelType",
+                "Wheel type/material and size when reliably known.");
+
+        addString(
+                properties,
+                "frontSuspension",
+                "Front suspension specification.");
+
+        addString(
+                properties,
+                "rearSuspension",
+                "Rear suspension specification.");
+
+        addNumber(
+                properties,
+                "kerbWeightKg",
+                "Kerb/curb weight in kg.");
+
+        addInteger(
+                properties,
+                "seatHeightMm",
+                "Seat height in millimetres.");
+
+        addInteger(
+                properties,
+                "groundClearanceMm",
+                "Ground clearance in millimetres.");
+
+        addInteger(
+                properties,
+                "cylinders",
+                "Number of engine cylinders.");
+
+        addString(
+                properties,
+                "coolingSystem",
+                "Cooling system.");
+
+        addString(
+                properties,
+                "clutchType",
+                "Clutch specification.");
+
+        addString(
+                properties,
+                "startingType",
+                "Starting system/type.");
+
+        Map<String, Object> schema =
+                new LinkedHashMap<>();
+
+        schema.put(
+                "type",
+                "OBJECT");
+
+        schema.put(
+                "properties",
+                properties);
+
+        return schema;
+    }
+
+    private void addString(
+            Map<String, Object> properties,
+            String key,
+            String description) {
+
+        properties.put(
+                key,
+                Map.of(
+                        "type",
+                        "STRING",
+                        "description",
+                        description));
+    }
+
+    private void addInteger(
+            Map<String, Object> properties,
+            String key,
+            String description) {
+
+        properties.put(
+                key,
+                Map.of(
+                        "type",
+                        "INTEGER",
+                        "description",
+                        description));
+    }
+
+    private void addNumber(
+            Map<String, Object> properties,
+            String key,
+            String description) {
+
+        properties.put(
+                key,
+                Map.of(
+                        "type",
+                        "NUMBER",
+                        "description",
+                        description));
+    }
+
+    private GeminiCallResult callGemini(
+            Map<String, Object> payload) {
+
+        String body;
+
+        try {
+
+            body =
+                    objectMapper.writeValueAsString(
+                            payload);
+
+        } catch (JacksonException ex) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Could not prepare Gemini request",
+                    ex);
+        }
+
+        URI uri =
+                URI.create(
+                        GEMINI_BASE_URL
+                                + model
+                                + ":generateContent");
+
+        HttpRequest request =
+                HttpRequest.newBuilder()
+                        .uri(uri)
+                        .timeout(
+                                Duration.ofSeconds(40))
+                        .header(
+                                "Content-Type",
+                                "application/json")
+                        .header(
+                                "x-goog-api-key",
+                                apiKey)
+                        .POST(
+                                HttpRequest.BodyPublishers
+                                        .ofString(body))
+                        .build();
+
+        HttpResponse<String> response;
+
+        try {
+
+            response =
+                    httpClient.send(
+                            request,
+                            HttpResponse.BodyHandlers
+                                    .ofString());
+
+        } catch (InterruptedException ex) {
+
+            Thread.currentThread()
+                    .interrupt();
+
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Gemini request was interrupted",
+                    ex);
+
+        } catch (IOException ex) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Could not connect to Gemini. Try again",
+                    ex);
+        }
+
+        int status =
+                response.statusCode();
+
+        if (status == 429) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Gemini free-tier limit is currently reached. Try again later");
+        }
+
+        if (status == 401
+                || status == 403) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Gemini API key is invalid or not allowed to use this model");
+        }
+
+        if (status < 200
+                || status >= 300) {
+
+            System.err.println(
+                    "Gemini API returned HTTP "
+                            + status);
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Gemini could not generate vehicle specifications. Try again");
+        }
+
+        try {
+
+            JsonNode root =
+                    objectMapper.readTree(
+                            response.body());
+
+            return new GeminiCallResult(
+                    root);
+
+        } catch (JacksonException ex) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    "Gemini returned an invalid response",
+                    ex);
+        }
+    }
+
+    private String extractText(
+            JsonNode root) {
+
+        JsonNode parts =
+                root.path(
+                        "candidates")
+                        .path(0)
+                        .path("content")
+                        .path("parts");
+
+        if (!parts.isArray()) {
+            return "";
+        }
+
+        StringBuilder text =
+                new StringBuilder();
+
+        for (JsonNode part :
+                parts) {
+
+            if (part.path("thought")
+                    .asBoolean(false)) {
+
+                continue;
+            }
+
+            String value =
+                    part.path("text")
+                            .asText("");
+
+            if (!value.isBlank()) {
+
+                if (!text.isEmpty()) {
+                    text.append('\n');
+                }
+
+                text.append(value);
+            }
+        }
+
+        return text.toString()
+                .trim();
+    }
+
+    private List<SpecificationSource> extractSources(
+            JsonNode root) {
+
+        JsonNode chunks =
+                root.path(
+                        "candidates")
+                        .path(0)
+                        .path("groundingMetadata")
+                        .path("groundingChunks");
+
+        if (!chunks.isArray()) {
+            return List.of();
+        }
+
+        List<SpecificationSource> result =
+                new ArrayList<>();
+
+        Set<String> seenUrls =
+                new LinkedHashSet<>();
+
+        for (JsonNode chunk :
+                chunks) {
+
+            JsonNode web =
+                    chunk.path("web");
+
+            String url =
+                    web.path("uri")
+                            .asText("")
+                            .trim();
+
+            if (url.isBlank()
+                    || !url.startsWith("http")
+                    || !seenUrls.add(url)) {
+
+                continue;
+            }
+
+            String title =
+                    web.path("title")
+                            .asText("")
+                            .trim();
+
+            if (title.isBlank()) {
+                title = "Specification source";
+            }
+
+            result.add(
+                    new SpecificationSource(
+                            title,
+                            url));
+
+            if (result.size() >= 8) {
+                break;
+            }
+        }
+
+        return List.copyOf(
+                result);
+    }
+
+    private VehicleSpecifications sanitizeSpecifications(
+            VehicleSpecifications specs,
+            String fuelType) {
+
+        if (specs == null) {
+
+            return new VehicleSpecifications(
+                    null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null);
+        }
+
+        boolean electric =
+                "ELECTRIC".equals(
+                        fuelType);
+
+        return new VehicleSpecifications(
+                electric
+                        ? null
+                        : saneInteger(
+                                specs.displacementCc(),
+                                20,
+                                5000),
+                clean(
+                        specs.engineType()),
+                clean(
+                        specs.maxPower()),
+                clean(
+                        specs.maxTorque()),
+                clean(
+                        specs.transmission()),
+                saneInteger(
+                        specs.topSpeedKmph(),
+                        5,
+                        500),
+                electric
+                        ? null
+                        : saneNumber(
+                                specs.mileageKmpl(),
+                                1,
+                                300),
+                electric
+                        ? null
+                        : saneNumber(
+                                specs.fuelTankLitres(),
+                                0.5,
+                                100),
+                electric
+                        ? saneNumber(
+                                specs.batteryCapacityKwh(),
+                                0.1,
+                                100)
+                        : null,
+                electric
+                        ? saneInteger(
+                                specs.claimedRangeKm(),
+                                1,
+                                2000)
+                        : null,
+                electric
+                        ? clean(
+                                specs.chargingTime())
+                        : null,
+                electric
+                        ? clean(
+                                specs.motorPower())
+                        : null,
+                clean(
+                        specs.frontBrake()),
+                clean(
+                        specs.rearBrake()),
+                clean(
+                        specs.absType()),
+                clean(
+                        specs.frontTyre()),
+                clean(
+                        specs.rearTyre()),
+                clean(
+                        specs.wheelType()),
+                clean(
+                        specs.frontSuspension()),
+                clean(
+                        specs.rearSuspension()),
+                saneNumber(
+                        specs.kerbWeightKg(),
+                        20,
+                        1000),
+                saneInteger(
+                        specs.seatHeightMm(),
+                        300,
+                        1500),
+                saneInteger(
+                        specs.groundClearanceMm(),
+                        30,
+                        1000),
+                electric
+                        ? null
+                        : saneInteger(
+                                specs.cylinders(),
+                                1,
+                                16),
+                electric
+                        ? null
+                        : clean(
+                                specs.coolingSystem()),
+                electric
+                        ? null
+                        : clean(
+                                specs.clutchType()),
+                clean(
+                        specs.startingType()));
+    }
+
+    private boolean hasAnyUsefulSpecification(
+            VehicleSpecifications specs) {
+
+        return specs != null
+                && (
+                        specs.displacementCc() != null
+                                || specs.maxPower() != null
+                                || specs.topSpeedKmph() != null
+                                || specs.mileageKmpl() != null
+                                || specs.batteryCapacityKwh() != null
+                                || specs.claimedRangeKm() != null
+                                || specs.motorPower() != null
+                                || specs.frontBrake() != null
+                                || specs.frontTyre() != null
+                                || specs.kerbWeightKg() != null);
+    }
+
+    private NormalizedVehicle validateAndNormalize(
+            AiSpecificationRequest request) {
+
+        if (request == null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Vehicle information is required");
+        }
+
+        String name =
+                normalizeText(
+                        request.name());
+
+        String type =
+                normalizeText(
+                        request.type());
+
+        String fuelType =
+                request.fuelType() == null
+                        ? ""
+                        : request.fuelType()
+                                .trim()
+                                .toUpperCase(
+                                        Locale.ROOT);
+
+        Integer modelYear =
+                request.modelYear();
+
+        if (name.length() < 2
+                || name.length() > 100) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Enter the exact vehicle/model name");
+        }
+
+        if (type.isBlank()
+                || type.length() > 40) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Vehicle type is required");
+        }
+
+        if (!ALLOWED_FUEL_TYPES.contains(
+                fuelType)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Fuel type must be PETROL or ELECTRIC");
+        }
+
+        if (modelYear == null
+                || modelYear < 1950
+                || modelYear > 2100) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Enter a valid model year");
+        }
+
+        return new NormalizedVehicle(
+                name,
+                modelYear,
+                type,
+                fuelType);
+    }
+
+    private void validateConfiguration() {
+
+        if (apiKey.isBlank()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "Gemini AI is not configured. Add GEMINI_API_KEY in Railway Variables");
+        }
+    }
+
+    private String normalizeText(
+            String value) {
+
+        if (value == null) {
+            return "";
+        }
+
+        return value.trim()
+                .replaceAll(
+                        "\\s+",
+                        " ");
+    }
+
+    private String clean(
+            String value) {
+
+        if (value == null) {
+            return null;
+        }
+
+        String normalized =
+                value.trim()
+                        .replaceAll(
+                                "\\s+",
+                                " ");
+
+        if (normalized.isBlank()
+                || normalized.equalsIgnoreCase(
+                        "unknown")
+                || normalized.equalsIgnoreCase(
+                        "n/a")
+                || normalized.length() > 180) {
+
+            return null;
+        }
+
+        return normalized;
+    }
+
+    private Integer saneInteger(
+            Integer value,
+            int minimum,
+            int maximum) {
+
+        if (value == null
+                || value < minimum
+                || value > maximum) {
+
+            return null;
+        }
+
+        return value;
+    }
+
+    private Double saneNumber(
+            Double value,
+            double minimum,
+            double maximum) {
+
+        if (value == null
+                || !Double.isFinite(
+                        value)
+                || value < minimum
+                || value > maximum) {
+
+            return null;
+        }
+
+        return value;
+    }
+
+    private record GeminiCallResult(
+            JsonNode root) {
+    }
+
+    private record NormalizedVehicle(
+            String name,
+            Integer modelYear,
+            String type,
+            String fuelType) {
+    }
+}

@@ -518,6 +518,169 @@ async function applyVehicleDetailImage(imageUrl, altText) {
   };
 }
 
+
+const VEHICLE_SPEC_GROUPS = [
+  {
+    title: "Performance",
+    fields: [
+      ["displacementCc", "Displacement", value => `${value} cc`],
+      ["maxPower", "Max Power", value => value],
+      ["maxTorque", "Max Torque", value => value],
+      ["topSpeedKmph", "Top Speed", value => `${value} km/h`],
+      ["mileageKmpl", "Mileage", value => `${value} km/l`],
+      ["claimedRangeKm", "Claimed Range", value => `${value} km`],
+      ["motorPower", "Motor Power", value => value]
+    ]
+  },
+  {
+    title: "Engine & Transmission",
+    fields: [
+      ["engineType", "Engine Type", value => value],
+      ["cylinders", "Cylinders", value => String(value)],
+      ["coolingSystem", "Cooling", value => value],
+      ["transmission", "Transmission", value => value],
+      ["clutchType", "Clutch", value => value],
+      ["startingType", "Starting", value => value]
+    ]
+  },
+  {
+    title: "Fuel / Battery",
+    fields: [
+      ["fuelTankLitres", "Fuel Tank", value => `${value} L`],
+      ["batteryCapacityKwh", "Battery Capacity", value => `${value} kWh`],
+      ["chargingTime", "Charging Time", value => value]
+    ]
+  },
+  {
+    title: "Brakes & Safety",
+    fields: [
+      ["frontBrake", "Front Brake", value => value],
+      ["rearBrake", "Rear Brake", value => value],
+      ["absType", "ABS", value => value]
+    ]
+  },
+  {
+    title: "Wheels & Tyres",
+    fields: [
+      ["frontTyre", "Front Tyre", value => value],
+      ["rearTyre", "Rear Tyre", value => value],
+      ["wheelType", "Wheel Type", value => value]
+    ]
+  },
+  {
+    title: "Suspension",
+    fields: [
+      ["frontSuspension", "Front Suspension", value => value],
+      ["rearSuspension", "Rear Suspension", value => value]
+    ]
+  },
+  {
+    title: "Dimensions",
+    fields: [
+      ["kerbWeightKg", "Kerb Weight", value => `${value} kg`],
+      ["seatHeightMm", "Seat Height", value => `${value} mm`],
+      ["groundClearanceMm", "Ground Clearance", value => `${value} mm`]
+    ]
+  }
+];
+
+function hasDetailSpecValue(value) {
+  return value !== null && value !== undefined && value !== "";
+}
+
+function formatDetailSpecValue(field, value) {
+  try {
+    return field[2](value);
+  } catch {
+    return String(value);
+  }
+}
+
+function renderVehicleSpecifications(bike) {
+  const section = document.getElementById("vehicleSpecificationSection");
+  const highlights = document.getElementById("vehicleSpecHighlights");
+  const groups = document.getElementById("vehicleSpecGroups");
+
+  if (!section || !highlights || !groups) return;
+
+  const availableFields = [];
+
+  VEHICLE_SPEC_GROUPS.forEach((group) => {
+    group.fields.forEach((field) => {
+      if (hasDetailSpecValue(bike?.[field[0]])) {
+        availableFields.push(field);
+      }
+    });
+  });
+
+  if (!availableFields.length) {
+    section.hidden = true;
+    return;
+  }
+
+  const fuel = String(bike?.fuelType || "").toUpperCase();
+
+  const preferredHighlightKeys =
+    fuel === "ELECTRIC"
+      ? ["claimedRangeKm", "motorPower", "topSpeedKmph", "batteryCapacityKwh"]
+      : ["displacementCc", "maxPower", "topSpeedKmph", "mileageKmpl"];
+
+  const highlightFields = preferredHighlightKeys
+    .map((key) =>
+      availableFields.find((field) => field[0] === key)
+    )
+    .filter(Boolean)
+    .slice(0, 4);
+
+  highlights.innerHTML = highlightFields
+    .map((field) => {
+      const key = field[0];
+      const label = field[1];
+      const value = formatDetailSpecValue(field, bike[key]);
+
+      return `
+        <article class="vehicle-spec-highlight">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+        </article>
+      `;
+    })
+    .join("");
+
+  groups.innerHTML = VEHICLE_SPEC_GROUPS
+    .map((group) => {
+      const rows = group.fields
+        .filter((field) => hasDetailSpecValue(bike?.[field[0]]))
+        .map((field) => {
+          const key = field[0];
+          const label = field[1];
+          const value = formatDetailSpecValue(field, bike[key]);
+
+          return `
+            <div class="vehicle-spec-row">
+              <span>${escapeHtml(label)}</span>
+              <strong>${escapeHtml(value)}</strong>
+            </div>
+          `;
+        })
+        .join("");
+
+      if (!rows) return "";
+
+      return `
+        <article class="vehicle-spec-group">
+          <h3>${escapeHtml(group.title)}</h3>
+          <div class="vehicle-spec-row-list">
+            ${rows}
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+
+  section.hidden = false;
+}
+
 function renderDetailBike(bike) {
   detailBike = bike;
 
@@ -557,6 +720,15 @@ function renderDetailBike(bike) {
   if (fuel === "Petrol") fuelPill.classList.add("fuel-petrol");
   if (fuel === "Electric") fuelPill.classList.add("fuel-electric");
 
+  const yearPill = document.getElementById("vehicleYearPill");
+  if (yearPill) {
+    const modelYear = Number(bike.modelYear);
+    yearPill.hidden = !Number.isInteger(modelYear);
+    if (Number.isInteger(modelYear)) {
+      yearPill.textContent = String(modelYear);
+    }
+  }
+
   document.getElementById("vehicleTypeText").textContent = category;
   document.getElementById("vehicleFuelText").textContent = fuel;
 
@@ -592,6 +764,8 @@ function renderDetailBike(bike) {
     bookButton.textContent = "Currently Unavailable";
     unavailableNote.hidden = false;
   }
+
+  renderVehicleSpecifications(bike);
 
   document.getElementById("vehicleDetailLoading").hidden = true;
   document.getElementById("vehicleDetailError").hidden = true;

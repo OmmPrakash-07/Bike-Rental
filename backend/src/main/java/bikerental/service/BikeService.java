@@ -1,5 +1,6 @@
 package bikerental.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -29,8 +30,11 @@ public class BikeService {
             BikeRepository bikeRepository,
             BookingRepository bookingRepository) {
 
-        this.bikeRepository = bikeRepository;
-        this.bookingRepository = bookingRepository;
+        this.bikeRepository =
+                bikeRepository;
+
+        this.bookingRepository =
+                bookingRepository;
     }
 
     // ---------------------------------------------------------
@@ -63,28 +67,22 @@ public class BikeService {
     @Transactional
     public Bike addBike(Bike bike) {
 
-        validateBike(bike);
+        validateBike(
+                bike);
 
-        bike.setId(null);
+        bike.setId(
+                null);
 
-        bike.setName(
-                bike.getName().trim());
-
-        bike.setType(
-                bike.getType().trim());
-
-        bike.setFuelType(
-                normalizeFuelType(
-                        bike.getFuelType()));
+        applyEditableFields(
+                bike,
+                bike);
 
         /*
-         * New bikes are operationally available
-         * by default.
-         *
-         * Time-slot availability is handled by
-         * BookingService separately.
+         * New bikes are operationally available by default.
+         * Time-slot availability is handled separately.
          */
-        bike.setAvailable(true);
+        bike.setAvailable(
+                true);
 
         return bikeRepository.save(
                 bike);
@@ -99,43 +97,216 @@ public class BikeService {
             Long id,
             Bike newBike) {
 
-        validateBike(newBike);
+        validateBike(
+                newBike);
 
         Bike bike =
-                getBikeById(id);
+                getBikeById(
+                        id);
 
-        bike.setName(
-                newBike.getName().trim());
-
-        bike.setType(
-                newBike.getType().trim());
-
-        bike.setFuelType(
-                normalizeFuelType(
-                        newBike.getFuelType()));
-
-        bike.setPricePerDay(
-                newBike.getPricePerDay());
-
-        bike.setPricePerHour(
-                newBike.getPricePerHour());
+        applyEditableFields(
+                bike,
+                newBike);
 
         /*
-         * Do NOT allow a normal details edit
-         * to silently change availability.
-         *
-         * Availability has dedicated endpoints.
+         * Do NOT allow a normal details edit to silently change
+         * operational availability. Availability has dedicated
+         * endpoints.
          */
         if (newBike.getImageUrl() != null
                 && !newBike.getImageUrl()
                         .isBlank()) {
 
             bike.setImageUrl(
-                    newBike.getImageUrl());
+                    newBike.getImageUrl()
+                            .trim());
         }
 
         return bikeRepository.save(
                 bike);
+    }
+
+    private void applyEditableFields(
+            Bike target,
+            Bike source) {
+
+        target.setName(
+                source.getName()
+                        .trim());
+
+        target.setType(
+                source.getType()
+                        .trim());
+
+        String fuelType =
+                normalizeFuelType(
+                        source.getFuelType());
+
+        target.setFuelType(
+                fuelType);
+
+        target.setModelYear(
+                source.getModelYear());
+
+        target.setPricePerDay(
+                source.getPricePerDay());
+
+        target.setPricePerHour(
+                source.getPricePerHour());
+
+        // AI-assisted technical fields.
+        target.setDisplacementCc(
+                source.getDisplacementCc());
+
+        target.setEngineType(
+                clean(
+                        source.getEngineType()));
+
+        target.setMaxPower(
+                clean(
+                        source.getMaxPower()));
+
+        target.setMaxTorque(
+                clean(
+                        source.getMaxTorque()));
+
+        target.setTransmission(
+                clean(
+                        source.getTransmission()));
+
+        target.setTopSpeedKmph(
+                source.getTopSpeedKmph());
+
+        target.setMileageKmpl(
+                source.getMileageKmpl());
+
+        target.setFuelTankLitres(
+                source.getFuelTankLitres());
+
+        target.setBatteryCapacityKwh(
+                source.getBatteryCapacityKwh());
+
+        target.setClaimedRangeKm(
+                source.getClaimedRangeKm());
+
+        target.setChargingTime(
+                clean(
+                        source.getChargingTime()));
+
+        target.setMotorPower(
+                clean(
+                        source.getMotorPower()));
+
+        target.setFrontBrake(
+                clean(
+                        source.getFrontBrake()));
+
+        target.setRearBrake(
+                clean(
+                        source.getRearBrake()));
+
+        target.setAbsType(
+                clean(
+                        source.getAbsType()));
+
+        target.setFrontTyre(
+                clean(
+                        source.getFrontTyre()));
+
+        target.setRearTyre(
+                clean(
+                        source.getRearTyre()));
+
+        target.setWheelType(
+                clean(
+                        source.getWheelType()));
+
+        target.setFrontSuspension(
+                clean(
+                        source.getFrontSuspension()));
+
+        target.setRearSuspension(
+                clean(
+                        source.getRearSuspension()));
+
+        target.setKerbWeightKg(
+                source.getKerbWeightKg());
+
+        target.setSeatHeightMm(
+                source.getSeatHeightMm());
+
+        target.setGroundClearanceMm(
+                source.getGroundClearanceMm());
+
+        target.setCylinders(
+                source.getCylinders());
+
+        target.setCoolingSystem(
+                clean(
+                        source.getCoolingSystem()));
+
+        target.setClutchType(
+                clean(
+                        source.getClutchType()));
+
+        target.setStartingType(
+                clean(
+                        source.getStartingType()));
+
+        /*
+         * Never keep petrol-only fields on electric vehicles,
+         * or electric-only fields on petrol vehicles.
+         */
+        if ("ELECTRIC".equals(
+                fuelType)) {
+
+            target.setDisplacementCc(
+                    null);
+
+            target.setMileageKmpl(
+                    null);
+
+            target.setFuelTankLitres(
+                    null);
+
+            target.setCylinders(
+                    null);
+
+            target.setCoolingSystem(
+                    null);
+
+            target.setClutchType(
+                    null);
+
+        } else {
+
+            target.setBatteryCapacityKwh(
+                    null);
+
+            target.setClaimedRangeKm(
+                    null);
+
+            target.setChargingTime(
+                    null);
+
+            target.setMotorPower(
+                    null);
+        }
+
+        boolean hasSpecs =
+                hasAnySpecification(
+                        source);
+
+        target.setSpecificationsGeneratedAt(
+                hasSpecs
+                        ? LocalDateTime.now()
+                        : null);
+
+        target.setSpecificationsModel(
+                hasSpecs
+                        ? clean(
+                                source.getSpecificationsModel())
+                        : null);
     }
 
     // ---------------------------------------------------------
@@ -146,12 +317,9 @@ public class BikeService {
     public void deleteBike(Long id) {
 
         Bike bike =
-                getBikeById(id);
+                getBikeById(
+                        id);
 
-        /*
-         * Do not delete a vehicle while it has
-         * pending or approved bookings.
-         */
         boolean hasActiveBooking =
                 bookingRepository
                         .existsByBikeIdAndStatusIn(
@@ -172,7 +340,8 @@ public class BikeService {
                     "Cannot delete a bike with an active booking");
         }
 
-        bikeRepository.deleteById(id);
+        bikeRepository.deleteById(
+                id);
     }
 
     // ---------------------------------------------------------
@@ -183,22 +352,11 @@ public class BikeService {
     public Bike makeAvailable(Long id) {
 
         Bike bike =
-                getBikeById(id);
+                getBikeById(
+                        id);
 
-        /*
-         * IMPORTANT:
-         *
-         * available=true means:
-         *
-         * The vehicle is operational and may
-         * accept rental requests.
-         *
-         * It DOES NOT mean there are no bookings.
-         *
-         * Existing booking time conflicts are
-         * handled by BookingService.
-         */
-        bike.setAvailable(true);
+        bike.setAvailable(
+                true);
 
         return bikeRepository.save(
                 bike);
@@ -212,21 +370,11 @@ public class BikeService {
     public Bike makeUnavailable(Long id) {
 
         Bike bike =
-                getBikeById(id);
+                getBikeById(
+                        id);
 
-        /*
-         * Admin can disable a bike because of:
-         *
-         * maintenance
-         * repair
-         * servicing
-         * offline status
-         * other operational reasons
-         *
-         * Existing booking records are NOT deleted,
-         * rejected or completed automatically.
-         */
-        bike.setAvailable(false);
+        bike.setAvailable(
+                false);
 
         return bikeRepository.save(
                 bike);
@@ -236,7 +384,8 @@ public class BikeService {
     // VALIDATION
     // ---------------------------------------------------------
 
-    private void validateBike(Bike bike) {
+    private void validateBike(
+            Bike bike) {
 
         if (bike == null) {
 
@@ -244,8 +393,6 @@ public class BikeService {
                     HttpStatus.BAD_REQUEST,
                     "Bike data is required");
         }
-
-        // ---------------- NAME ----------------
 
         if (bike.getName() == null
                 || bike.getName()
@@ -257,7 +404,8 @@ public class BikeService {
         }
 
         String name =
-                bike.getName().trim();
+                bike.getName()
+                        .trim();
 
         if (name.length() < 2
                 || name.length() > 80) {
@@ -266,8 +414,6 @@ public class BikeService {
                     HttpStatus.BAD_REQUEST,
                     "Bike name must be between 2 and 80 characters");
         }
-
-        // ---------------- TYPE ----------------
 
         if (bike.getType() == null
                 || bike.getType()
@@ -279,7 +425,8 @@ public class BikeService {
         }
 
         String type =
-                bike.getType().trim();
+                bike.getType()
+                        .trim();
 
         if (type.length() > 30) {
 
@@ -287,8 +434,6 @@ public class BikeService {
                     HttpStatus.BAD_REQUEST,
                     "Bike type must be 30 characters or fewer");
         }
-
-        // ---------------- FUEL TYPE ----------------
 
         if (bike.getFuelType() == null
                 || bike.getFuelType()
@@ -311,11 +456,20 @@ public class BikeService {
                     "Fuel type must be PETROL or ELECTRIC");
         }
 
-        // ---------------- DAILY PRICE ----------------
+        Integer modelYear =
+                bike.getModelYear();
+
+        if (modelYear == null
+                || modelYear < 1950
+                || modelYear > 2100) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Model year must be between 1950 and 2100");
+        }
 
         if (!Double.isFinite(
                 bike.getPricePerDay())
-
                 || bike.getPricePerDay() <= 0) {
 
             throw new ResponseStatusException(
@@ -331,15 +485,6 @@ public class BikeService {
                     "Price per day must not exceed 1000000");
         }
 
-        // ---------------- HOURLY PRICE ----------------
-
-        /*
-         * Hourly price is now required whenever
-         * a bike is created or edited.
-         *
-         * Existing DB bikes may still temporarily
-         * contain null until admin updates them.
-         */
         Double hourlyPrice =
                 bike.getPricePerHour();
 
@@ -350,7 +495,8 @@ public class BikeService {
                     "Price per hour is required");
         }
 
-        if (!Double.isFinite(hourlyPrice)
+        if (!Double.isFinite(
+                hourlyPrice)
                 || hourlyPrice <= 0) {
 
             throw new ResponseStatusException(
@@ -358,19 +504,14 @@ public class BikeService {
                     "Price per hour must be greater than 0");
         }
 
-        if (hourlyPrice > 1_000_000) {
+        if (hourlyPrice
+                > 1_000_000) {
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Price per hour must not exceed 1000000");
         }
 
-        /*
-         * Basic pricing sanity check:
-         *
-         * Hourly price should not be greater
-         * than the full daily price.
-         */
         if (hourlyPrice
                 > bike.getPricePerDay()) {
 
@@ -378,6 +519,179 @@ public class BikeService {
                     HttpStatus.BAD_REQUEST,
                     "Price per hour cannot exceed price per day");
         }
+
+        validateTechnicalRanges(
+                bike,
+                fuelType);
+    }
+
+    private void validateTechnicalRanges(
+            Bike bike,
+            String fuelType) {
+
+        ensureIntegerRange(
+                bike.getDisplacementCc(),
+                20,
+                5000,
+                "Displacement");
+
+        ensureIntegerRange(
+                bike.getTopSpeedKmph(),
+                5,
+                500,
+                "Top speed");
+
+        ensureDoubleRange(
+                bike.getMileageKmpl(),
+                1,
+                300,
+                "Mileage");
+
+        ensureDoubleRange(
+                bike.getFuelTankLitres(),
+                0.5,
+                100,
+                "Fuel tank");
+
+        ensureDoubleRange(
+                bike.getBatteryCapacityKwh(),
+                0.1,
+                100,
+                "Battery capacity");
+
+        ensureIntegerRange(
+                bike.getClaimedRangeKm(),
+                1,
+                2000,
+                "Claimed range");
+
+        ensureDoubleRange(
+                bike.getKerbWeightKg(),
+                20,
+                1000,
+                "Kerb weight");
+
+        ensureIntegerRange(
+                bike.getSeatHeightMm(),
+                300,
+                1500,
+                "Seat height");
+
+        ensureIntegerRange(
+                bike.getGroundClearanceMm(),
+                30,
+                1000,
+                "Ground clearance");
+
+        ensureIntegerRange(
+                bike.getCylinders(),
+                1,
+                16,
+                "Cylinder count");
+
+        if ("ELECTRIC".equals(
+                fuelType)
+                && bike.getMileageKmpl() != null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Electric vehicles cannot use petrol mileage specifications");
+        }
+
+        if ("PETROL".equals(
+                fuelType)
+                && bike.getBatteryCapacityKwh() != null) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Petrol vehicles cannot use electric battery specifications");
+        }
+    }
+
+    private void ensureIntegerRange(
+            Integer value,
+            int minimum,
+            int maximum,
+            String label) {
+
+        if (value != null
+                && (value < minimum
+                || value > maximum)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    label
+                            + " is outside the supported range");
+        }
+    }
+
+    private void ensureDoubleRange(
+            Double value,
+            double minimum,
+            double maximum,
+            String label) {
+
+        if (value != null
+                && (!Double.isFinite(value)
+                || value < minimum
+                || value > maximum)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    label
+                            + " is outside the supported range");
+        }
+    }
+
+    private boolean hasAnySpecification(
+            Bike bike) {
+
+        return bike.getDisplacementCc() != null
+                || clean(
+                        bike.getEngineType()) != null
+                || clean(
+                        bike.getMaxPower()) != null
+                || clean(
+                        bike.getMaxTorque()) != null
+                || clean(
+                        bike.getTransmission()) != null
+                || bike.getTopSpeedKmph() != null
+                || bike.getMileageKmpl() != null
+                || bike.getFuelTankLitres() != null
+                || bike.getBatteryCapacityKwh() != null
+                || bike.getClaimedRangeKm() != null
+                || clean(
+                        bike.getMotorPower()) != null
+                || clean(
+                        bike.getFrontBrake()) != null
+                || clean(
+                        bike.getRearBrake()) != null
+                || clean(
+                        bike.getFrontTyre()) != null
+                || clean(
+                        bike.getRearTyre()) != null
+                || bike.getKerbWeightKg() != null;
+    }
+
+    private String clean(
+            String value) {
+
+        if (value == null) {
+            return null;
+        }
+
+        String cleaned =
+                value.trim()
+                        .replaceAll(
+                                "\\s+",
+                                " ");
+
+        if (cleaned.isBlank()
+                || cleaned.length() > 180) {
+            return null;
+        }
+
+        return cleaned;
     }
 
     private String normalizeFuelType(
@@ -389,5 +703,4 @@ public class BikeService {
                         .toUpperCase(
                                 Locale.ROOT);
     }
-
 }

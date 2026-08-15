@@ -215,6 +215,226 @@
         font-size: .86rem;
     }
 }
+
+/* AI Vehicle Specifications */
+.ai-spec-card {
+    margin: 18px 0 0;
+    padding: 18px;
+    border: 1px solid rgba(255, 138, 53, .18);
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at top right, rgba(255, 107, 0, .12), transparent 34%),
+        rgba(255,255,255,.025);
+}
+
+.ai-spec-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.ai-spec-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #ff8a35;
+    font-size: .63rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.ai-spec-head h3 {
+    margin: 6px 0 5px;
+    color: #f5f8fc;
+    font-size: 1rem;
+}
+
+.ai-spec-head p {
+    max-width: 650px;
+    margin: 0;
+    color: #7f8da3;
+    font-size: .7rem;
+    line-height: 1.55;
+}
+
+.ai-generate-btn {
+    flex: 0 0 auto;
+    min-height: 42px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 138, 53, .28);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #ff6b00, #ff8a35);
+    color: #fff;
+    font: inherit;
+    font-size: .68rem;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(255,107,0,.13);
+}
+
+.ai-generate-btn:disabled {
+    opacity: .62;
+    cursor: wait;
+}
+
+.ai-spec-status {
+    min-height: 20px;
+    margin-top: 12px;
+    color: #8fa0b6;
+    font-size: .65rem;
+}
+
+.ai-spec-status.is-success {
+    color: #55dcae;
+}
+
+.ai-spec-status.is-error {
+    color: #fb8d8d;
+}
+
+.ai-spec-preview {
+    margin-top: 14px;
+}
+
+.ai-spec-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.ai-spec-summary > div {
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 12px;
+    background: rgba(5,11,22,.46);
+}
+
+.ai-spec-summary span {
+    display: block;
+    color: #64748b;
+    font-size: .52rem;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.ai-spec-summary strong {
+    display: block;
+    margin-top: 4px;
+    color: #edf4ff;
+    font-size: .73rem;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.ai-spec-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ai-spec-list > div {
+    min-width: 0;
+    padding: 9px 10px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+}
+
+.ai-spec-list span {
+    display: block;
+    color: #69788d;
+    font-size: .53rem;
+}
+
+.ai-spec-list strong {
+    display: block;
+    margin-top: 3px;
+    color: #cfd8e6;
+    font-size: .65rem;
+    line-height: 1.35;
+}
+
+.ai-source-block {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+.ai-source-block > strong {
+    color: #93a4b9;
+    font-size: .6rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.ai-source-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 8px;
+}
+
+.ai-source-links a {
+    max-width: 100%;
+    padding: 6px 9px;
+    border: 1px solid rgba(96,165,250,.14);
+    border-radius: 999px;
+    color: #8fc0ff;
+    background: rgba(96,165,250,.05);
+    font-size: .56rem;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ai-spec-note {
+    margin: 11px 0 0;
+    color: #69788d;
+    font-size: .58rem;
+    line-height: 1.45;
+}
+
+.ai-spec-stale {
+    color: #f4c653;
+}
+
+@media (max-width: 900px) {
+    .ai-spec-head {
+        flex-direction: column;
+    }
+
+    .ai-generate-btn {
+        width: 100%;
+    }
+
+    .ai-spec-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ai-spec-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .ai-spec-card {
+        padding: 14px;
+        border-radius: 14px;
+    }
+
+    .ai-spec-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ai-spec-list {
+        grid-template-columns: 1fr;
+    }
+}
+
 </style>
 </head>
 
@@ -487,6 +707,34 @@
 
                 </div>
 
+
+                <!-- MODEL YEAR -->
+
+                <div class="form-group">
+
+                    <label for="modelYear">
+                        Model Year
+                    </label>
+
+                    <input
+                        type="number"
+                        id="modelYear"
+                        min="1950"
+                        max="2100"
+                        step="1"
+                        placeholder="e.g. 2025"
+                        aria-describedby="modelYearError"
+                        required
+                    >
+
+                    <small
+                        id="modelYearError"
+                        class="field-error"
+                        aria-live="polite"
+                    ></small>
+
+                </div>
+
                 <!-- DAILY PRICE -->
 
                 <div class="form-group">
@@ -586,6 +834,82 @@
                 </div>
 
             </div>
+
+
+            <!-- AI SPECIFICATIONS -->
+
+            <section class="ai-spec-card" aria-labelledby="aiSpecTitle">
+
+                <div class="ai-spec-head">
+
+                    <div>
+                        <span class="ai-spec-kicker">
+                            ✨ GEMINI + GOOGLE SEARCH
+                        </span>
+
+                        <h3 id="aiSpecTitle">
+                            Generate Technical Specifications
+                        </h3>
+
+                        <p>
+                            Enter the exact vehicle name, model year, type and fuel type.
+                            Gemini researches public web sources and prepares the technical
+                            specification preview. Unknown values stay blank.
+                        </p>
+                    </div>
+
+                    <button
+                        id="generateAiSpecsButton"
+                        class="ai-generate-btn"
+                        type="button"
+                    >
+                        ✨ Generate AI Specs
+                    </button>
+
+                </div>
+
+                <div
+                    id="aiSpecStatus"
+                    class="ai-spec-status"
+                    aria-live="polite"
+                >
+                    Ready when vehicle identity is filled.
+                </div>
+
+                <div
+                    id="aiSpecPreview"
+                    class="ai-spec-preview"
+                    hidden
+                >
+                    <div
+                        id="aiSpecSummary"
+                        class="ai-spec-summary"
+                    ></div>
+
+                    <div
+                        id="aiSpecList"
+                        class="ai-spec-list"
+                    ></div>
+
+                    <div
+                        id="aiSpecSources"
+                        class="ai-source-block"
+                        hidden
+                    >
+                        <strong>Grounded sources</strong>
+                        <div
+                            id="aiSpecSourceLinks"
+                            class="ai-source-links"
+                        ></div>
+                    </div>
+
+                    <p
+                        id="aiSpecNotice"
+                        class="ai-spec-note"
+                    ></p>
+                </div>
+
+            </section>
 
             <!-- IMAGE PREVIEW -->
 
