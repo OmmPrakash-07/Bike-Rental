@@ -165,9 +165,14 @@ public class GeminiVehicleSpecificationService {
         Map<String, Object> responseTextFormat =
                 new LinkedHashMap<>();
 
+        /*
+         * Current GenerateContent REST schema exposes mimeType as a
+         * MimeType enum. Gemini returned HTTP 400 for the literal MIME
+         * string "application/json", so send the enum token instead.
+         */
         responseTextFormat.put(
                 "mimeType",
-                "application/json");
+                "APPLICATION_JSON");
 
         responseTextFormat.put(
                 "schema",
