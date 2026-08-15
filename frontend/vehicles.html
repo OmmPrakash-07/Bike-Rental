@@ -361,7 +361,7 @@
                 <div class="contact-info">
                     <div class="info-item"><span class="icon">📞</span><span>+91 98765 43210</span></div>
                     <div class="info-item"><span class="icon">📍</span><span>Bhubaneswar, Odisha</span></div>
-                    <div class="info-item gray-text"><span class="icon">🕒</span><span>Open 7 AM — 9 PM Daily</span>
+                    <div class="info-item gray-text"><span class="icon">🕒</span><span>Open 8 AM — 10 PM Daily</span>
                     </div>
                 </div>
             </div>
@@ -418,14 +418,8 @@
                         </label>
                     </div>
 
-                    <div id="hourlyRentalFields" class="rental-details-grid" hidden>
-                        <div class="form-group">
-                            <label for="pickupTime">Pickup Time</label>
-                            <input id="pickupTime" type="time" step="1800" aria-describedby="pickupTimeError">
-                            <small id="pickupTimeError" class="field-error" aria-live="polite"></small>
-                        </div>
-
-                        <div class="form-group">
+                    <div id="hourlyRentalFields" class="hourly-rental-layout" hidden>
+                        <div class="form-group hourly-duration-field">
                             <label for="durationHours">Rental Hours</label>
                             <select id="durationHours" aria-describedby="durationHoursError">
                                 <option value="1">1 Hour</option>
@@ -437,7 +431,36 @@
                                 <option value="12">12 Hours</option>
                             </select>
                             <small id="durationHoursError" class="field-error" aria-live="polite"></small>
+                            <small class="duration-availability-note">Available pickup slots update automatically for your selected duration.</small>
                         </div>
+
+                        <section class="pickup-slot-picker" aria-labelledby="pickupSlotHeading">
+                            <div class="pickup-slot-heading-row">
+                                <div>
+                                    <span class="pickup-slot-kicker">LIVE AVAILABILITY</span>
+                                    <h3 id="pickupSlotHeading">Available pickup slots</h3>
+                                    <p id="pickupSlotSubtext">Choose a date, duration and pickup time.</p>
+                                </div>
+                                <span id="availabilityStatusPill" class="availability-status-pill">Waiting</span>
+                            </div>
+
+                            <div class="ampm-toggle" role="tablist" aria-label="Pickup time period">
+                                <button id="timePeriodAm" class="ampm-button active" type="button" role="tab"
+                                    aria-selected="true" onclick="setTimePeriod('AM')">AM</button>
+                                <button id="timePeriodPm" class="ampm-button" type="button" role="tab"
+                                    aria-selected="false" onclick="setTimePeriod('PM')">PM</button>
+                            </div>
+
+                            <input id="pickupTime" type="hidden" aria-describedby="pickupTimeError">
+
+                            <div id="pickupTimeGrid" class="pickup-time-grid" tabindex="-1" aria-live="polite">
+                                <div class="pickup-slot-empty">Select a pickup date to load time slots.</div>
+                            </div>
+
+                            <small id="pickupTimeError" class="field-error" aria-live="polite"></small>
+
+                            <div id="bookedTimeSummary" class="booked-time-summary" aria-live="polite" hidden></div>
+                        </section>
                     </div>
 
                     <div id="dailyRentalFields" class="rental-details-grid" hidden>

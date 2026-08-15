@@ -10873,3 +10873,442 @@ main {
         font-size: .43rem !important;
     }
 }
+
+/* =========================================================
+   LIVE AVAILABILITY + PREMIUM AM/PM PICKUP SLOT PICKER
+   ========================================================= */
+
+#bookingModal .modal-card {
+    width: min(680px, 100%);
+}
+
+.hourly-rental-layout {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.hourly-rental-layout:not([hidden]) {
+    animation: rentalStageIn 0.2s ease-out both;
+}
+
+.hourly-duration-field {
+    margin-bottom: 0;
+}
+
+.hourly-duration-field select {
+    min-height: 46px;
+}
+
+.duration-availability-note {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    line-height: 1.45;
+}
+
+.pickup-slot-picker {
+    padding: 18px;
+    border: 1px solid var(--border-hover);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(255, 107, 0, 0.08), transparent 38%),
+        rgba(9, 14, 27, 0.72);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.pickup-slot-heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 15px;
+}
+
+.pickup-slot-kicker {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--orange);
+    font-size: .67rem;
+    font-weight: 800;
+    letter-spacing: .11em;
+}
+
+.pickup-slot-heading-row h3 {
+    margin: 0;
+    font-size: 1.08rem;
+}
+
+.pickup-slot-heading-row p {
+    margin-top: 4px;
+    font-size: .76rem;
+    color: var(--text-secondary);
+}
+
+.availability-status-pill {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 5px 10px;
+    border: 1px solid var(--border-hover);
+    border-radius: 999px;
+    background: rgba(255,255,255,.035);
+    color: var(--text-secondary);
+    font-size: .7rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.availability-status-pill.available {
+    color: #86efac;
+    border-color: rgba(34,197,94,.28);
+    background: rgba(34,197,94,.09);
+}
+
+.availability-status-pill.unavailable {
+    color: #fca5a5;
+    border-color: rgba(239,68,68,.28);
+    background: rgba(239,68,68,.08);
+}
+
+.availability-status-pill.checking {
+    color: #fdba74;
+    border-color: var(--orange-border);
+    background: var(--orange-soft);
+}
+
+.ampm-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    width: min(360px, 100%);
+    margin: 0 auto 16px;
+    padding: 4px;
+    border: 1px solid var(--border-hover);
+    border-radius: 999px;
+    background: #090e19;
+}
+
+.ampm-button {
+    min-height: 42px;
+    margin: 0;
+    padding: 8px 18px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-body);
+    font-size: .92rem;
+    font-weight: 800;
+    box-shadow: none;
+    transition:
+        background var(--transition),
+        border-color var(--transition),
+        color var(--transition),
+        transform var(--transition);
+}
+
+.ampm-button:hover {
+    background: rgba(255,255,255,.045);
+    color: var(--text-primary);
+    box-shadow: none;
+}
+
+.ampm-button.active {
+    border-color: rgba(255,140,45,.9);
+    background: linear-gradient(135deg, #ff7a00, #ff5a00);
+    color: white;
+    box-shadow: 0 7px 20px rgba(255,107,0,.22);
+}
+
+.pickup-time-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    min-height: 112px;
+    outline: none;
+}
+
+.pickup-time-grid:focus-visible {
+    border-radius: 14px;
+    box-shadow: 0 0 0 2px rgba(255,107,0,.35);
+}
+
+.pickup-time-card {
+    min-width: 0;
+    min-height: 112px;
+    margin: 0;
+    padding: 13px 8px 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 17px;
+    background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+    color: var(--text-primary);
+    box-shadow: none;
+    transform: none;
+    transition:
+        transform var(--transition),
+        border-color var(--transition),
+        background var(--transition),
+        box-shadow var(--transition);
+}
+
+.pickup-time-card strong {
+    font-family: var(--font-display);
+    font-size: 1.16rem;
+    line-height: 1.15;
+}
+
+.pickup-time-card > span {
+    color: var(--text-secondary);
+    font-size: .77rem;
+    font-weight: 700;
+}
+
+.pickup-time-card small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 7px;
+    font-size: .67rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.pickup-time-card small i {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.pickup-time-card.available small {
+    color: #86efac;
+}
+
+.pickup-time-card.available:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,107,0,.45);
+    background: linear-gradient(180deg, rgba(255,107,0,.09), rgba(255,255,255,.03));
+    box-shadow: 0 10px 24px rgba(0,0,0,.25);
+}
+
+.pickup-time-card.selected {
+    border-color: #ff8a1f;
+    background: linear-gradient(145deg, #ff7b00, #ff5a00);
+    color: white;
+    box-shadow:
+        0 0 0 2px rgba(255,107,0,.12),
+        0 13px 28px rgba(255,92,0,.25);
+}
+
+.pickup-time-card.selected > span,
+.pickup-time-card.selected small {
+    color: white;
+}
+
+.pickup-time-card.unavailable,
+.pickup-time-card:disabled {
+    cursor: not-allowed;
+    opacity: .62;
+    border-color: rgba(239,68,68,.16);
+    background: rgba(75,27,32,.22);
+    color: #c6a1a5;
+    transform: none;
+    box-shadow: none;
+}
+
+.pickup-time-card.unavailable small,
+.pickup-time-card:disabled small {
+    color: #f87171;
+}
+
+.pickup-slot-empty,
+.pickup-slot-loading {
+    grid-column: 1 / -1;
+    min-height: 106px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px dashed var(--border-hover);
+    border-radius: 15px;
+    color: var(--text-secondary);
+    text-align: center;
+    font-size: .8rem;
+}
+
+.pickup-slot-loading {
+    flex-direction: row;
+}
+
+.slot-loading-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--orange);
+    box-shadow: 0 0 0 0 rgba(255,107,0,.35);
+    animation: slotPulse 1.1s ease-out infinite;
+}
+
+@keyframes slotPulse {
+    70% { box-shadow: 0 0 0 8px rgba(255,107,0,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,107,0,0); }
+}
+
+.pickup-slot-empty.error {
+    color: #fca5a5;
+}
+
+.pickup-slot-empty.error span {
+    color: var(--text-secondary);
+}
+
+.pickup-slot-empty.error button {
+    width: auto;
+    min-height: 34px;
+    margin: 3px 0 0;
+    padding: 7px 12px;
+    background: var(--orange-soft);
+    border: 1px solid var(--orange-border);
+    color: #fdba74;
+    box-shadow: none;
+}
+
+.booked-time-summary {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 10px;
+    margin-top: 13px;
+    padding: 11px 12px;
+    border: 1px solid rgba(239,68,68,.18);
+    border-radius: 13px;
+    background: rgba(74,24,31,.17);
+}
+
+.booked-time-summary[hidden] {
+    display: none;
+}
+
+.booked-time-summary.clear-day {
+    border-color: rgba(34,197,94,.17);
+    background: rgba(21,72,43,.13);
+}
+
+.booked-summary-icon {
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,107,0,.35);
+    border-radius: 50%;
+    color: #fdba74;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.clear-day .booked-summary-icon {
+    border-color: rgba(34,197,94,.3);
+    color: #86efac;
+}
+
+.booked-time-summary strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+    font-size: .78rem;
+}
+
+.booked-time-summary small {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: .66rem;
+    line-height: 1.4;
+}
+
+.booked-range-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.booked-range-list span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(239,68,68,.1);
+    color: #fca5a5;
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    #bookingModal {
+        padding: 8px;
+        align-items: flex-end;
+    }
+
+    #bookingModal .modal-card {
+        width: 100%;
+        max-height: 95vh;
+        padding: 1.2rem;
+        border-radius: 24px 24px 15px 15px;
+    }
+
+    .pickup-slot-picker {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .pickup-slot-heading-row {
+        gap: 8px;
+    }
+
+    .availability-status-pill {
+        padding-inline: 8px;
+        font-size: .65rem;
+    }
+
+    .ampm-toggle {
+        width: 100%;
+    }
+
+    .pickup-time-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+    }
+
+    .pickup-time-card {
+        min-height: 102px;
+    }
+
+    .pickup-time-card strong {
+        font-size: 1.08rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .pickup-slot-heading-row {
+        flex-direction: column;
+    }
+
+    .pickup-time-card {
+        min-height: 96px;
+        padding-inline: 6px;
+    }
+}

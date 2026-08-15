@@ -9,6 +9,9 @@ let bikes = [];
 let selectedBike = null;
 let currentUser = null;
 let lastFocusedElement = null;
+let bikeAvailability = null;
+let selectedTimePeriod = "AM";
+let availabilityRequestSequence = 0;
 
 function escapeHtml(value = "") {
   return String(value)
@@ -945,14 +948,377 @@ function formatPickupTime(time) {
   }
 
   const [hours, minutes] = time.split(":").map(Number);
+  const suffix = hours >= 12 ? "PM" : "AM";
+  const displayHour = hours % 12 || 12;
 
-  const tempDate = new Date();
-  tempDate.setHours(hours, minutes, 0, 0);
+  return `${displayHour}:${String(minutes).padStart(2, "0")} ${suffix}`;
+}
 
-  return tempDate.toLocaleTimeString("en-IN", {
-    hour: "numeric",
-    minute: "2-digit",
+function formatShortDate(dateText) {
+  if (!dateText) return "";
+
+  const [year, month, day] = dateText.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (!Number.isFinite(date.getTime())) return dateText;
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
   });
+}
+
+function isoTimePart(dateTimeText) {
+  const match = String(dateTimeText || "").match(/T(\d{2}:\d{2})/);
+  return match ? match[1] : "";
+}
+
+function timePeriodFor(time) {
+  const hour = Number(String(time || "").split(":")[0]);
+  return Number.isFinite(hour) && hour >= 12 ? "PM" : "AM";
+}
+
+function setTimePeriod(period) {
+  selectedTimePeriod = period === "PM" ? "PM" : "AM";
+
+  const amButton = document.getElementById("timePeriodAm");
+  const pmButton = document.getElementById("timePeriodPm");
+
+  if (amButton) {
+    const active = selectedTimePeriod === "AM";
+    amButton.classList.toggle("active", active);
+    amButton.setAttribute("aria-selected", String(active));
+  }
+
+  if (pmButton) {
+    const active = selectedTimePeriod === "PM";
+    pmButton.classList.toggle("active", active);
+    pmButton.setAttribute("aria-selected", String(active));
+  }
+
+  renderPickupSlots();
+}
+
+function resetAvailabilityUi(message = "Select a pickup date to load time slots.") {
+  bikeAvailability = null;
+  availabilityRequestSequence += 1;
+
+  const pickupTime = document.getElementById("pickupTime");
+  const grid = document.getElementById("pickupTimeGrid");
+  const bookedSummary = document.getElementById("bookedTimeSummary");
+  const statusPill = document.getElementById("availabilityStatusPill");
+  const subtext = document.getElementById("pickupSlotSubtext");
+
+  if (pickupTime) pickupTime.value = "";
+
+  if (grid) {
+    grid.innerHTML = `<div class="pickup-slot-empty">${escapeHtml(message)}</div>`;
+  }
+
+  if (bookedSummary) {
+    bookedSummary.hidden = true;
+    bookedSummary.innerHTML = "";
+  }
+
+  if (statusPill) {
+    statusPill.textContent = "Waiting";
+    statusPill.className = "availability-status-pill";
+  }
+
+  if (subtext) {
+    subtext.textContent = "Choose a date, duration and pickup time.";
+  }
+}
+
+function renderAvailabilityLoading() {
+  const grid = document.getElementById("pickupTimeGrid");
+  const statusPill = document.getElementById("availabilityStatusPill");
+  const bookedSummary = document.getElementById("bookedTimeSummary");
+
+  if (grid) {
+    grid.innerHTML = `
+      <div class="pickup-slot-loading">
+        <span class="slot-loading-dot"></span>
+        Checking live availability…
+      </div>`;
+  }
+
+  if (statusPill) {
+    statusPill.textContent = "Checking…";
+    statusPill.className = "availability-status-pill checking";
+  }
+
+  if (bookedSummary) {
+    bookedSummary.hidden = true;
+    bookedSummary.innerHTML = "";
+  }
+}
+
+function bookedRangeText(slot) {
+  if (!slot) return "";
+  if (slot.allDay) return "All day booked";
+
+  const start = formatPickupTime(isoTimePart(slot.startDateTime));
+  const end = formatPickupTime(isoTimePart(slot.endDateTime));
+
+  if (slot.startsBeforeDate && slot.endsAfterDate) {
+    return "Booked all day";
+  }
+
+  if (slot.startsBeforeDate) {
+    return `Booked until ${end || "later"}`;
+  }
+
+  if (slot.endsAfterDate) {
+    return `Booked from ${start || "earlier"} into next day`;
+  }
+
+  return `${start || "Booked"} – ${end || "later"}`;
+}
+
+function renderBookedTimeSummary() {
+  const summary = document.getElementById("bookedTimeSummary");
+  if (!summary) return;
+
+  const slots = Array.isArray(bikeAvailability?.bookedSlots)
+    ? bikeAvailability.bookedSlots
+    : [];
+
+  if (!slots.length) {
+    summary.hidden = false;
+    summary.className = "booked-time-summary clear-day";
+    summary.innerHTML = `
+      <span class="booked-summary-icon">✓</span>
+      <div>
+        <strong>No existing bookings on this date</strong>
+        <small>Your selected duration is still checked against every pickup slot.</small>
+      </div>`;
+    return;
+  }
+
+  summary.hidden = false;
+  summary.className = "booked-time-summary";
+  summary.innerHTML = `
+    <span class="booked-summary-icon">i</span>
+    <div>
+      <strong>Already booked</strong>
+      <div class="booked-range-list">
+        ${slots
+          .map(
+            (slot) =>
+              `<span>${escapeHtml(bookedRangeText(slot))}</span>`,
+          )
+          .join("")}
+      </div>
+      <small>Customer details are private. Only occupied time is shown.</small>
+    </div>`;
+}
+
+function renderPickupSlots() {
+  const grid = document.getElementById("pickupTimeGrid");
+  const pickupTime = document.getElementById("pickupTime");
+  const statusPill = document.getElementById("availabilityStatusPill");
+  const subtext = document.getElementById("pickupSlotSubtext");
+
+  if (!grid) return;
+
+  if (!bikeAvailability) {
+    return;
+  }
+
+  const allSlots = Array.isArray(bikeAvailability.pickupSlots)
+    ? bikeAvailability.pickupSlots
+    : [];
+
+  const visibleSlots = allSlots.filter(
+    (slot) => timePeriodFor(slot.time) === selectedTimePeriod,
+  );
+
+  const availableCount = allSlots.filter((slot) => slot.available).length;
+
+  if (statusPill) {
+    if (!bikeAvailability.operationallyAvailable) {
+      statusPill.textContent = "Vehicle unavailable";
+      statusPill.className = "availability-status-pill unavailable";
+    } else if (availableCount > 0) {
+      statusPill.textContent = `${availableCount} open`;
+      statusPill.className = "availability-status-pill available";
+    } else {
+      statusPill.textContent = "Fully booked";
+      statusPill.className = "availability-status-pill unavailable";
+    }
+  }
+
+  if (subtext) {
+    const hours = Number(bikeAvailability.durationHours || 1);
+    subtext.textContent = `${formatShortDate(
+      bikeAvailability.date,
+    )} • checking a ${hours}-hour rental`;
+  }
+
+  if (!visibleSlots.length) {
+    grid.innerHTML = `<div class="pickup-slot-empty">No ${selectedTimePeriod} pickup slots.</div>`;
+    renderBookedTimeSummary();
+    return;
+  }
+
+  const selectedTime = pickupTime?.value || "";
+
+  grid.innerHTML = visibleSlots
+    .map((slot) => {
+      const selected = selectedTime === slot.time && slot.available;
+      const label = formatPickupTime(slot.time);
+      const [displayTime, period] = label.split(" ");
+
+      let stateText = "Available";
+      let stateClass = "available";
+
+      if (!slot.available) {
+        stateClass = "unavailable";
+        if (slot.reason === "PAST") {
+          stateText = "Passed";
+        } else if (slot.reason === "VEHICLE_UNAVAILABLE") {
+          stateText = "Unavailable";
+        } else {
+          stateText = "Not available";
+        }
+      }
+
+      if (selected) {
+        stateText = "Selected";
+        stateClass = "selected";
+      }
+
+      return `
+        <button
+          class="pickup-time-card ${stateClass}"
+          type="button"
+          ${slot.available ? `onclick="selectPickupTime('${slot.time}')"` : "disabled"}
+          aria-pressed="${selected}"
+          aria-label="${escapeHtml(label)} ${escapeHtml(stateText)}"
+        >
+          <strong>${escapeHtml(displayTime)}</strong>
+          <span>${escapeHtml(period)}</span>
+          <small>
+            <i aria-hidden="true"></i>
+            ${escapeHtml(stateText)}
+          </small>
+        </button>`;
+    })
+    .join("");
+
+  renderBookedTimeSummary();
+}
+
+async function loadBikeAvailability({ preserveSelection = false } = {}) {
+  const date = document.getElementById("pickupDate")?.value || "";
+  const rentalType = selectedRentalType();
+  const durationHours = Number(
+    document.getElementById("durationHours")?.value || 1,
+  );
+  const pickupTime = document.getElementById("pickupTime");
+
+  if (!selectedBike || !date || rentalType !== "HOURLY") {
+    resetAvailabilityUi();
+    return;
+  }
+
+  const previousSelection = preserveSelection ? pickupTime?.value || "" : "";
+  if (pickupTime && !preserveSelection) pickupTime.value = "";
+
+  const requestId = ++availabilityRequestSequence;
+  bikeAvailability = null;
+  renderAvailabilityLoading();
+
+  try {
+    const url = `${BIKE_API}/${selectedBike.id}/availability?date=${encodeURIComponent(
+      date,
+    )}&durationHours=${encodeURIComponent(durationHours)}`;
+
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) {
+      throw new Error(await errorMessage(res));
+    }
+
+    const data = await res.json();
+
+    if (requestId !== availabilityRequestSequence) return;
+
+    bikeAvailability = data;
+
+    if (pickupTime && previousSelection) {
+      const stillAvailable = data.pickupSlots?.some(
+        (slot) => slot.time === previousSelection && slot.available,
+      );
+
+      pickupTime.value = stillAvailable ? previousSelection : "";
+    }
+
+    const periodHasOpenSlot = data.pickupSlots?.some(
+      (slot) =>
+        slot.available && timePeriodFor(slot.time) === selectedTimePeriod,
+    );
+
+    if (!periodHasOpenSlot) {
+      const otherPeriod = selectedTimePeriod === "AM" ? "PM" : "AM";
+      const otherHasOpenSlot = data.pickupSlots?.some(
+        (slot) => slot.available && timePeriodFor(slot.time) === otherPeriod,
+      );
+
+      if (otherHasOpenSlot) {
+        selectedTimePeriod = otherPeriod;
+      }
+    }
+
+    setTimePeriod(selectedTimePeriod);
+  } catch (error) {
+    if (requestId !== availabilityRequestSequence) return;
+
+    console.error("Availability error:", error);
+    bikeAvailability = null;
+
+    const grid = document.getElementById("pickupTimeGrid");
+    const statusPill = document.getElementById("availabilityStatusPill");
+    const subtext = document.getElementById("pickupSlotSubtext");
+
+    if (grid) {
+      grid.innerHTML = `
+        <div class="pickup-slot-empty error">
+          <strong>Could not load live availability.</strong>
+          <span>${escapeHtml(error.message)}</span>
+          <button type="button" onclick="loadBikeAvailability()">Try Again</button>
+        </div>`;
+    }
+
+    if (statusPill) {
+      statusPill.textContent = "Unavailable";
+      statusPill.className = "availability-status-pill unavailable";
+    }
+
+    if (subtext) {
+      subtext.textContent = "Please retry before choosing a pickup time.";
+    }
+  }
+}
+
+function selectPickupTime(time) {
+  const slot = bikeAvailability?.pickupSlots?.find(
+    (item) => item.time === time,
+  );
+
+  if (!slot?.available) {
+    showToast("That pickup time is not available.", "error");
+    return;
+  }
+
+  const pickupTime = document.getElementById("pickupTime");
+  if (pickupTime) pickupTime.value = time;
+
+  clearFieldError("pickupTime");
+  renderPickupSlots();
+  updateBookingEstimate();
 }
 
 function clearRentalChoice() {
@@ -975,42 +1341,11 @@ function clearRentalChoice() {
   if (durationHours) durationHours.value = "1";
   if (durationDays) durationDays.value = "1";
 
+  selectedTimePeriod = "AM";
+  setTimePeriod("AM");
+  resetAvailabilityUi();
+
   ["pickupTime", "durationHours", "durationDays"].forEach(clearFieldError);
-}
-
-function updatePickupTimeMinimum() {
-  const pickupDate = document.getElementById("pickupDate");
-  const pickupTime = document.getElementById("pickupTime");
-
-  if (!pickupDate || !pickupTime) return;
-
-  pickupTime.removeAttribute("min");
-
-  if (pickupDate.value !== localToday()) {
-    return;
-  }
-
-  const now = new Date();
-
-  // Move to the next 30-minute slot.
-  now.setSeconds(0, 0);
-
-  const remainder = now.getMinutes() % 30;
-
-  if (remainder === 0) {
-    now.setMinutes(now.getMinutes() + 30);
-  } else {
-    now.setMinutes(now.getMinutes() + (30 - remainder));
-  }
-
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-
-  pickupTime.min = `${hours}:${minutes}`;
-
-  if (pickupTime.value && pickupTime.value < pickupTime.min) {
-    pickupTime.value = "";
-  }
 }
 
 function handlePickupDateChange() {
@@ -1032,7 +1367,12 @@ function handlePickupDateChange() {
 
   stage.hidden = false;
 
-  updatePickupTimeMinimum();
+  if (selectedRentalType() === "HOURLY") {
+    loadBikeAvailability();
+  } else {
+    resetAvailabilityUi("Choose Hours to see live pickup slots.");
+  }
+
   updateBookingEstimate();
 }
 
@@ -1047,15 +1387,71 @@ function updateRentalFields() {
 
   if (rentalType === "HOURLY") {
     clearFieldError("durationDays");
-    updatePickupTimeMinimum();
+    loadBikeAvailability();
   }
 
   if (rentalType === "DAILY") {
     clearFieldError("pickupTime");
     clearFieldError("durationHours");
+    resetAvailabilityUi("Hourly availability is shown when Hours is selected.");
   }
 
   updateBookingEstimate();
+}
+
+function calculateHourlyPreview(dateText, pickupTime, requestedHours) {
+  if (!dateText || !pickupTime || !Number.isFinite(requestedHours)) {
+    return null;
+  }
+
+  const [year, month, day] = dateText.split("-").map(Number);
+  const [hour, minute] = pickupTime.split(":").map(Number);
+
+  const start = new Date(year, month - 1, day, hour, minute, 0, 0);
+  if (!Number.isFinite(start.getTime())) return null;
+
+  const requestedEnd = new Date(
+    start.getTime() + requestedHours * 60 * 60 * 1000,
+  );
+
+  const closing = new Date(year, month - 1, day, 22, 0, 0, 0);
+  let finalEnd = requestedEnd;
+  let billableHours = requestedHours;
+
+  if (requestedEnd > closing) {
+    const nextOpening = new Date(year, month - 1, day + 1, 8, 0, 0, 0);
+    const minimumOvernightEnd = new Date(
+      start.getTime() + 12 * 60 * 60 * 1000,
+    );
+
+    finalEnd = new Date(
+      Math.max(
+        requestedEnd.getTime(),
+        nextOpening.getTime(),
+        minimumOvernightEnd.getTime(),
+      ),
+    );
+
+    billableHours = Math.round(
+      (finalEnd.getTime() - start.getTime()) / (60 * 60 * 1000),
+    );
+  }
+
+  return {
+    start,
+    end: finalEnd,
+    billableHours,
+    overnight: finalEnd.toDateString() !== start.toDateString(),
+  };
+}
+
+function focusBookingField(inputId) {
+  if (inputId === "pickupTime") {
+    document.getElementById("pickupTimeGrid")?.focus();
+    return;
+  }
+
+  document.getElementById(inputId)?.focus();
 }
 
 function validateBookingForm() {
@@ -1080,7 +1476,7 @@ function validateBookingForm() {
   }
 
   if (firstInvalid) {
-    document.getElementById(firstInvalid).focus();
+    focusBookingField(firstInvalid);
     return null;
   }
 
@@ -1112,24 +1508,6 @@ function validateBookingForm() {
       document.getElementById("durationHours").value,
     );
 
-    if (!pickupTime) {
-      setFieldError("pickupTime", "Select a pickup time.");
-      firstInvalid ??= "pickupTime";
-    } else if (date === localToday()) {
-      const selectedStart = new Date(`${date}T${pickupTime}:00`);
-
-      if (
-        !Number.isFinite(selectedStart.getTime()) ||
-        selectedStart.getTime() <= Date.now()
-      ) {
-        setFieldError(
-          "pickupTime",
-          "Pickup time must be in the future.",
-        );
-        firstInvalid ??= "pickupTime";
-      }
-    }
-
     const allowedHours = new Set([1, 2, 3, 4, 6, 8, 12]);
 
     if (!allowedHours.has(durationHours)) {
@@ -1140,8 +1518,25 @@ function validateBookingForm() {
       firstInvalid ??= "durationHours";
     }
 
+    if (!pickupTime) {
+      setFieldError("pickupTime", "Choose an available pickup time.");
+      firstInvalid ??= "pickupTime";
+    } else {
+      const selectedSlot = bikeAvailability?.pickupSlots?.find(
+        (slot) => slot.time === pickupTime,
+      );
+
+      if (!selectedSlot?.available) {
+        setFieldError(
+          "pickupTime",
+          "This pickup time is no longer available. Choose another slot.",
+        );
+        firstInvalid ??= "pickupTime";
+      }
+    }
+
     if (firstInvalid) {
-      document.getElementById(firstInvalid).focus();
+      focusBookingField(firstInvalid);
       return null;
     }
 
@@ -1170,7 +1565,7 @@ function validateBookingForm() {
   }
 
   if (firstInvalid) {
-    document.getElementById(firstInvalid).focus();
+    focusBookingField(firstInvalid);
     return null;
   }
 
@@ -1252,6 +1647,9 @@ function openBookingModal(bikeId) {
   document.getElementById("durationHours").value = "1";
   document.getElementById("durationDays").value = "1";
 
+  selectedTimePeriod = "AM";
+  setTimePeriod("AM");
+  resetAvailabilityUi();
   updateBookingEstimate();
 
   showModal("bookingModal");
@@ -1311,19 +1709,44 @@ function updateBookingEstimate() {
     const pickupTime =
       document.getElementById("pickupTime").value;
 
-    const total = hourlyPrice * hours;
+    const preview = calculateHourlyPreview(
+      date,
+      pickupTime,
+      hours,
+    );
+
+    const billableHours = preview?.billableHours || hours;
+    const total = hourlyPrice * billableHours;
+
+    let timingText = "Choose an available pickup time.";
+
+    if (pickupTime && preview) {
+      const returnTime = preview.end.toLocaleTimeString("en-IN", {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+      const returnLabel = preview.overnight
+        ? `Tomorrow ${returnTime}`
+        : returnTime;
+
+      timingText = `Pickup ${formatPickupTime(
+        pickupTime,
+      )} • Return ${returnLabel}`;
+    }
+
+    const overnightNote =
+      preview && preview.billableHours !== hours
+        ? ` • Overnight rule: ${preview.billableHours} billable hours`
+        : "";
 
     estimate.innerHTML = `
       <span>Estimated rental total</span>
       <strong>₹${total.toFixed(2)}</strong>
       <small>
-        ${hours} hour${hours === 1 ? "" : "s"} ×
+        ${billableHours} hour${billableHours === 1 ? "" : "s"} ×
         ₹${hourlyPrice.toFixed(2)}/hour
-        ${
-          pickupTime
-            ? ` • Pickup ${escapeHtml(formatPickupTime(pickupTime))}`
-            : ""
-        }
+        • ${escapeHtml(timingText)}${escapeHtml(overnightNote)}
       </small>`;
 
     return;
@@ -1432,6 +1855,10 @@ async function submitBooking(event) {
       )
     ) {
       await loadBikes({ quiet: true });
+
+      if (selectedRentalType() === "HOURLY") {
+        await loadBikeAvailability();
+      }
     }
   } finally {
     setButtonLoading(
@@ -1843,17 +2270,15 @@ document
   .addEventListener("change", updateRentalFields);
 
 document
-  .getElementById("pickupTime")
-  .addEventListener("input", () => {
+  .getElementById("durationHours")
+  .addEventListener("change", async () => {
+    clearFieldError("durationHours");
     clearFieldError("pickupTime");
     updateBookingEstimate();
-  });
 
-document
-  .getElementById("durationHours")
-  .addEventListener("change", () => {
-    clearFieldError("durationHours");
-    updateBookingEstimate();
+    if (selectedRentalType() === "HOURLY") {
+      await loadBikeAvailability();
+    }
   });
 
 document

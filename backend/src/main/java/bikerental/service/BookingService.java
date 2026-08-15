@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import bikerental.dto.BikeAvailabilityResponse;
 import bikerental.model.Bike;
 import bikerental.model.Booking;
 import bikerental.model.UserAccount;
@@ -252,6 +253,226 @@ public class BookingService {
         return bookingRepository
                 .findByUserIdOrderByIdDesc(
                         userId);
+    }
+
+    // ---------------------------------------------------------
+    // PUBLIC BIKE AVAILABILITY
+    // ---------------------------------------------------------
+
+    /**
+     * Returns only occupancy information required by the customer
+     * booking UI. No user name, phone, email, booking id or other
+     * customer data is exposed.
+     */
+    public BikeAvailabilityResponse getBikeAvailability(
+            Long bikeId,
+            String dateText,
+            Integer durationHours) {
+
+        if (bikeId == null || bikeId <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "bikeId must be a positive number");
+        }
+
+        Bike bike =
+                bikeRepository
+                        .findById(bikeId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Bike not found"));
+
+        LocalDate date;
+
+        try {
+            date = LocalDate.parse(dateText);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "date must use YYYY-MM-DD format");
+        }
+
+        LocalDate today =
+                LocalDate.now(RENTAL_ZONE);
+
+        if (date.isBefore(today)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Availability date cannot be in the past");
+        }
+
+        int requestedHours =
+                durationHours == null
+                        ? 1
+                        : durationHours;
+
+        if (requestedHours < 1
+                || requestedHours > 12) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "durationHours must be between 1 and 12");
+        }
+
+        List<Booking> candidates =
+                getCandidateBookings(
+                        bike,
+                        ACTIVE_STATUSES);
+
+        LocalDateTime dayStart =
+                date.atStartOfDay();
+
+        LocalDateTime dayEnd =
+                date.plusDays(1)
+                        .atStartOfDay();
+
+        List<BikeAvailabilityResponse.BookedSlot> bookedSlots =
+                new ArrayList<>();
+
+        Set<Long> bookedSlotSeenIds =
+                new HashSet<>();
+
+        for (Booking existing : candidates) {
+
+            if (existing.getId() != null
+                    && !bookedSlotSeenIds.add(
+                            existing.getId())) {
+                continue;
+            }
+
+            RentalWindow existingWindow;
+
+            try {
+                existingWindow =
+                        getStoredBookingWindow(
+                                existing);
+            } catch (ResponseStatusException ex) {
+                /*
+                 * A malformed active legacy booking is treated as an
+                 * all-day block rather than exposing a risky slot.
+                 */
+                bookedSlots.add(
+                        new BikeAvailabilityResponse.BookedSlot(
+                                dayStart.toString(),
+                                dayEnd.toString(),
+                                false,
+                                false,
+                                true));
+                continue;
+            }
+
+            if (!rangesOverlap(
+                    dayStart,
+                    dayEnd,
+                    existingWindow.start(),
+                    existingWindow.end())) {
+                continue;
+            }
+
+            LocalDateTime clippedStart =
+                    existingWindow.start()
+                            .isBefore(dayStart)
+                                    ? dayStart
+                                    : existingWindow.start();
+
+            LocalDateTime clippedEnd =
+                    existingWindow.end()
+                            .isAfter(dayEnd)
+                                    ? dayEnd
+                                    : existingWindow.end();
+
+            boolean startsBeforeDate =
+                    existingWindow.start()
+                            .isBefore(dayStart);
+
+            boolean endsAfterDate =
+                    existingWindow.end()
+                            .isAfter(dayEnd);
+
+            boolean allDay =
+                    clippedStart.equals(dayStart)
+                            && clippedEnd.equals(dayEnd);
+
+            bookedSlots.add(
+                    new BikeAvailabilityResponse.BookedSlot(
+                            clippedStart.toString(),
+                            clippedEnd.toString(),
+                            startsBeforeDate,
+                            endsAfterDate,
+                            allDay));
+        }
+
+        bookedSlots.sort(
+                (left, right) ->
+                        left.startDateTime()
+                                .compareTo(
+                                        right.startDateTime()));
+
+        List<BikeAvailabilityResponse.PickupSlot> pickupSlots =
+                new ArrayList<>();
+
+        LocalDateTime now =
+                LocalDateTime.now(RENTAL_ZONE);
+
+        for (int hour =
+                     SHOP_OPEN_TIME.getHour();
+             hour <= SHOP_CLOSE_TIME.getHour();
+             hour++) {
+
+            LocalTime pickupTime =
+                    LocalTime.of(hour, 0);
+
+            RentalWindow requestedWindow =
+                    calculateHourlyWindow(
+                            date,
+                            pickupTime,
+                            requestedHours,
+                            false);
+
+            boolean available = true;
+            String reason = "AVAILABLE";
+
+            if (!bike.isAvailable()) {
+                available = false;
+                reason = "VEHICLE_UNAVAILABLE";
+
+            } else if (!requestedWindow.start()
+                    .isAfter(now)) {
+                available = false;
+                reason = "PAST";
+
+            } else {
+                Booking conflict =
+                        findConflictingBookingInCandidates(
+                                candidates,
+                                requestedWindow.start(),
+                                requestedWindow.end(),
+                                null);
+
+                if (conflict != null) {
+                    available = false;
+                    reason = "BOOKED";
+                }
+            }
+
+            pickupSlots.add(
+                    new BikeAvailabilityResponse.PickupSlot(
+                            pickupTime.format(TIME_FORMAT),
+                            available,
+                            reason));
+        }
+
+        return new BikeAvailabilityResponse(
+                bike.getId(),
+                bike.getName(),
+                date.toString(),
+                bike.isAvailable(),
+                requestedHours,
+                SHOP_OPEN_TIME.format(TIME_FORMAT),
+                SHOP_CLOSE_TIME.format(TIME_FORMAT),
+                bookedSlots,
+                pickupSlots);
     }
 
     // ---------------------------------------------------------
@@ -579,20 +800,34 @@ public class BookingService {
                     "Hourly duration must be between 1 and 12 hours");
         }
 
+        return calculateHourlyWindow(
+                date,
+                pickupTime,
+                requestedHours,
+                true);
+    }
+
+    private RentalWindow calculateHourlyWindow(
+            LocalDate date,
+            LocalTime pickupTime,
+            int requestedHours,
+            boolean enforceFuture) {
+
         LocalDateTime start =
                 LocalDateTime.of(
                         date,
                         pickupTime);
 
-        LocalDateTime now =
-                LocalDateTime.now(
-                        RENTAL_ZONE);
+        if (enforceFuture) {
+            LocalDateTime now =
+                    LocalDateTime.now(
+                            RENTAL_ZONE);
 
-        if (!start.isAfter(now)) {
-
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Hourly pickup time must be in the future");
+            if (!start.isAfter(now)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Hourly pickup time must be in the future");
+            }
         }
 
         LocalDateTime requestedEnd =
@@ -611,44 +846,10 @@ public class BookingService {
                 requestedHours;
 
         /*
-         * Normal hourly rental:
-         *
-         * If the requested return is on or before 10:00 PM,
-         * keep the exact requested duration.
-         *
-         * Overnight rental:
-         *
-         * If the requested return crosses 10:00 PM, the bike
-         * cannot be returned while the shop is closed.
-         *
-         * The customer must therefore keep the bike until:
-         *
-         * 1. at least the next day's 08:00 AM opening time, and
-         * 2. at least 12 hours from pickup.
-         *
-         * Whichever point is later becomes the real reservation
-         * end time. Billing uses that full backend-calculated
-         * duration.
-         *
-         * Examples:
-         *
-         * 19:00 + 4h -> requested return 23:00
-         * next opening = 08:00
-         * 12h minimum = 07:00
-         * final return = 08:00
-         * billable = 13h
-         *
-         * 20:00 + 3h -> requested return 23:00
-         * next opening = 08:00
-         * 12h minimum = 08:00
-         * final return = 08:00
-         * billable = 12h
-         *
-         * 22:00 + 1h -> requested return 23:00
-         * next opening = 08:00
-         * 12h minimum = 10:00
-         * final return = 10:00
-         * billable = 12h
+         * If the requested return crosses 10:00 PM, keep the bike
+         * until at least the next 08:00 AM opening and enforce the
+         * existing 12-hour overnight minimum. This is the same rule
+         * used for both the real booking and availability preview.
          */
         if (requestedEnd.isAfter(
                 sameDayClosing)) {
@@ -676,7 +877,6 @@ public class BookingService {
 
             if (calculatedHours < 1
                     || calculatedHours > Integer.MAX_VALUE) {
-
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Unable to calculate hourly rental duration");
@@ -754,6 +954,19 @@ public class BookingService {
             Long excludeBookingId,
             Set<String> statuses) {
 
+        return findConflictingBookingInCandidates(
+                getCandidateBookings(
+                        bike,
+                        statuses),
+                requestedStart,
+                requestedEnd,
+                excludeBookingId);
+    }
+
+    private List<Booking> getCandidateBookings(
+            Bike bike,
+            Set<String> statuses) {
+
         List<Booking> candidates =
                 new ArrayList<>();
 
@@ -776,17 +989,24 @@ public class BookingService {
                                 bike.getName(),
                                 statuses));
 
+        return candidates;
+    }
+
+    private Booking findConflictingBookingInCandidates(
+            List<Booking> candidates,
+            LocalDateTime requestedStart,
+            LocalDateTime requestedEnd,
+            Long excludeBookingId) {
+
         Set<Long> seenIds =
                 new HashSet<>();
 
-        for (Booking existing :
-                candidates) {
+        for (Booking existing : candidates) {
 
             if (existing.getId() != null) {
 
                 if (!seenIds.add(
                         existing.getId())) {
-
                     continue;
                 }
             }
@@ -794,25 +1014,20 @@ public class BookingService {
             if (excludeBookingId != null
                     && excludeBookingId.equals(
                             existing.getId())) {
-
                 continue;
             }
 
             RentalWindow existingWindow;
 
             try {
-
                 existingWindow =
                         getStoredBookingWindow(
                                 existing);
-
             } catch (ResponseStatusException ex) {
-
                 /*
-                 * If an active legacy booking is too
-                 * damaged to calculate safely, block
-                 * another booking rather than risk
-                 * double-booking the same bike.
+                 * If an active legacy booking is too damaged to
+                 * calculate safely, block the requested slot rather
+                 * than risk double-booking the same bike.
                  */
                 return existing;
             }
@@ -822,7 +1037,6 @@ public class BookingService {
                     requestedEnd,
                     existingWindow.start(),
                     existingWindow.end())) {
-
                 return existing;
             }
         }
