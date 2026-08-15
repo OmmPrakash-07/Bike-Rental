@@ -16,4 +16,4 @@ Thumbs.db
 .env
 *.local
 
-Add-Content .gitignore "frontend/user.js.backup"
+frontend/user.js.backup
