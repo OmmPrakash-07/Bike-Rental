@@ -13,6 +13,13 @@ let bikeAvailability = null;
 let selectedTimePeriod = "AM";
 let availabilityRequestSequence = 0;
 
+// Premium circular pickup-date wheel state.
+let dateWheelFocusDate = null;
+let dateWheelCommittedDate = "";
+let dateWheelTouchStart = null;
+let dateWheelScrollLock = false;
+const DATE_WHEEL_MAX_DAYS_AHEAD = 90;
+
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -942,6 +949,277 @@ function selectedRentalType() {
   );
 }
 
+function dateWheelStartOfDay(value = new Date()) {
+  return new Date(
+    value.getFullYear(),
+    value.getMonth(),
+    value.getDate(),
+    0,
+    0,
+    0,
+    0,
+  );
+}
+
+function dateWheelAddDays(value, amount) {
+  const next = dateWheelStartOfDay(value);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function dateWheelIso(value) {
+  const year = value.getFullYear();
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function dateWheelFromIso(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+  return Number.isFinite(date.getTime()) ? date : null;
+}
+
+function dateWheelClamp(value) {
+  const today = dateWheelStartOfDay();
+  const max = dateWheelAddDays(today, DATE_WHEEL_MAX_DAYS_AHEAD);
+  const candidate = dateWheelStartOfDay(value);
+
+  if (candidate < today) return today;
+  if (candidate > max) return max;
+  return candidate;
+}
+
+function dateWheelFormatLong(value) {
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(value);
+}
+
+function dateWheelFormatMonthYear(value) {
+  return new Intl.DateTimeFormat("en-IN", {
+    month: "short",
+    year: "numeric",
+  })
+    .format(value)
+    .toUpperCase();
+}
+
+function dateWheelFormatWeekday(value) {
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "long",
+  }).format(value);
+}
+
+function dateWheelFormatShortWeekday(value) {
+  return new Intl.DateTimeFormat("en-IN", {
+    weekday: "short",
+  })
+    .format(value)
+    .toUpperCase();
+}
+
+function dateWheelIsSameDay(a, b) {
+  return Boolean(
+    a &&
+      b &&
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate(),
+  );
+}
+
+function renderPickupDateWheel() {
+  const wheel = document.getElementById("pickupDateWheel");
+  const ring = document.getElementById("dateWheelRing");
+  const day = document.getElementById("dateWheelDay");
+  const monthYear = document.getElementById("dateWheelMonthYear");
+  const weekday = document.getElementById("dateWheelWeekday");
+  const formatted = document.getElementById("dateWheelFormatted");
+  const state = document.getElementById("dateWheelSelectionState");
+
+  if (!wheel || !ring || !dateWheelFocusDate) return;
+
+  const today = dateWheelStartOfDay();
+  const max = dateWheelAddDays(today, DATE_WHEEL_MAX_DAYS_AHEAD);
+  const selectedIso = dateWheelCommittedDate;
+  const focusIso = dateWheelIso(dateWheelFocusDate);
+
+  day.textContent = String(dateWheelFocusDate.getDate()).padStart(2, "0");
+  monthYear.textContent = dateWheelFormatMonthYear(dateWheelFocusDate);
+  weekday.textContent = dateWheelFormatWeekday(dateWheelFocusDate);
+
+  const committed = selectedIso === focusIso;
+  wheel.classList.toggle("has-selection", committed);
+
+  if (formatted) {
+    formatted.textContent = committed
+      ? dateWheelFormatLong(dateWheelFocusDate)
+      : "Tap the highlighted date to select";
+  }
+
+  if (state) {
+    state.textContent = committed ? "Selected" : "Tap to select";
+    state.classList.toggle("selected", committed);
+  }
+
+  // Eight positions around the ring. The focused date sits in the
+  // orange selector on the right, matching the selected mockup.
+  const offsets = [-3, -2, -1, 0, 1, 2, 3, 4];
+  const angles = [-45, 0, 45, 90, 135, 180, 225, 270];
+
+  ring.innerHTML = offsets
+    .map((offset, index) => {
+      const itemDate = dateWheelAddDays(dateWheelFocusDate, offset);
+      const itemIso = dateWheelIso(itemDate);
+      const disabled = itemDate < today || itemDate > max;
+      const isFocus = offset === 0;
+      const isToday = dateWheelIsSameDay(itemDate, today);
+      const isCommitted = itemIso === selectedIso;
+
+      return `
+        <button
+          class="date-wheel-slot${isFocus ? " is-focus" : ""}${
+            isToday ? " is-today" : ""
+          }${isCommitted ? " is-committed" : ""}"
+          type="button"
+          style="--slot-angle:${angles[index]}deg"
+          data-date="${itemIso}"
+          ${disabled ? "disabled" : ""}
+          onclick="choosePickupDateFromWheel('${itemIso}')"
+          aria-label="${escapeHtml(dateWheelFormatLong(itemDate))}${
+            isCommitted ? ", selected" : ""
+          }"
+        >
+          <strong>${itemDate.getDate()}</strong>
+          <span>${escapeHtml(dateWheelFormatShortWeekday(itemDate))}</span>
+        </button>`;
+    })
+    .join("");
+
+  document
+    .querySelector(".date-wheel-prev")
+    ?.toggleAttribute("disabled", dateWheelFocusDate <= today);
+  document
+    .querySelector(".date-wheel-next")
+    ?.toggleAttribute("disabled", dateWheelFocusDate >= max);
+}
+
+function commitPickupDate(value) {
+  const date = dateWheelClamp(value);
+  const input = document.getElementById("pickupDate");
+  if (!input) return;
+
+  dateWheelFocusDate = date;
+  dateWheelCommittedDate = dateWheelIso(date);
+  input.value = dateWheelCommittedDate;
+
+  clearFieldError("pickupDate");
+  renderPickupDateWheel();
+  handlePickupDateChange();
+}
+
+function choosePickupDateFromWheel(isoDate) {
+  const date = dateWheelFromIso(isoDate);
+  if (!date) return;
+  commitPickupDate(date);
+}
+
+function spinPickupDate(direction) {
+  const delta = Number(direction) < 0 ? -1 : 1;
+  const base = dateWheelFocusDate || dateWheelStartOfDay();
+  const next = dateWheelClamp(dateWheelAddDays(base, delta));
+
+  if (dateWheelIsSameDay(base, next) && delta !== 0) return;
+
+  dateWheelFocusDate = next;
+  commitPickupDate(next);
+}
+
+function selectPickupDateToday() {
+  commitPickupDate(dateWheelStartOfDay());
+}
+
+function initializePickupDateWheel() {
+  const input = document.getElementById("pickupDate");
+  const wheel = document.getElementById("pickupDateWheel");
+  if (!input || !wheel) return;
+
+  input.value = "";
+  dateWheelCommittedDate = "";
+  dateWheelFocusDate = dateWheelStartOfDay();
+  renderPickupDateWheel();
+
+  if (wheel.dataset.dateWheelReady === "true") return;
+  wheel.dataset.dateWheelReady = "true";
+
+  wheel.addEventListener(
+    "wheel",
+    (event) => {
+      if (Math.abs(event.deltaY) < 5 && Math.abs(event.deltaX) < 5) return;
+      event.preventDefault();
+      if (dateWheelScrollLock) return;
+
+      dateWheelScrollLock = true;
+      const movement = Math.abs(event.deltaX) > Math.abs(event.deltaY)
+        ? event.deltaX
+        : event.deltaY;
+
+      spinPickupDate(movement > 0 ? 1 : -1);
+      window.setTimeout(() => {
+        dateWheelScrollLock = false;
+      }, 130);
+    },
+    { passive: false },
+  );
+
+  wheel.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    dateWheelTouchStart = {
+      x: event.clientX,
+      y: event.clientY,
+      id: event.pointerId,
+    };
+  });
+
+  wheel.addEventListener("pointerup", (event) => {
+    if (!dateWheelTouchStart || dateWheelTouchStart.id !== event.pointerId) {
+      dateWheelTouchStart = null;
+      return;
+    }
+
+    const dx = event.clientX - dateWheelTouchStart.x;
+    const dy = event.clientY - dateWheelTouchStart.y;
+    dateWheelTouchStart = null;
+
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 34) return;
+
+    const dominant = Math.abs(dx) > Math.abs(dy) ? dx : -dy;
+    spinPickupDate(dominant < 0 ? 1 : -1);
+  });
+
+  wheel.addEventListener("pointercancel", () => {
+    dateWheelTouchStart = null;
+  });
+
+  wheel.addEventListener("keydown", (event) => {
+    if (["ArrowRight", "ArrowDown"].includes(event.key)) {
+      event.preventDefault();
+      spinPickupDate(1);
+    } else if (["ArrowLeft", "ArrowUp"].includes(event.key)) {
+      event.preventDefault();
+      spinPickupDate(-1);
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      commitPickupDate(dateWheelFocusDate || dateWheelStartOfDay());
+    }
+  });
+}
+
 function formatPickupTime(time) {
   if (!time || !/^\d{2}:\d{2}$/.test(time)) {
     return "";
@@ -1446,6 +1724,11 @@ function calculateHourlyPreview(dateText, pickupTime, requestedHours) {
 }
 
 function focusBookingField(inputId) {
+  if (inputId === "pickupDate") {
+    document.getElementById("pickupDateWheel")?.focus();
+    return;
+  }
+
   if (inputId === "pickupTime") {
     document.getElementById("pickupTimeGrid")?.focus();
     return;
@@ -1628,11 +1911,11 @@ function openBookingModal(bikeId) {
   const rentalStage = document.getElementById("rentalOptionsStage");
   const hourlyOption = document.getElementById("rentalHourly");
 
-  pickupInput.min = localToday();
-
-  // Important: date starts blank so Hours/Days only appears AFTER
-  // the customer chooses a pickup date.
+  // The native date field has been replaced by a custom circular
+  // wheel. Keep pickupDate as the hidden canonical YYYY-MM-DD value
+  // so all existing validation/backend payload logic stays unchanged.
   pickupInput.value = "";
+  initializePickupDateWheel();
 
   rentalStage.hidden = true;
 
@@ -1654,7 +1937,7 @@ function openBookingModal(bikeId) {
 
   showModal("bookingModal");
 
-  setTimeout(() => pickupInput.focus(), 50);
+  setTimeout(() => document.getElementById("pickupDateWheel")?.focus(), 80);
 }
 
 function closeBookingModal() {

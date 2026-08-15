@@ -387,11 +387,49 @@
                 </div>
 
                 <div class="booking-date-first">
-                    <div class="form-group">
-                        <label for="pickupDate">Pickup Date</label>
-                        <input id="pickupDate" type="date" aria-describedby="pickupDateError" required>
+                    <section class="spin-date-picker" aria-labelledby="pickupDateWheelHeading">
+                        <div class="spin-date-picker-head">
+                            <div>
+                                <span class="spin-date-kicker">PICKUP DATE</span>
+                                <h3 id="pickupDateWheelHeading">Spin to choose your date</h3>
+                                <p>Swipe, scroll, use the arrows, or tap a date on the wheel.</p>
+                            </div>
+                            <button class="spin-date-today" type="button" onclick="selectPickupDateToday()">Today</button>
+                        </div>
+
+                        <input id="pickupDate" type="hidden" aria-describedby="pickupDateError">
+
+                        <div id="pickupDateWheel" class="date-wheel" tabindex="0" role="group"
+                            aria-label="Spin pickup date selector">
+                            <div class="date-wheel-glow" aria-hidden="true"></div>
+                            <div id="dateWheelRing" class="date-wheel-ring"></div>
+                            <div class="date-wheel-selector" aria-hidden="true"></div>
+                            <div class="date-wheel-pointer" aria-hidden="true"></div>
+
+                            <button class="date-wheel-step date-wheel-prev" type="button"
+                                onclick="spinPickupDate(-1)" aria-label="Previous date">‹</button>
+                            <button class="date-wheel-step date-wheel-next" type="button"
+                                onclick="spinPickupDate(1)" aria-label="Next date">›</button>
+
+                            <div class="date-wheel-center" aria-live="polite">
+                                <span>SELECTED DATE</span>
+                                <strong id="dateWheelDay">—</strong>
+                                <b id="dateWheelMonthYear">Choose date</b>
+                                <small id="dateWheelWeekday">Spin the wheel</small>
+                            </div>
+                        </div>
+
+                        <div class="date-wheel-footer">
+                            <span class="date-wheel-gesture" aria-hidden="true">↔</span>
+                            <div>
+                                <small>Pickup date</small>
+                                <strong id="dateWheelFormatted">Spin or tap to select</strong>
+                            </div>
+                            <span id="dateWheelSelectionState" class="date-wheel-state">Choose</span>
+                        </div>
+
                         <small id="pickupDateError" class="field-error" aria-live="polite"></small>
-                    </div>
+                    </section>
                 </div>
 
                 <div id="rentalOptionsStage" class="rental-options-stage" hidden>

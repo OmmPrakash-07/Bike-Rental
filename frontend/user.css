@@ -11312,3 +11312,832 @@ main {
         padding-inline: 6px;
     }
 }
+
+
+/* =========================================================
+   SPIN DATE PICKER + MOBILE RESPONSIVE DETAIL/BOOKING FIX
+   2026-08-16
+   ========================================================= */
+
+/* Custom date wheel ------------------------------------------------------- */
+.spin-date-picker {
+    margin-bottom: 18px;
+    padding: clamp(14px, 2.2vw, 20px);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at 50% 35%, rgba(255,107,0,.065), transparent 46%),
+        linear-gradient(145deg, rgba(255,255,255,.025), rgba(255,255,255,.012));
+    overflow: hidden;
+}
+
+.spin-date-picker-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.spin-date-kicker {
+    display: block;
+    margin-bottom: 4px;
+    color: #ff7a1a;
+    font-size: .58rem;
+    font-weight: 900;
+    letter-spacing: .15em;
+}
+
+.spin-date-picker-head h3 {
+    margin: 0;
+    color: #f7f9fc;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 2.8vw, 1.48rem);
+    line-height: 1.05;
+}
+
+.spin-date-picker-head p {
+    margin: 6px 0 0;
+    color: #7f8da2;
+    font-size: .67rem;
+    line-height: 1.45;
+}
+
+.spin-date-today {
+    flex: 0 0 auto;
+    min-height: 34px;
+    margin: 0;
+    padding: 0 12px;
+    border: 1px solid rgba(255,107,0,.24);
+    border-radius: 999px;
+    background: rgba(255,107,0,.075);
+    color: #ff9a4d;
+    font-size: .62rem;
+    font-weight: 850;
+}
+
+.spin-date-today:hover {
+    background: rgba(255,107,0,.13);
+    box-shadow: none;
+}
+
+.date-wheel {
+    --wheel-size: min(400px, 72vw);
+    --ring-radius: calc(var(--wheel-size) * .365);
+    position: relative;
+    width: var(--wheel-size);
+    height: var(--wheel-size);
+    margin: 4px auto 12px;
+    border-radius: 50%;
+    outline: none;
+    touch-action: pan-y;
+    user-select: none;
+    isolation: isolate;
+    background:
+        radial-gradient(circle at 50% 50%, #121c2d 0 30%, transparent 30.5%),
+        radial-gradient(circle at 50% 50%, rgba(255,107,0,.08) 0 31%, transparent 50%),
+        conic-gradient(from 67.5deg,
+            rgba(255,107,0,.08) 0deg 45deg,
+            rgba(255,255,255,.018) 45deg 90deg,
+            rgba(255,255,255,.012) 90deg 135deg,
+            rgba(255,255,255,.018) 135deg 180deg,
+            rgba(255,255,255,.012) 180deg 225deg,
+            rgba(255,255,255,.018) 225deg 270deg,
+            rgba(255,255,255,.012) 270deg 315deg,
+            rgba(255,255,255,.018) 315deg 360deg);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow:
+        inset 0 0 0 8px rgba(4,8,16,.42),
+        inset 0 0 0 10px rgba(255,255,255,.025),
+        0 24px 54px rgba(0,0,0,.26);
+}
+
+.date-wheel::before,
+.date-wheel::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.date-wheel::before {
+    inset: 5.5%;
+    border: 1px solid rgba(255,255,255,.055);
+}
+
+.date-wheel::after {
+    inset: 25%;
+    z-index: 2;
+    border: 1px solid rgba(255,122,26,.52);
+    box-shadow:
+        0 0 0 5px rgba(255,107,0,.045),
+        0 0 26px rgba(255,107,0,.16);
+}
+
+.date-wheel:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(255,107,0,.14),
+        inset 0 0 0 8px rgba(4,8,16,.42),
+        0 24px 54px rgba(0,0,0,.26);
+}
+
+.date-wheel-glow {
+    position: absolute;
+    z-index: 0;
+    inset: 8%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,107,0,.095), transparent 60%);
+    filter: blur(12px);
+    pointer-events: none;
+}
+
+.date-wheel-ring {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+}
+
+.date-wheel-slot {
+    --slot-angle: 0deg;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(54px, 12vw, 72px);
+    min-height: clamp(46px, 10vw, 60px);
+    margin: 0;
+    padding: 5px 6px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 1px;
+    transform:
+        translate(-50%, -50%)
+        rotate(var(--slot-angle))
+        translateY(calc(var(--ring-radius) * -1))
+        rotate(calc(var(--slot-angle) * -1));
+    border: 1px solid transparent;
+    border-radius: 15px;
+    background: transparent;
+    color: #8f9db0;
+    box-shadow: none;
+    transition:
+        color .18s ease,
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease;
+}
+
+.date-wheel-slot strong,
+.date-wheel-slot span {
+    display: block;
+}
+
+.date-wheel-slot strong {
+    color: inherit;
+    font-family: var(--font-display);
+    font-size: clamp(.98rem, 3vw, 1.28rem);
+    line-height: 1;
+}
+
+.date-wheel-slot span {
+    margin-top: 3px;
+    color: #66758a;
+    font-size: clamp(.42rem, 1.7vw, .55rem);
+    font-weight: 850;
+    letter-spacing: .07em;
+}
+
+.date-wheel-slot:hover:not(:disabled) {
+    border-color: rgba(255,122,26,.18);
+    background: rgba(255,107,0,.055);
+    color: #e6edf7;
+    box-shadow: none;
+}
+
+.date-wheel-slot.is-focus {
+    border-color: rgba(255,128,36,.62);
+    background: linear-gradient(145deg, rgba(255,118,16,.78), rgba(154,54,0,.62));
+    color: white;
+    box-shadow:
+        0 0 0 2px rgba(255,107,0,.08),
+        0 10px 24px rgba(255,91,0,.24);
+}
+
+.date-wheel-slot.is-focus span {
+    color: rgba(255,255,255,.78);
+}
+
+.date-wheel-slot.is-today:not(.is-focus)::after {
+    content: "";
+    width: 5px;
+    height: 5px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background: #ff7a1a;
+}
+
+.date-wheel-slot:disabled {
+    opacity: .22;
+    cursor: not-allowed;
+}
+
+.date-wheel-selector {
+    position: absolute;
+    z-index: 3;
+    right: 0.5%;
+    top: 50%;
+    width: 28%;
+    height: 24%;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255,126,38,.40);
+    border-radius: 42% 18px 18px 42%;
+    background: linear-gradient(90deg, rgba(255,107,0,.06), rgba(255,107,0,.17));
+    box-shadow: inset 0 0 24px rgba(255,107,0,.07);
+    pointer-events: none;
+}
+
+.date-wheel-pointer {
+    position: absolute;
+    z-index: 7;
+    right: -7px;
+    top: 50%;
+    width: 0;
+    height: 0;
+    transform: translateY(-50%);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 11px solid #ff7a1a;
+    filter: drop-shadow(0 0 7px rgba(255,107,0,.5));
+    pointer-events: none;
+}
+
+.date-wheel-center {
+    position: absolute;
+    z-index: 6;
+    left: 50%;
+    top: 50%;
+    width: 45%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+    align-content: center;
+    text-align: center;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 50% 40%, rgba(255,107,0,.11), transparent 58%),
+        #101827;
+    box-shadow: 0 0 30px rgba(0,0,0,.25);
+    pointer-events: none;
+}
+
+.date-wheel-center span {
+    color: #ff8b37;
+    font-size: clamp(.38rem, 1.55vw, .50rem);
+    font-weight: 900;
+    letter-spacing: .12em;
+}
+
+.date-wheel-center strong {
+    margin-top: 3px;
+    color: #ff7a1a;
+    font-family: var(--font-display);
+    font-size: clamp(2.1rem, 9vw, 4rem);
+    line-height: .86;
+}
+
+.date-wheel-center b {
+    margin-top: 7px;
+    color: #ff9b54;
+    font-size: clamp(.68rem, 2.4vw, .92rem);
+    letter-spacing: .03em;
+}
+
+.date-wheel-center small {
+    margin-top: 4px;
+    color: #d5deea;
+    font-size: clamp(.58rem, 2vw, .75rem);
+}
+
+.date-wheel-step {
+    position: absolute;
+    z-index: 9;
+    top: 50%;
+    width: 35px;
+    height: 35px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.09);
+    border-radius: 50%;
+    background: rgba(6,11,21,.72);
+    color: #dce5ef;
+    font-size: 1.25rem;
+    line-height: 1;
+    backdrop-filter: blur(8px);
+}
+
+.date-wheel-step:hover:not(:disabled) {
+    border-color: rgba(255,107,0,.34);
+    background: rgba(255,107,0,.10);
+    box-shadow: none;
+}
+
+.date-wheel-step:disabled {
+    opacity: .24;
+    cursor: not-allowed;
+}
+
+.date-wheel-prev { left: 6%; }
+.date-wheel-next { right: 6%; }
+
+.date-wheel-footer {
+    min-height: 58px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,.07);
+    border-radius: 15px;
+    background: rgba(255,255,255,.025);
+}
+
+.date-wheel-gesture {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    background: rgba(255,107,0,.08);
+    color: #ff8a31;
+    font-size: 1rem;
+}
+
+.date-wheel-footer div {
+    min-width: 0;
+}
+
+.date-wheel-footer small,
+.date-wheel-footer strong {
+    display: block;
+}
+
+.date-wheel-footer small {
+    color: #748398;
+    font-size: .55rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.date-wheel-footer strong {
+    margin-top: 2px;
+    overflow: hidden;
+    color: #edf3fa;
+    font-size: .71rem;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.date-wheel-state {
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 9px;
+    border-radius: 999px;
+    background: rgba(148,163,184,.075);
+    color: #93a2b7;
+    font-size: .55rem;
+    font-weight: 850;
+}
+
+.date-wheel-state.selected {
+    background: rgba(53,212,167,.10);
+    color: #62e0b0;
+}
+
+.spin-date-picker:has(#pickupDate.input-error) .date-wheel {
+    border-color: rgba(239,68,68,.46);
+    box-shadow:
+        0 0 0 3px rgba(239,68,68,.07),
+        inset 0 0 0 8px rgba(4,8,16,.42),
+        0 24px 54px rgba(0,0,0,.26);
+}
+
+/* Booking modal is a proper bottom sheet on phones ---------------------- */
+#bookingModal .modal-card {
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+@media (max-width: 700px) {
+    #bookingModal {
+        padding: 0 !important;
+        align-items: flex-end !important;
+    }
+
+    #bookingModal .modal-backdrop {
+        background: rgba(0,0,0,.78);
+        backdrop-filter: blur(8px);
+    }
+
+    #bookingModal .modal-card {
+        width: 100% !important;
+        max-width: none !important;
+        max-height: min(94dvh, 940px) !important;
+        margin: 0 !important;
+        padding:
+            24px
+            max(14px, env(safe-area-inset-right))
+            max(18px, env(safe-area-inset-bottom))
+            max(14px, env(safe-area-inset-left)) !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        border-bottom: 0 !important;
+        border-radius: 28px 28px 0 0 !important;
+        overflow-x: hidden !important;
+        box-shadow: 0 -24px 70px rgba(0,0,0,.45) !important;
+    }
+
+    #bookingModal .modal-card::before {
+        content: "";
+        display: block;
+        width: 48px;
+        height: 5px;
+        margin: -10px auto 15px;
+        border-radius: 99px;
+        background: rgba(148,163,184,.42);
+    }
+
+    #bookingModal .modal-close {
+        top: 15px !important;
+        right: 14px !important;
+        width: 40px !important;
+        height: 40px !important;
+    }
+
+    #bookingModal h2 {
+        padding-right: 44px;
+        font-size: clamp(1.72rem, 8vw, 2.35rem);
+        line-height: 1;
+    }
+
+    #bookingModal .selected-bike-summary {
+        padding-right: 10px;
+        font-size: .68rem;
+        line-height: 1.45;
+    }
+
+    #bookingModal .booking-account-box {
+        padding: 12px !important;
+    }
+
+    .spin-date-picker {
+        margin-left: -2px;
+        margin-right: -2px;
+        padding: 12px 10px 13px;
+        border-radius: 19px;
+    }
+
+    .spin-date-picker-head {
+        padding: 0 3px;
+    }
+
+    .spin-date-picker-head p {
+        max-width: 260px;
+    }
+
+    .date-wheel {
+        --wheel-size: min(330px, 88vw);
+        margin-top: 1px;
+        margin-bottom: 10px;
+    }
+
+    .date-wheel-slot {
+        width: clamp(47px, 14vw, 58px);
+        min-height: clamp(42px, 12vw, 50px);
+        border-radius: 12px;
+    }
+
+    .date-wheel-step {
+        width: 32px;
+        height: 32px;
+        font-size: 1.05rem;
+    }
+
+    .date-wheel-prev { left: 4%; }
+    .date-wheel-next { right: 4%; }
+
+    .date-wheel-footer {
+        min-height: 54px;
+        padding: 9px 10px;
+    }
+
+    .rental-options-stage {
+        margin-top: 14px !important;
+    }
+
+    .rental-type-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px !important;
+    }
+
+    .rental-type-card-content {
+        min-height: 68px !important;
+        padding: 11px 9px !important;
+    }
+
+    .hourly-rental-layout,
+    .rental-details-grid {
+        min-width: 0 !important;
+    }
+
+    .pickup-slot-picker {
+        min-width: 0 !important;
+        padding: 12px !important;
+    }
+
+    .pickup-slot-heading-row {
+        align-items: flex-start !important;
+    }
+
+    .pickup-time-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .pickup-time-card {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .estimate-box {
+        grid-template-columns: minmax(0, 1fr) auto !important;
+        overflow: hidden;
+    }
+
+    .estimate-box strong {
+        max-width: 48vw;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 390px) {
+    #bookingModal .modal-card {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .spin-date-picker-head h3 {
+        font-size: 1rem;
+    }
+
+    .spin-date-picker-head p {
+        font-size: .59rem;
+    }
+
+    .spin-date-today {
+        min-height: 31px;
+        padding-inline: 9px;
+        font-size: .56rem;
+    }
+
+    .date-wheel {
+        --wheel-size: min(300px, 90vw);
+    }
+
+    .date-wheel-footer strong {
+        font-size: .64rem;
+    }
+
+    .date-wheel-state {
+        padding-inline: 7px;
+        font-size: .49rem;
+    }
+}
+
+/* Vehicle details mobile overflow fix ----------------------------------- */
+.vehicle-details-page,
+.vehicle-details-page main,
+.vehicle-details-shell,
+.vehicle-detail-layout,
+.vehicle-detail-copy,
+.vehicle-detail-visual {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.vehicle-details-page {
+    overflow-x: clip;
+}
+
+@media (max-width: 960px) {
+    /* This !important is required because the V2 title pass later forced
+       the desktop two-column grid with !important. */
+    .vehicle-detail-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 24px !important;
+    }
+
+    .vehicle-detail-copy {
+        width: 100% !important;
+        max-width: 760px !important;
+        margin-inline: auto !important;
+    }
+}
+
+@media (max-width: 700px) {
+    .vehicle-details-main {
+        width: 100%;
+        padding: 18px 14px 46px !important;
+        overflow-x: clip;
+    }
+
+    .vehicle-back-link {
+        margin: 4px 0 12px !important;
+        font-size: .69rem !important;
+    }
+
+    .vehicle-detail-layout {
+        width: 100% !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 16px !important;
+        align-items: stretch !important;
+    }
+
+    .vehicle-detail-visual {
+        width: 100% !important;
+        min-height: 322px !important;
+        order: 1;
+    }
+
+    .vehicle-detail-copy {
+        width: 100% !important;
+        max-width: 100% !important;
+        order: 2;
+        overflow: hidden;
+    }
+
+    .vehicle-detail-orbit {
+        width: min(255px, 68vw) !important;
+    }
+
+    .vehicle-detail-image-frame {
+        width: min(100%, 410px) !important;
+        min-height: 292px !important;
+        margin-inline: auto !important;
+    }
+
+    .vehicle-detail-image-stage {
+        min-height: 292px !important;
+    }
+
+    .vehicle-detail-image-frame img {
+        width: min(100%, 390px) !important;
+        max-width: 100% !important;
+        height: 274px !important;
+        max-height: 274px !important;
+    }
+
+    .vehicle-detail-availability {
+        top: 8px !important;
+        right: max(8px, 4vw) !important;
+    }
+
+    .vehicle-detail-mini-trust {
+        bottom: 1px !important;
+        max-width: 92vw !important;
+        white-space: normal !important;
+        justify-content: center !important;
+    }
+
+    .vehicle-detail-copy .section-label {
+        margin-top: 1px;
+    }
+
+    .vehicle-detail-pills {
+        margin-top: 12px !important;
+    }
+
+    .vehicle-detail-copy h1,
+    .vehicle-detail-copy h1.vehicle-title-long,
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 13px 0 10px !important;
+        font-size: clamp(2rem, 11vw, 3.15rem) !important;
+        line-height: .96 !important;
+        letter-spacing: -.035em !important;
+        overflow-wrap: anywhere !important;
+        word-break: normal !important;
+        text-wrap: balance;
+    }
+
+    .vehicle-detail-subtitle {
+        max-width: 100% !important;
+        font-size: .80rem !important;
+        line-height: 1.55 !important;
+    }
+
+    .vehicle-detail-price-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px !important;
+        margin-top: 18px !important;
+    }
+
+    .vehicle-detail-price-card {
+        min-width: 0 !important;
+        min-height: 108px !important;
+        padding: 13px 11px !important;
+    }
+
+    .vehicle-detail-price-card strong {
+        font-size: clamp(1rem, 5vw, 1.35rem) !important;
+        line-height: 1.15 !important;
+        overflow-wrap: anywhere;
+    }
+
+    .vehicle-detail-price-card small {
+        font-size: .52rem !important;
+        line-height: 1.4;
+    }
+
+    .vehicle-detail-facts {
+        grid-template-columns: 1fr !important;
+        gap: 7px !important;
+    }
+
+    .vehicle-detail-facts > div {
+        min-height: 62px !important;
+        padding: 10px 12px !important;
+    }
+
+    .vehicle-detail-steps {
+        grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+        gap: 10px 8px !important;
+    }
+
+    .vehicle-detail-actions {
+        grid-template-columns: 1fr !important;
+        gap: 9px !important;
+        margin-top: 22px !important;
+    }
+
+    .vehicle-detail-book-btn,
+    .vehicle-detail-secondary-btn {
+        width: 100% !important;
+        min-height: 50px !important;
+    }
+
+    .vehicle-detail-benefits {
+        width: 100% !important;
+        grid-template-columns: 1fr !important;
+        margin-top: 42px !important;
+    }
+
+    .vehicle-detail-benefits > div {
+        min-height: 112px !important;
+        border-right: 0 !important;
+        border-bottom: 1px solid rgba(255,255,255,.06) !important;
+    }
+
+    .vehicle-detail-benefits > div:last-child {
+        border-bottom: 0 !important;
+    }
+}
+
+@media (max-width: 390px) {
+    .vehicle-details-main {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .vehicle-detail-visual {
+        min-height: 292px !important;
+    }
+
+    .vehicle-detail-orbit {
+        width: min(225px, 68vw) !important;
+    }
+
+    .vehicle-detail-image-frame,
+    .vehicle-detail-image-stage {
+        min-height: 265px !important;
+    }
+
+    .vehicle-detail-image-frame img {
+        height: 248px !important;
+        max-height: 248px !important;
+    }
+
+    .vehicle-detail-copy h1,
+    .vehicle-detail-copy h1.vehicle-title-long,
+    .vehicle-detail-copy h1.vehicle-title-very-long {
+        font-size: clamp(1.82rem, 10.6vw, 2.7rem) !important;
+    }
+}
