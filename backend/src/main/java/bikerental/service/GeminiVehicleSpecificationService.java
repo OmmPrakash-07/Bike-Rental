@@ -236,16 +236,40 @@ public class GeminiVehicleSpecificationService {
                         vehicle.fuelType(),
                         groundedResearch);
 
+        Map<String, Object> responseTextFormat =
+                new LinkedHashMap<>();
+
+        responseTextFormat.put(
+                "mimeType",
+                "application/json");
+
+        responseTextFormat.put(
+                "schema",
+                specificationSchema());
+
+        Map<String, Object> responseFormat =
+                new LinkedHashMap<>();
+
+        responseFormat.put(
+                "text",
+                responseTextFormat);
+
         Map<String, Object> generationConfig =
                 new LinkedHashMap<>();
 
+        /*
+         * Current Gemini generateContent structured-output format:
+         *
+         * generationConfig.responseFormat.text.mimeType
+         * generationConfig.responseFormat.text.schema
+         *
+         * The previous responseMimeType / responseSchema pair can be
+         * rejected by the current API with HTTP 400, which our V1 code
+         * surfaced to the admin UI only as "Bad Gateway".
+         */
         generationConfig.put(
-                "responseMimeType",
-                "application/json");
-
-        generationConfig.put(
-                "responseSchema",
-                specificationSchema());
+                "responseFormat",
+                responseFormat);
 
         Map<String, Object> payload =
                 new LinkedHashMap<>();
@@ -439,7 +463,7 @@ public class GeminiVehicleSpecificationService {
 
         schema.put(
                 "type",
-                "OBJECT");
+                "object");
 
         schema.put(
                 "properties",
@@ -457,7 +481,7 @@ public class GeminiVehicleSpecificationService {
                 key,
                 Map.of(
                         "type",
-                        "STRING",
+                        "string",
                         "description",
                         description));
     }
@@ -471,7 +495,7 @@ public class GeminiVehicleSpecificationService {
                 key,
                 Map.of(
                         "type",
-                        "INTEGER",
+                        "integer",
                         "description",
                         description));
     }
@@ -485,7 +509,7 @@ public class GeminiVehicleSpecificationService {
                 key,
                 Map.of(
                         "type",
-                        "NUMBER",
+                        "number",
                         "description",
                         description));
     }
@@ -580,13 +604,28 @@ public class GeminiVehicleSpecificationService {
         if (status < 200
                 || status >= 300) {
 
+            String upstreamMessage =
+                    extractGeminiErrorMessage(
+                            response.body());
+
             System.err.println(
                     "Gemini API returned HTTP "
-                            + status);
+                            + status
+                            + (
+                                    upstreamMessage.isBlank()
+                                            ? ""
+                                            : " - "
+                                                    + upstreamMessage));
+
+            String publicMessage =
+                    upstreamMessage.isBlank()
+                            ? "Gemini could not generate vehicle specifications. Try again"
+                            : "Gemini request failed: "
+                                    + upstreamMessage;
 
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,
-                    "Gemini could not generate vehicle specifications. Try again");
+                    publicMessage);
         }
 
         try {
@@ -604,6 +643,54 @@ public class GeminiVehicleSpecificationService {
                     HttpStatus.BAD_GATEWAY,
                     "Gemini returned an invalid response",
                     ex);
+        }
+    }
+
+    private String extractGeminiErrorMessage(
+            String responseBody) {
+
+        if (responseBody == null
+                || responseBody.isBlank()) {
+
+            return "";
+        }
+
+        try {
+
+            JsonNode root =
+                    objectMapper.readTree(
+                            responseBody);
+
+            String message =
+                    root.path(
+                            "error")
+                            .path(
+                                    "message")
+                            .asText("")
+                            .trim();
+
+            if (message.isBlank()) {
+                return "";
+            }
+
+            /*
+             * Keep the admin-facing error useful but bounded. Gemini error
+             * messages do not need to expose request bodies or credentials.
+             */
+            message =
+                    message.replaceAll(
+                            "\\s+",
+                            " ");
+
+            return message.length() > 300
+                    ? message.substring(
+                            0,
+                            300)
+                    : message;
+
+        } catch (JacksonException ex) {
+
+            return "";
         }
     }
 
