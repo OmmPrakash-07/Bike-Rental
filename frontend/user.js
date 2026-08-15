@@ -862,7 +862,17 @@ function renderBikes() {
     const categoryLabel = category === "SCOOTY" ? "Scooty" : category === "BIKE" ? "Bike" : String(bike.type || "Vehicle");
     const fuelLabel = fuel === "PETROL" ? "Petrol" : fuel === "ELECTRIC" ? "Electric" : "Fuel not set";
     const specHighlights = vehicleCardSpecificationHighlights(bike);
-    const modelYearText = Number.isInteger(Number(bike.modelYear)) ? ` • ${escapeHtml(String(bike.modelYear))}` : "";
+    const rawModelYear = bike.modelYear;
+    const parsedModelYear = Number(rawModelYear);
+    const modelYearText =
+      rawModelYear !== null &&
+      rawModelYear !== undefined &&
+      String(rawModelYear).trim() !== "" &&
+      Number.isInteger(parsedModelYear) &&
+      parsedModelYear >= 1900 &&
+      parsedModelYear <= 2100
+        ? ` • ${escapeHtml(String(parsedModelYear))}`
+        : "";
 
     card.innerHTML = `
       ${image}

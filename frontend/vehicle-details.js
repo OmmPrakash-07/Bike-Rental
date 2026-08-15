@@ -640,8 +640,8 @@ function renderVehicleSpecifications(bike) {
 
       return `
         <article class="vehicle-spec-highlight">
-          <span>${escapeHtml(label)}</span>
-          <strong>${escapeHtml(value)}</strong>
+          <span>${detailEscape(label)}</span>
+          <strong>${detailEscape(value)}</strong>
         </article>
       `;
     })
@@ -658,8 +658,8 @@ function renderVehicleSpecifications(bike) {
 
           return `
             <div class="vehicle-spec-row">
-              <span>${escapeHtml(label)}</span>
-              <strong>${escapeHtml(value)}</strong>
+              <span>${detailEscape(label)}</span>
+              <strong>${detailEscape(value)}</strong>
             </div>
           `;
         })
@@ -669,7 +669,7 @@ function renderVehicleSpecifications(bike) {
 
       return `
         <article class="vehicle-spec-group">
-          <h3>${escapeHtml(group.title)}</h3>
+          <h3>${detailEscape(group.title)}</h3>
           <div class="vehicle-spec-row-list">
             ${rows}
           </div>
