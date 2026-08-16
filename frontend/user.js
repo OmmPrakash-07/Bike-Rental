@@ -1364,6 +1364,22 @@ function resetAvailabilityUi(message = "Select a pickup date to load time slots.
   }
 }
 
+function parseHourlyDuration(value) {
+  const text = String(value ?? "").trim();
+  const hours = Number(text);
+
+  if (
+    !text ||
+    !Number.isInteger(hours) ||
+    hours < 1 ||
+    hours > 12
+  ) {
+    return null;
+  }
+
+  return hours;
+}
+
 function updateSubmitAvailabilityState() {
   const button = document.getElementById("submitBookingButton");
   if (!button || button.classList.contains("is-loading")) return;
@@ -1559,13 +1575,18 @@ function renderPickupSlots() {
 async function loadBikeAvailability({ preserveSelection = false } = {}) {
   const date = document.getElementById("pickupDate")?.value || "";
   const rentalType = selectedRentalType();
-  const durationHours = Number(
-    document.getElementById("durationHours")?.value || 1,
+  const durationHours = parseHourlyDuration(
+    document.getElementById("durationHours")?.value,
   );
   const pickupTime = document.getElementById("pickupTime");
 
   if (!selectedBike || !date || rentalType !== "HOURLY") {
     resetAvailabilityUi();
+    return;
+  }
+
+  if (durationHours === null) {
+    resetAvailabilityUi("Choose between 1 and 12 hours.");
     return;
   }
 
@@ -2027,16 +2048,14 @@ function validateBookingForm() {
     }
 
     const pickupTime = document.getElementById("pickupTime").value;
-    const durationHours = Number(
+    const durationHours = parseHourlyDuration(
       document.getElementById("durationHours").value,
     );
 
-    const allowedHours = new Set([1, 2, 3, 4, 6, 8, 12]);
-
-    if (!allowedHours.has(durationHours)) {
+    if (durationHours === null) {
       setFieldError(
         "durationHours",
-        "Choose 1, 2, 3, 4, 6, 8 or 12 hours.",
+        "Choose between 1 and 12 hours.",
       );
       firstInvalid ??= "durationHours";
     }
@@ -2242,15 +2261,17 @@ function updateBookingEstimate() {
       return;
     }
 
-    const rawHours = Number(
+    const hours = parseHourlyDuration(
       document.getElementById("durationHours").value,
     );
 
-    const allowedHours = [1, 2, 3, 4, 6, 8, 12];
-
-    const hours = allowedHours.includes(rawHours)
-      ? rawHours
-      : 1;
+    if (hours === null) {
+      estimate.innerHTML = `
+        <span>Hourly rental</span>
+        <strong>Choose 1–12 hours</strong>
+        <small>Select a whole-hour duration before booking.</small>`;
+      return;
+    }
 
     const pickupTime =
       document.getElementById("pickupTime").value;
