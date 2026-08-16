@@ -10346,6 +10346,7 @@ main {
     line-height: 1.08 !important;
     letter-spacing: -.02em;
 
+    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }

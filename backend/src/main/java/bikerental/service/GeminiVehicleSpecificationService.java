@@ -6,9 +6,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import bikerental.dto.AiSpecificationRequest;
 import bikerental.dto.AiSpecificationResponse;
-import bikerental.dto.SpecificationSource;
 import bikerental.dto.VehicleSpecifications;
 
 import tools.jackson.core.JacksonException;
@@ -114,7 +111,7 @@ public class GeminiVehicleSpecificationService {
                 specifications)) {
 
             throw new ResponseStatusException(
-                    HttpStatus.UNPROCESSABLE_ENTITY,
+                    HttpStatus.UNPROCESSABLE_CONTENT,
                     "Gemini could not generate enough technical specifications. "
                             + "Use the exact model/variant and model year, then try again");
         }
@@ -601,11 +598,11 @@ public class GeminiVehicleSpecificationService {
                             responseBody);
 
             String message =
-                    root.path(
-                            "error")
-                            .path(
-                                    "message")
-                            .asText("")
+                    textOrEmpty(
+                            root.path(
+                                    "error")
+                                    .path(
+                                            "message"))
                             .trim();
 
             if (message.isBlank()) {
@@ -660,8 +657,8 @@ public class GeminiVehicleSpecificationService {
             }
 
             String value =
-                    part.path("text")
-                            .asText("");
+                    textOrEmpty(
+                            part.path("text"));
 
             if (!value.isBlank()) {
 
@@ -677,65 +674,17 @@ public class GeminiVehicleSpecificationService {
                 .trim();
     }
 
-    private List<SpecificationSource> extractSources(
-            JsonNode root) {
+    private String textOrEmpty(
+            JsonNode node) {
 
-        JsonNode chunks =
-                root.path(
-                        "candidates")
-                        .path(0)
-                        .path("groundingMetadata")
-                        .path("groundingChunks");
+        if (node == null
+                || node.isMissingNode()
+                || node.isNull()) {
 
-        if (!chunks.isArray()) {
-            return List.of();
+            return "";
         }
 
-        List<SpecificationSource> result =
-                new ArrayList<>();
-
-        Set<String> seenUrls =
-                new LinkedHashSet<>();
-
-        for (JsonNode chunk :
-                chunks) {
-
-            JsonNode web =
-                    chunk.path("web");
-
-            String url =
-                    web.path("uri")
-                            .asText("")
-                            .trim();
-
-            if (url.isBlank()
-                    || !url.startsWith("http")
-                    || !seenUrls.add(url)) {
-
-                continue;
-            }
-
-            String title =
-                    web.path("title")
-                            .asText("")
-                            .trim();
-
-            if (title.isBlank()) {
-                title = "Specification source";
-            }
-
-            result.add(
-                    new SpecificationSource(
-                            title,
-                            url));
-
-            if (result.size() >= 8) {
-                break;
-            }
-        }
-
-        return List.copyOf(
-                result);
+        return node.asString();
     }
 
     private VehicleSpecifications sanitizeSpecifications(
