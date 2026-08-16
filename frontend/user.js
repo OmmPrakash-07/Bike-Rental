@@ -10,8 +10,10 @@ let selectedBike = null;
 let currentUser = null;
 let lastFocusedElement = null;
 let bikeAvailability = null;
+let dailyAvailability = null;
 let selectedTimePeriod = "AM";
 let availabilityRequestSequence = 0;
+let dailyAvailabilityRequestSequence = 0;
 
 // Premium circular pickup-date wheel state.
 let dateWheelFocusDate = null;
@@ -1362,6 +1364,18 @@ function resetAvailabilityUi(message = "Select a pickup date to load time slots.
   }
 }
 
+function updateSubmitAvailabilityState() {
+  const button = document.getElementById("submitBookingButton");
+  if (!button || button.classList.contains("is-loading")) return;
+
+  if (selectedRentalType() === "DAILY") {
+    button.disabled = !dailyAvailability?.available;
+    return;
+  }
+
+  button.disabled = false;
+}
+
 function renderAvailabilityLoading() {
   const grid = document.getElementById("pickupTimeGrid");
   const statusPill = document.getElementById("availabilityStatusPill");
@@ -1634,6 +1648,170 @@ async function loadBikeAvailability({ preserveSelection = false } = {}) {
   }
 }
 
+function resetDailyAvailabilityUi(
+  message = "Choose a date and duration to check this range before booking.",
+) {
+  dailyAvailability = null;
+  dailyAvailabilityRequestSequence += 1;
+
+  const panel = document.getElementById("dailyAvailabilityPanel");
+  if (panel) {
+    panel.className = "daily-availability-panel";
+    panel.innerHTML = `
+      <div class="daily-availability-icon" aria-hidden="true">i</div>
+      <div>
+        <strong>Daily availability</strong>
+        <small>${escapeHtml(message)}</small>
+      </div>`;
+  }
+
+  updateSubmitAvailabilityState();
+}
+
+function renderDailyAvailabilityLoading() {
+  dailyAvailability = null;
+  updateSubmitAvailabilityState();
+
+  const panel = document.getElementById("dailyAvailabilityPanel");
+  if (!panel) return;
+
+  panel.className = "daily-availability-panel checking";
+  panel.innerHTML = `
+    <div class="daily-availability-icon is-loading" aria-hidden="true"></div>
+    <div>
+      <strong>Checking daily availability</strong>
+      <small>Please wait while we check this date range.</small>
+    </div>`;
+}
+
+function dailyRangeDateLabel(dateText) {
+  if (!dateText) return "";
+
+  const [year, month, day] = dateText.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+
+  if (!Number.isFinite(date.getTime())) return dateText;
+
+  return date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+  });
+}
+
+function dailyAvailabilityRangeLabel(data) {
+  return `${dailyRangeDateLabel(data.startDate)} – ${dailyRangeDateLabel(
+    data.endDate,
+  )}`;
+}
+
+function dailyAvailabilityMessage(data) {
+  if (!data?.operationallyAvailable) {
+    return "This vehicle is currently unavailable.";
+  }
+
+  if (data?.reason === "BOOKED") {
+    return "This vehicle is already booked during part of this date range.";
+  }
+
+  return "Daily availability could not be confirmed.";
+}
+
+function renderDailyAvailabilityResult(data) {
+  const panel = document.getElementById("dailyAvailabilityPanel");
+  if (!panel) return;
+
+  const days = Number(data?.durationDays || 1);
+
+  if (data?.available) {
+    panel.className = "daily-availability-panel available";
+    panel.innerHTML = `
+      <div class="daily-availability-icon" aria-hidden="true">✓</div>
+      <div>
+        <strong>Available for ${days} day${days === 1 ? "" : "s"}</strong>
+        <small>${escapeHtml(dailyAvailabilityRangeLabel(data))}</small>
+      </div>`;
+  } else {
+    panel.className = "daily-availability-panel unavailable";
+    panel.innerHTML = `
+      <div class="daily-availability-icon" aria-hidden="true">!</div>
+      <div>
+        <strong>Daily range unavailable</strong>
+        <small>${escapeHtml(dailyAvailabilityMessage(data))}</small>
+      </div>`;
+  }
+
+  updateSubmitAvailabilityState();
+}
+
+function renderDailyAvailabilityError(message) {
+  const panel = document.getElementById("dailyAvailabilityPanel");
+  if (!panel) return;
+
+  panel.className = "daily-availability-panel error";
+  panel.innerHTML = `
+    <div class="daily-availability-icon" aria-hidden="true">!</div>
+    <div>
+      <strong>Could not check daily availability</strong>
+      <small>${escapeHtml(message)} Try again before booking.</small>
+      <button type="button" onclick="loadDailyAvailability()">Retry</button>
+    </div>`;
+
+  updateSubmitAvailabilityState();
+}
+
+async function loadDailyAvailability() {
+  const date = document.getElementById("pickupDate")?.value || "";
+  const rentalType = selectedRentalType();
+  const durationDaysInput = document.getElementById("durationDays");
+  const durationDaysText = durationDaysInput?.value?.trim() || "";
+  const durationDays = Number(durationDaysText);
+
+  if (!selectedBike || !date || rentalType !== "DAILY") {
+    resetDailyAvailabilityUi();
+    return;
+  }
+
+  if (
+    !durationDaysText ||
+    !Number.isInteger(durationDays) ||
+    durationDays < 1 ||
+    durationDays > 30
+  ) {
+    resetDailyAvailabilityUi("Choose between 1 and 30 days.");
+    return;
+  }
+
+  const requestId = ++dailyAvailabilityRequestSequence;
+  dailyAvailability = null;
+  renderDailyAvailabilityLoading();
+  updateSubmitAvailabilityState();
+
+  try {
+    const url = `${BIKE_API}/${selectedBike.id}/availability/daily?date=${encodeURIComponent(
+      date,
+    )}&durationDays=${encodeURIComponent(durationDays)}`;
+
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) {
+      throw new Error(await errorMessage(res));
+    }
+
+    const data = await res.json();
+
+    if (requestId !== dailyAvailabilityRequestSequence) return;
+
+    dailyAvailability = data;
+    renderDailyAvailabilityResult(data);
+  } catch (error) {
+    if (requestId !== dailyAvailabilityRequestSequence) return;
+
+    console.error("Daily availability error:", error);
+    dailyAvailability = null;
+    renderDailyAvailabilityError(error.message);
+  }
+}
+
 function selectPickupTime(time) {
   const slot = bikeAvailability?.pickupSlots?.find(
     (item) => item.time === time,
@@ -1675,6 +1853,7 @@ function clearRentalChoice() {
   selectedTimePeriod = "AM";
   setTimePeriod("AM");
   resetAvailabilityUi();
+  resetDailyAvailabilityUi();
 
   ["pickupTime", "durationHours", "durationDays"].forEach(clearFieldError);
 }
@@ -1699,9 +1878,14 @@ function handlePickupDateChange() {
   stage.hidden = false;
 
   if (selectedRentalType() === "HOURLY") {
+    resetDailyAvailabilityUi();
     loadBikeAvailability();
+  } else if (selectedRentalType() === "DAILY") {
+    resetAvailabilityUi("Hourly availability is shown when Hours is selected.");
+    loadDailyAvailability();
   } else {
     resetAvailabilityUi("Choose Hours to see live pickup slots.");
+    resetDailyAvailabilityUi();
   }
 
   updateBookingEstimate();
@@ -1718,6 +1902,7 @@ function updateRentalFields() {
 
   if (rentalType === "HOURLY") {
     clearFieldError("durationDays");
+    resetDailyAvailabilityUi();
     loadBikeAvailability();
   }
 
@@ -1725,9 +1910,11 @@ function updateRentalFields() {
     clearFieldError("pickupTime");
     clearFieldError("durationHours");
     resetAvailabilityUi("Hourly availability is shown when Hours is selected.");
+    loadDailyAvailability();
   }
 
   updateBookingEstimate();
+  updateSubmitAvailabilityState();
 }
 
 function calculateHourlyPreview(dateText, pickupTime, requestedHours) {
@@ -1905,6 +2092,28 @@ function validateBookingForm() {
     return null;
   }
 
+  if (
+    !dailyAvailability ||
+    dailyAvailability.startDate !== date ||
+    Number(dailyAvailability.durationDays) !== durationDays
+  ) {
+    setFieldError(
+      "durationDays",
+      "Check daily availability before booking.",
+    );
+    focusBookingField("durationDays");
+    return null;
+  }
+
+  if (!dailyAvailability.available) {
+    setFieldError(
+      "durationDays",
+      dailyAvailabilityMessage(dailyAvailability),
+    );
+    focusBookingField("durationDays");
+    return null;
+  }
+
   return {
     date,
     rentalType: "DAILY",
@@ -1986,6 +2195,7 @@ function openBookingModal(bikeId) {
   selectedTimePeriod = "AM";
   setTimePeriod("AM");
   resetAvailabilityUi();
+  resetDailyAvailabilityUi();
   updateBookingEstimate();
 
   showModal("bookingModal");
@@ -2194,6 +2404,8 @@ async function submitBooking(event) {
 
       if (selectedRentalType() === "HOURLY") {
         await loadBikeAvailability();
+      } else if (selectedRentalType() === "DAILY") {
+        await loadDailyAvailability();
       }
     }
   } finally {
@@ -2203,6 +2415,7 @@ async function submitBooking(event) {
       "Sending Request…",
       "Send Booking Request",
     );
+    updateSubmitAvailabilityState();
   }
 }
 
@@ -2621,6 +2834,9 @@ document
   .getElementById("durationDays")
   .addEventListener("input", () => {
     clearFieldError("durationDays");
+    if (selectedRentalType() === "DAILY") {
+      loadDailyAvailability();
+    }
     updateBookingEstimate();
   });
 
