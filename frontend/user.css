@@ -12473,3 +12473,419 @@ main {
     padding: 8px 9px;
   }
 }
+
+/* =========================================================
+   UI DEMO V1 - Premium customer experience refresh
+   Presentation-only overrides for Browse, booking and details.
+========================================================= */
+
+body {
+  background:
+    linear-gradient(180deg, #070b14 0%, #0b1220 48%, #080c15 100%);
+}
+
+.navbar {
+  min-height: 72px;
+  background: rgba(7, 11, 20, .92);
+  border-bottom-color: rgba(255, 255, 255, .09);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .26);
+}
+
+.logo {
+  letter-spacing: .01em;
+}
+
+.nav-services-link,
+.nav-bookings-btn,
+.login-nav-btn,
+.user-menu-button {
+  border-radius: 999px;
+}
+
+.browse-divider {
+  width: min(1180px, calc(100% - 28px));
+  margin: 24px auto 0;
+  padding: clamp(18px, 4vw, 32px);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 176, 32, .12), transparent 34%),
+    linear-gradient(145deg, rgba(18, 27, 44, .94), rgba(8, 12, 21, .96));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .32);
+}
+
+.browse-divider span,
+.section-label,
+.vehicle-filter-eyebrow,
+.pickup-slot-kicker,
+.spin-date-kicker {
+  color: #ffbd55;
+}
+
+#vehicles.hero-section {
+  width: min(1220px, calc(100% - 28px));
+  max-width: none;
+  padding: clamp(28px, 4vw, 52px) 0 84px;
+}
+
+.hero-heading-row {
+  margin-bottom: 20px;
+}
+
+.hero-copy {
+  max-width: 620px;
+}
+
+.vehicle-filter-panel,
+.fleet-discovery-toolbar,
+.active-discovery-summary,
+.fleet-toolbar {
+  width: 100%;
+}
+
+.vehicle-filter-panel {
+  padding: clamp(16px, 3vw, 26px);
+  border-radius: 22px;
+  border-color: rgba(255, 255, 255, .09);
+  background:
+    linear-gradient(160deg, rgba(18, 27, 44, .96), rgba(9, 14, 25, .98));
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .26);
+}
+
+button.vehicle-filter-option,
+.mobile-filter-choice,
+.mobile-sort-option {
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .035);
+}
+
+button.vehicle-filter-option.is-active,
+.mobile-filter-choice.is-active,
+.mobile-sort-option.is-active {
+  border-color: rgba(255, 183, 77, .44);
+  background:
+    linear-gradient(135deg, rgba(255, 107, 0, .18), rgba(255, 189, 85, .08));
+}
+
+.fleet-discovery-toolbar {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 18px;
+  background: rgba(7, 11, 20, .68);
+}
+
+.vehicle-search-wrap,
+.vehicle-sort-wrap,
+.vehicle-sort-select,
+.vehicle-search-input {
+  min-width: 0;
+}
+
+.vehicle-search-wrap,
+.vehicle-sort-wrap {
+  border-radius: 14px;
+}
+
+#bikeContainer.grid {
+  grid-template-columns: repeat(auto-fit, minmax(278px, 1fr));
+  gap: 18px;
+  padding: 20px 0 0;
+}
+
+.vehicle-card {
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(21, 31, 50, .98), rgba(9, 14, 24, .99)) !important;
+  box-shadow: 0 16px 42px rgba(0, 0, 0, .28) !important;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px) !important;
+}
+
+.vehicle-card .card-image-wrap {
+  height: 198px !important;
+  min-height: 198px !important;
+  border-radius: 14px !important;
+  background:
+    linear-gradient(180deg, #f7f8fb, #e9edf3) !important;
+}
+
+.vehicle-card .card-image-wrap img {
+  height: 172px !important;
+  max-height: 172px !important;
+}
+
+.vehicle-card-body {
+  padding: 16px !important;
+}
+
+.vehicle-card .card-name {
+  min-height: 0 !important;
+  color: #fff7ed !important;
+  overflow-wrap: anywhere;
+}
+
+.vehicle-card-description {
+  color: #9aa8ba !important;
+}
+
+.vehicle-card-specs {
+  margin: 14px 0 0;
+}
+
+.vehicle-card-spec-chip,
+.vehicle-price-item {
+  border-color: rgba(255, 255, 255, .08) !important;
+  background: rgba(255, 255, 255, .04) !important;
+}
+
+.vehicle-card-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, .86fr) minmax(0, 1.14fr) !important;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.vehicle-card .vehicle-details-btn,
+.vehicle-card .vehicle-card-book-btn {
+  min-width: 0;
+  min-height: 44px !important;
+  border-radius: 12px !important;
+  font-size: .72rem !important;
+  text-align: center;
+}
+
+.vehicle-card .vehicle-details-btn {
+  background: rgba(255, 255, 255, .05) !important;
+  color: #e7edf7 !important;
+  border-color: rgba(255, 255, 255, .12) !important;
+}
+
+.vehicle-card .vehicle-card-book-btn {
+  background: linear-gradient(135deg, #ffb547, #ff6b00) !important;
+  color: #111827 !important;
+}
+
+.vehicle-card .vehicle-card-book-btn:disabled {
+  color: #aeb9c7 !important;
+  background: rgba(148, 163, 184, .14) !important;
+}
+
+#bookingModal .modal-card {
+  width: min(760px, calc(100vw - 24px));
+  max-height: min(92vh, 980px);
+  padding: clamp(18px, 3vw, 28px);
+  border-radius: 24px;
+  border-color: rgba(255, 255, 255, .12);
+  background:
+    linear-gradient(180deg, rgba(18, 27, 44, .98), rgba(8, 12, 21, .99));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, .54);
+}
+
+.selected-bike-summary,
+.booking-account-box,
+.spin-date-picker,
+.rental-options-stage,
+.pickup-slot-picker,
+.daily-availability-panel,
+.estimate-box {
+  border-radius: 18px;
+}
+
+.booking-account-box,
+.spin-date-picker,
+.rental-options-stage {
+  border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, .035);
+}
+
+.rental-type-card-content {
+  border-radius: 16px;
+}
+
+.rental-type-card input:checked + .rental-type-card-content,
+.ampm-button.active {
+  background: linear-gradient(135deg, #ffb547, #ff6b00);
+  color: #101827;
+}
+
+.pickup-time-card {
+  border-radius: 13px;
+}
+
+.daily-availability-panel.available {
+  border-color: rgba(34, 197, 94, .32);
+}
+
+.daily-availability-panel.unavailable,
+.daily-availability-panel.error {
+  border-color: rgba(248, 113, 113, .34);
+}
+
+.estimate-box {
+  border-color: rgba(255, 183, 77, .2);
+  background:
+    linear-gradient(135deg, rgba(255, 107, 0, .12), rgba(255, 255, 255, .035));
+}
+
+#submitBookingButton {
+  min-height: 50px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffbd55, #ff6b00);
+  color: #111827;
+}
+
+.success-card {
+  max-width: 580px;
+}
+
+.success-icon {
+  background: rgba(34, 197, 94, .16);
+  border: 1px solid rgba(34, 197, 94, .3);
+}
+
+.success-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.success-actions .btn-primary,
+.success-secondary-btn {
+  min-height: 44px;
+  border-radius: 12px;
+}
+
+.success-secondary-btn {
+  background: rgba(255, 255, 255, .06);
+  color: #e7edf7;
+  border: 1px solid rgba(255, 255, 255, .12);
+}
+
+.vehicle-details-page {
+  background:
+    linear-gradient(180deg, #070b14 0%, #0b1220 55%, #070b14 100%) !important;
+}
+
+.vehicle-detail-orbit,
+.vehicle-detail-orbit-inner {
+  display: none !important;
+}
+
+.vehicle-detail-layout,
+.vehicle-spec-section,
+.vehicle-detail-benefits > div {
+  border-color: rgba(255, 255, 255, .09) !important;
+  background:
+    linear-gradient(160deg, rgba(18, 27, 44, .96), rgba(8, 12, 21, .98)) !important;
+}
+
+.vehicle-detail-image-frame {
+  border-radius: 24px !important;
+  background: linear-gradient(180deg, #f8fafc, #e6ebf2) !important;
+}
+
+.vehicle-detail-copy h1 {
+  color: #fff7ed;
+  overflow-wrap: anywhere;
+}
+
+.vehicle-detail-price-card,
+.vehicle-detail-facts > div,
+.vehicle-spec-highlight,
+.vehicle-spec-group {
+  border-color: rgba(255, 255, 255, .08) !important;
+  background: rgba(255, 255, 255, .04) !important;
+}
+
+.vehicle-detail-book-btn {
+  background: linear-gradient(135deg, #ffbd55, #ff6b00) !important;
+  color: #111827 !important;
+}
+
+@media (max-width: 1024px) {
+  #bikeContainer.grid {
+    grid-template-columns: repeat(auto-fit, minmax(242px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .browse-divider,
+  #vehicles.hero-section {
+    width: min(100% - 20px, 1220px);
+  }
+
+  .vehicle-filter-panel {
+    border-radius: 18px;
+  }
+
+  .fleet-discovery-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  #bookingModal .modal-card {
+    width: 100vw;
+    max-height: 92vh;
+    margin: auto 0 0;
+    border-radius: 24px 24px 0 0;
+  }
+
+  .success-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .navbar {
+    min-height: 64px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  #bikeContainer.grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .vehicle-card .card-image-wrap {
+    height: 184px !important;
+    min-height: 184px !important;
+  }
+
+  .vehicle-card .card-image-wrap img {
+    height: 158px !important;
+    max-height: 158px !important;
+  }
+
+  .vehicle-card-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .pickup-time-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .date-wheel {
+    width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 375px) {
+  .vehicle-filter-panel,
+  .fleet-discovery-toolbar,
+  .vehicle-card-body,
+  #bookingModal .modal-card {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .rental-type-card-content,
+  .pickup-time-card,
+  .success-actions .btn-primary,
+  .success-secondary-btn {
+    min-width: 0;
+  }
+}
