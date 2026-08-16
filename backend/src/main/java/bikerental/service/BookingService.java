@@ -93,7 +93,9 @@ public class BookingService {
                 userService.getRequiredUser(
                         authenticatedUserId);
 
-        Bike bike = resolveBike(request);
+        Bike bike =
+                resolveBikeForBookingCreation(
+                        request);
 
         /*
          * available=false now means the bike has been
@@ -741,6 +743,59 @@ public class BookingService {
         throw new ResponseStatusException(
                 HttpStatus.BAD_REQUEST,
                 "bikeId is required");
+    }
+
+    private Bike resolveBikeForBookingCreation(
+            Booking request) {
+
+        if (request.getBikeId() != null) {
+
+            return lockBikeById(
+                    request.getBikeId());
+        }
+
+        /*
+         * Legacy request compatibility:
+         *
+         * Resolve the authoritative Bike row by name first,
+         * then lock that specific row by id so concurrent
+         * booking creation for the same vehicle serializes.
+         */
+        if (request.getBikeName() != null
+                && !request.getBikeName()
+                        .isBlank()) {
+
+            Bike bike =
+                    bikeRepository
+                            .findFirstByNameIgnoreCase(
+                                    request.getBikeName()
+                                            .trim())
+                            .orElseThrow(
+                                    () ->
+                                            new ResponseStatusException(
+                                                    HttpStatus.NOT_FOUND,
+                                                    "Bike not found"));
+
+            return lockBikeById(
+                    bike.getId());
+        }
+
+        throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "bikeId is required");
+    }
+
+    private Bike lockBikeById(
+            Long bikeId) {
+
+        return bikeRepository
+                .findByIdForUpdate(
+                        bikeId)
+                .orElseThrow(
+                        () ->
+                                new ResponseStatusException(
+                                        HttpStatus.NOT_FOUND,
+                                        "Bike not found"));
     }
 
     // ---------------------------------------------------------
