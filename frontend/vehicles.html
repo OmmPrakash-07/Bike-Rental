@@ -543,7 +543,10 @@
             <div class="success-icon">✓</div>
             <h2 id="successTitle">Booking Request Sent</h2>
             <div id="successDetails"></div>
-            <button class="btn-primary" type="button" onclick="closeSuccessModal()">Done</button>
+            <div class="success-actions">
+                <button class="btn-primary" type="button" onclick="closeSuccessModal(); scrollToMyBookings()">View My Bookings</button>
+                <button class="success-secondary-btn" type="button" onclick="closeSuccessModal()">Back to Browse</button>
+            </div>
         </div>
     </div>
 

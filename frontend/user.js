@@ -795,6 +795,7 @@ function renderBikes() {
     const card = document.createElement("article");
     const category = normalizedVehicleCategory(bike);
     const fuel = normalizedFuelType(bike);
+    const displayName = String(bike.name || "Vehicle").trim() || "Vehicle";
 
     card.className = [
       "card",
@@ -816,13 +817,13 @@ function renderBikes() {
       ? `
         <a class="vehicle-card-image-link"
            href="vehicle.html?id=${encodeURIComponent(bike.id)}"
-           aria-label="View ${escapeHtml(bike.name)} details">
+           aria-label="View ${escapeHtml(displayName)} details">
           <div class="card-image-wrap">
             ${availabilityBadge}
             <span class="vehicle-card-image-accent" aria-hidden="true"></span>
             <img loading="lazy"
                  src="${escapeHtml(imageSrc(bike.imageUrl))}"
-                 alt="${escapeHtml(bike.name)}">
+                 alt="${escapeHtml(displayName)}">
             <span class="vehicle-card-image-cta">View ride →</span>
           </div>
         </a>`
@@ -889,7 +890,7 @@ function renderBikes() {
 
         <a class="card-name vehicle-card-name-link"
            href="vehicle.html?id=${encodeURIComponent(bike.id)}">
-          ${escapeHtml(bike.name)}
+          ${escapeHtml(displayName)}
         </a>
 
         <p class="card-type vehicle-card-description">
@@ -900,7 +901,13 @@ function renderBikes() {
 
         ${priceHtml}
 
-        <div class="vehicle-card-actions vehicle-card-actions-single">
+        <div class="vehicle-card-actions">
+          <a
+            class="vehicle-details-btn"
+            href="vehicle.html?id=${encodeURIComponent(bike.id)}"
+          >
+            View Details
+          </a>
           <button
             class="${bike.available ? "btn-primary vehicle-card-book-btn" : "unavailable-btn vehicle-card-book-btn"}"
             ${bike.available ? `onclick="openBookingModal(${bike.id})"` : "disabled"}>
