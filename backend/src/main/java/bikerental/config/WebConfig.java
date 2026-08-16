@@ -2,7 +2,8 @@ package bikerental.config;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -28,10 +29,29 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        String[] origins = Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(value -> !value.isBlank())
-                .toArray(String[]::new);
+        String configuredOrigins =
+                allowedOrigins == null
+                        ? "*"
+                        : allowedOrigins;
+
+        List<String> parsedOrigins =
+                new ArrayList<>();
+
+        for (String origin :
+                configuredOrigins.split(",")) {
+
+            String trimmedOrigin =
+                    origin.trim();
+
+            if (!trimmedOrigin.isBlank()) {
+                parsedOrigins.add(
+                        trimmedOrigin);
+            }
+        }
+
+        String[] origins =
+                parsedOrigins.toArray(
+                        new String[0]);
 
         registry.addMapping("/api/**")
                 .allowedOrigins(origins.length == 0 ? new String[]{"*"} : origins)
