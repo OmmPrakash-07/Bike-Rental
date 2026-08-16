@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import bikerental.dto.BikeAvailabilityResponse;
+import bikerental.dto.DailyAvailabilityResponse;
 import bikerental.service.BookingService;
 
 @RestController
@@ -37,5 +38,23 @@ public class BikeAvailabilityController {
                 bikeId,
                 date,
                 durationHours);
+    }
+
+    /**
+     * Public read-only daily range availability endpoint.
+     *
+     * Example:
+     * GET /api/bikes/2/availability/daily?date=2026-08-15&durationDays=3
+     */
+    @GetMapping("/{bikeId}/availability/daily")
+    public DailyAvailabilityResponse getDailyAvailability(
+            @PathVariable Long bikeId,
+            @RequestParam String date,
+            @RequestParam Integer durationDays) {
+
+        return bookingService.getBikeDailyAvailability(
+                bikeId,
+                date,
+                durationDays);
     }
 }

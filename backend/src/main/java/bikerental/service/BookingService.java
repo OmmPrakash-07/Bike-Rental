@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import bikerental.dto.BikeAvailabilityResponse;
+import bikerental.dto.DailyAvailabilityResponse;
 import bikerental.model.Bike;
 import bikerental.model.Booking;
 import bikerental.model.UserAccount;
@@ -475,6 +476,92 @@ public class BookingService {
                 pickupSlots);
     }
 
+    /**
+     * Returns whether a complete daily date range is available.
+     * This is informational only; createBooking remains authoritative.
+     */
+    public DailyAvailabilityResponse getBikeDailyAvailability(
+            Long bikeId,
+            String dateText,
+            Integer durationDays) {
+
+        if (bikeId == null || bikeId <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "bikeId must be a positive number");
+        }
+
+        Bike bike =
+                bikeRepository
+                        .findById(bikeId)
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Bike not found"));
+
+        LocalDate date;
+
+        try {
+            date = LocalDate.parse(dateText);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "date must use YYYY-MM-DD format");
+        }
+
+        LocalDate today =
+                LocalDate.now(RENTAL_ZONE);
+
+        if (date.isBefore(today)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Availability date cannot be in the past");
+        }
+
+        RentalWindow window =
+                buildDailyWindow(
+                        durationDays,
+                        date);
+
+        boolean available =
+                bike.isAvailable();
+
+        String reason =
+                available
+                        ? "AVAILABLE"
+                        : "VEHICLE_UNAVAILABLE";
+
+        if (available) {
+
+            Booking conflict =
+                    findConflictingBooking(
+                            bike,
+                            window.start(),
+                            window.end(),
+                            null,
+                            ACTIVE_STATUSES);
+
+            if (conflict != null) {
+                available = false;
+                reason = "BOOKED";
+            }
+        }
+
+        return new DailyAvailabilityResponse(
+                bike.getId(),
+                bike.getName(),
+                window.date()
+                        .toString(),
+                window.end()
+                        .toLocalDate()
+                        .toString(),
+                window.durationDays(),
+                bike.isAvailable(),
+                available,
+                reason);
+    }
+
     // ---------------------------------------------------------
     // GET BOOKING
     // ---------------------------------------------------------
@@ -905,8 +992,14 @@ public class BookingService {
             Booking request,
             LocalDate date) {
 
-        Integer days =
-                request.getDurationDays();
+        return buildDailyWindow(
+                request.getDurationDays(),
+                date);
+    }
+
+    private RentalWindow buildDailyWindow(
+            Integer days,
+            LocalDate date) {
 
         if (days == null
                 || days < 1

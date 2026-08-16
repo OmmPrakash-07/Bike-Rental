@@ -10908,6 +10908,95 @@ main {
     line-height: 1.45;
 }
 
+.daily-availability-panel {
+    grid-column: 1 / -1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 11px;
+    align-items: flex-start;
+    padding: 13px;
+    border: 1px solid var(--border-hover);
+    border-radius: 15px;
+    background: rgba(9, 14, 27, 0.72);
+    color: var(--text-secondary);
+}
+
+.daily-availability-icon {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255,107,0,.34);
+    border-radius: 50%;
+    color: #fdba74;
+    font-size: .76rem;
+    font-weight: 900;
+}
+
+.daily-availability-icon.is-loading {
+    width: 12px;
+    height: 12px;
+    margin: 8px;
+    border: 0;
+    background: var(--orange);
+    box-shadow: 0 0 0 0 rgba(255,107,0,.35);
+    animation: slotPulse 1.1s ease-out infinite;
+}
+
+.daily-availability-panel strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: .82rem;
+    line-height: 1.3;
+}
+
+.daily-availability-panel small {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-muted);
+    font-size: .72rem;
+    line-height: 1.45;
+}
+
+.daily-availability-panel.available {
+    border-color: rgba(34,197,94,.22);
+    background: rgba(21,72,43,.14);
+}
+
+.daily-availability-panel.available .daily-availability-icon {
+    border-color: rgba(34,197,94,.32);
+    color: #86efac;
+}
+
+.daily-availability-panel.unavailable,
+.daily-availability-panel.error {
+    border-color: rgba(239,68,68,.24);
+    background: rgba(74,24,31,.18);
+}
+
+.daily-availability-panel.unavailable .daily-availability-icon,
+.daily-availability-panel.error .daily-availability-icon {
+    border-color: rgba(239,68,68,.34);
+    color: #fca5a5;
+}
+
+.daily-availability-panel.checking {
+    border-color: var(--orange-border);
+    background: var(--orange-soft);
+}
+
+.daily-availability-panel.error button {
+    width: auto;
+    min-height: 34px;
+    margin: 8px 0 0;
+    padding: 7px 12px;
+    background: var(--orange-soft);
+    border: 1px solid var(--orange-border);
+    color: #fdba74;
+    box-shadow: none;
+}
+
 .pickup-slot-picker {
     padding: 18px;
     border: 1px solid var(--border-hover);
@@ -12383,4 +12472,3 @@ main {
     padding: 8px 9px;
   }
 }
-
