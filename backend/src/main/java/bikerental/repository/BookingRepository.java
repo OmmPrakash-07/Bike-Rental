@@ -15,7 +15,7 @@ public interface BookingRepository
             Long bikeId,
             Collection<String> statuses);
 
-    boolean existsByBikeNameIgnoreCaseAndStatusIn(
+    boolean existsByBikeIdIsNullAndBikeNameIgnoreCaseAndStatusIn(
             String bikeName,
             Collection<String> statuses);
 
@@ -23,7 +23,7 @@ public interface BookingRepository
             Long bikeId,
             Collection<String> statuses);
 
-    List<Booking> findByBikeNameIgnoreCaseAndStatusIn(
+    List<Booking> findByBikeIdIsNullAndBikeNameIgnoreCaseAndStatusIn(
             String bikeName,
             Collection<String> statuses);
 

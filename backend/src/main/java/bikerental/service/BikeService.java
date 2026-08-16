@@ -329,7 +329,7 @@ public class BikeService {
                         ||
 
                         bookingRepository
-                                .existsByBikeNameIgnoreCaseAndStatusIn(
+                                .existsByBikeIdIsNullAndBikeNameIgnoreCaseAndStatusIn(
                                         bike.getName(),
                                         ACTIVE_BOOKING_STATUSES);
 

@@ -724,20 +724,14 @@ public class BookingService {
 
         /*
          * Compatibility with old/legacy records.
+         * Only safe when the display name maps to exactly one bike.
          */
         if (request.getBikeName() != null
                 && !request.getBikeName()
                         .isBlank()) {
 
-            return bikeRepository
-                    .findFirstByNameIgnoreCase(
-                            request.getBikeName()
-                                    .trim())
-                    .orElseThrow(
-                            () ->
-                                    new ResponseStatusException(
-                                            HttpStatus.NOT_FOUND,
-                                            "Bike not found"));
+            return resolveUniqueBikeByLegacyName(
+                    request.getBikeName());
         }
 
         throw new ResponseStatusException(
@@ -748,41 +742,15 @@ public class BookingService {
     private Bike resolveBikeForBookingCreation(
             Booking request) {
 
-        if (request.getBikeId() != null) {
-
-            return lockBikeById(
-                    request.getBikeId());
+        if (request.getBikeId() == null
+                || request.getBikeId() <= 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "bikeId must be a positive number");
         }
 
-        /*
-         * Legacy request compatibility:
-         *
-         * Resolve the authoritative Bike row by name first,
-         * then lock that specific row by id so concurrent
-         * booking creation for the same vehicle serializes.
-         */
-        if (request.getBikeName() != null
-                && !request.getBikeName()
-                        .isBlank()) {
-
-            Bike bike =
-                    bikeRepository
-                            .findFirstByNameIgnoreCase(
-                                    request.getBikeName()
-                                            .trim())
-                            .orElseThrow(
-                                    () ->
-                                            new ResponseStatusException(
-                                                    HttpStatus.NOT_FOUND,
-                                                    "Bike not found"));
-
-            return lockBikeById(
-                    bike.getId());
-        }
-
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "bikeId is required");
+        return lockBikeById(
+                request.getBikeId());
     }
 
     private Bike lockBikeById(
@@ -796,6 +764,29 @@ public class BookingService {
                                 new ResponseStatusException(
                                         HttpStatus.NOT_FOUND,
                                         "Bike not found"));
+    }
+
+    private Bike resolveUniqueBikeByLegacyName(
+            String bikeName) {
+
+        List<Bike> matches =
+                bikeRepository
+                        .findByNameIgnoreCase(
+                                bikeName.trim());
+
+        if (matches.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Bike not found");
+        }
+
+        if (matches.size() > 1) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Legacy booking bike name is ambiguous");
+        }
+
+        return matches.get(0);
     }
 
     // ---------------------------------------------------------
@@ -1128,12 +1119,13 @@ public class BookingService {
                                 statuses));
 
         /*
-         * Compatibility for old bookings
-         * that may only contain bikeName.
+         * Compatibility for old bookings that may only contain
+         * bikeName. Scope this to bikeId IS NULL so modern bookings
+         * for another bike with the same display name do not collide.
          */
         candidates.addAll(
                 bookingRepository
-                        .findByBikeNameIgnoreCaseAndStatusIn(
+                        .findByBikeIdIsNullAndBikeNameIgnoreCaseAndStatusIn(
                                 bike.getName(),
                                 statuses));
 
