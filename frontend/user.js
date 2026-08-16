@@ -725,44 +725,6 @@ function renderVehicleStats(visibleBikes = filteredVehicles()) {
 }
 
 
-function vehicleCardSpecificationHighlights(bike) {
-  const fuel = normalizedFuelType(bike);
-
-  const candidates =
-    fuel === "ELECTRIC"
-      ? [
-          ["claimedRangeKm", "Range", value => `${value} km`],
-          ["motorPower", "Motor", value => value],
-          ["topSpeedKmph", "Top Speed", value => `${value} km/h`],
-          ["batteryCapacityKwh", "Battery", value => `${value} kWh`]
-        ]
-      : [
-          ["displacementCc", "Engine", value => `${value} cc`],
-          ["maxPower", "Power", value => value],
-          ["topSpeedKmph", "Top Speed", value => `${value} km/h`],
-          ["mileageKmpl", "Mileage", value => `${value} km/l`]
-        ];
-
-  const items = candidates
-    .filter(([key]) => bike?.[key] !== null && bike?.[key] !== undefined && bike?.[key] !== "")
-    .slice(0, 2);
-
-  if (!items.length) return "";
-
-  return `
-    <div class="vehicle-card-specs" aria-label="Key vehicle specifications">
-      ${items
-        .map(([key, label, format]) => `
-          <div class="vehicle-card-spec-chip">
-            <span>${escapeHtml(label)}</span>
-            <strong>${escapeHtml(format(bike[key]))}</strong>
-          </div>
-        `)
-        .join("")}
-    </div>
-  `;
-}
-
 function renderBikes() {
   const container = document.getElementById("bikeContainer");
   if (!container) return;
@@ -864,7 +826,6 @@ function renderBikes() {
         </div>`;
     const categoryLabel = category === "SCOOTY" ? "Scooty" : category === "BIKE" ? "Bike" : String(bike.type || "Vehicle");
     const fuelLabel = fuel === "PETROL" ? "Petrol" : fuel === "ELECTRIC" ? "Electric" : "Fuel not set";
-    const specHighlights = vehicleCardSpecificationHighlights(bike);
     const rawModelYear = bike.modelYear;
     const parsedModelYear = Number(rawModelYear);
     const modelYearText =
@@ -896,8 +857,6 @@ function renderBikes() {
         <p class="card-type vehicle-card-description">
           ${escapeHtml(String(bike.type || "Vehicle"))}${fuel !== "UNSET" ? ` • ${escapeHtml(fuelLabel)}` : ""}${modelYearText}
         </p>
-
-        ${specHighlights}
 
         ${priceHtml}
 

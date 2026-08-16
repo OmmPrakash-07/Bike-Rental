@@ -12233,42 +12233,8 @@ main {
 }
 
 /* =========================================================
-   AI VEHICLE SPECS — Browse cards + Vehicle Details
+   AI VEHICLE SPECS - Vehicle Details
    ========================================================= */
-
-.vehicle-card-specs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  margin: 10px 0 4px;
-}
-
-.vehicle-card-spec-chip {
-  min-width: 0;
-  padding: 9px 10px;
-  border: 1px solid rgba(255,255,255,.07);
-  border-radius: 11px;
-  background: rgba(255,255,255,.025);
-}
-
-.vehicle-card-spec-chip span,
-.vehicle-card-spec-chip strong {
-  display: block;
-}
-
-.vehicle-card-spec-chip span {
-  color: var(--text-muted, #8390a3);
-  font-size: .62rem;
-  line-height: 1.2;
-}
-
-.vehicle-card-spec-chip strong {
-  margin-top: 3px;
-  color: var(--text-primary, #f4f7fb);
-  font-size: .78rem;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
 
 .vehicle-spec-section {
   width: min(1180px, calc(100% - 32px));
@@ -12469,9 +12435,6 @@ main {
     text-align: left;
   }
 
-  .vehicle-card-spec-chip {
-    padding: 8px 9px;
-  }
 }
 
 /* =========================================================
@@ -12631,11 +12594,6 @@ button.vehicle-filter-option.is-active,
   color: #9aa8ba !important;
 }
 
-.vehicle-card-specs {
-  margin: 14px 0 0;
-}
-
-.vehicle-card-spec-chip,
 .vehicle-price-item {
   border-color: rgba(255, 255, 255, .08) !important;
   background: rgba(255, 255, 255, .04) !important;
