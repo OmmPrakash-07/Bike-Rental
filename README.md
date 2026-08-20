@@ -11,7 +11,6 @@ BikeRental currently supports secure customer authentication, email OTP verifica
 
 ## 🌐 Live Application
 
-- **Customer Website:** https://bike-rental-phi.vercel.app
 - **Browse Vehicles:** https://bike-rental-phi.vercel.app/vehicles.html
 - **Customer Account:** https://bike-rental-phi.vercel.app/account.html
 - **Admin Login:** https://bike-rental-phi.vercel.app/login.html
